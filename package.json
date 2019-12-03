@@ -9,7 +9,7 @@
     "build": "ionic build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e",
+    "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
@@ -69,7 +69,7 @@
         "dmg",
         "zip"
       ],
-      "icon": "build/logo512.png",
+      "icon": "build/logo512.png"
     },
     "win": {
       "verifyUpdateCodeSignature": false,
