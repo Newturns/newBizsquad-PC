@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="2433 -646 16 16">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #b3b9bd;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #fff;
+      }
+    </style>
+  </defs>
+  <g id="btn_close" transform="translate(2028 -764)">
+    <circle id="타원_12" data-name="타원 12" class="cls-1" cx="8" cy="8" r="8" transform="translate(405 118)"/>
+    <line id="선_3" data-name="선 3" class="cls-2" x2="7" y2="7" transform="translate(409.5 122.5)"/>
+    <line id="선_4" data-name="선 4" class="cls-2" x1="7" y2="7" transform="translate(409.5 122.5)"/>
+  </g>
+</svg>

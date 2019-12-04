@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-687 -1203 30 30">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #4f86c6;
+      }
+
+      .cls-2 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <g id="establishment" transform="translate(-772 -1445)">
+    <circle id="타원_107" data-name="타원 107" class="cls-1" cx="15" cy="15" r="15" transform="translate(85 242)"/>
+    <path id="ic_establishment" class="cls-2" d="M695.875,1212a1.881,1.881,0,0,1-1.875-1.876v-7.5h15v7.5a1.881,1.881,0,0,1-1.876,1.876Zm1.876-2.812h7.5v-3.75h-7.5Zm.937-.938v-1.875h5.625v1.875Zm-4.687-7.5v-.938h15v.938Zm0-.938,2.437-2.437a1.431,1.431,0,0,1,.938-.375h8.25a1.428,1.428,0,0,1,.937.375l2.438,2.437Z" transform="translate(-602 -948)"/>
+  </g>
+</svg>

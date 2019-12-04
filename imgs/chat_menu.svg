@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="819 695 28 28">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #555;
+        stroke: #e2e4e5;
+      }
+
+      .cls-2 {
+        fill: #555;
+        stroke: #555;
+      }
+
+      .cls-3 {
+        stroke: #555;
+      }
+
+      .cls-4 {
+        fill: #555;
+      }
+    </style>
+  </defs>
+  <g id="버튼" transform="translate(420 686)">
+    <g id="타원_8" data-name="타원 8" class="cls-1" transform="translate(399 9)">
+      <circle class="cls-3" cx="14" cy="14" r="14"/>
+      <circle class="cls-4" cx="14" cy="14" r="13.5"/>
+    </g>
+    <path id="합치기_19" data-name="합치기 19" class="cls-2" d="M0,8V6.989h11V8ZM0,4.339V3.331h11V4.339ZM0,.681V-.327h11V.681Z" transform="translate(406.995 19.327)"/>
+  </g>
+</svg>

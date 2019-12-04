@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-596 -1295 30 30">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #ffc952;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <g id="mail" transform="translate(-681 -1537)">
+    <circle id="타원_107" data-name="타원 107" class="cls-1" cx="15" cy="15" r="15" transform="translate(85 242)"/>
+    <path id="패스_424" data-name="패스 424" class="cls-2" d="M13.75,13.75H3.25A2.25,2.25,0,0,1,1,11.5V3.25A2.25,2.25,0,0,1,3.25,1h10.5A2.25,2.25,0,0,1,16,3.25V11.5A2.25,2.25,0,0,1,13.75,13.75Zm.593-10.243a.686.686,0,0,0-.962,0L8.49,7.052,3.6,3.507a.686.686,0,0,0-.962,0,.664.664,0,0,0,0,.949L7.982,8.33A.77.77,0,0,0,9,8.329l5.344-3.874A.665.665,0,0,0,14.343,3.507Z" transform="translate(92 250)"/>
+  </g>
+</svg>

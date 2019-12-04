@@ -1,19 +1,69 @@
+//보안에러 나오지않도록.. 추가
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
-// Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron');
 
+const {app,BrowserWindow,Tray,Menu,ipcMain,dialog,shell} = require('electron');
 const path = require('path');
 const url = require('url');
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+//윈도우 유저로컬별 크기 저장.
+const windowStateKeeper = require('electron-window-state');
+//로컬 스토리지 사용. 유저데이터 저장.
+const storage = require('electron-json-storage');
+//일렉트론 디폴트 메뉴
+const defaultMenu = require('electron-default-menu');
+//메뉴
+const _menu = require('./menu');
+
+//메인 윈도우.
 let mainWindow;
+//dev tool on/off
+const devMode = true;
+// 트레이(최소화)상태일때의 메뉴.
+let tray = null;
+const trayContextMenu = Menu.buildFromTemplate([
+    {
+        label: 'Show',
+        accelerator: 'CmdOrCtrl+S',
+        click: function () {
+            mainWindow.show();
+        },
+    },
+    {
+        type: 'separator',
+    },
+    {
+        label: 'Quit',
+        accelerator: 'CmdOrCtrl+Q',
+        role:'quit',
+    }
+]);
+
+//프로그램 중복실행 체크.
+const gotTheLock = app.requestSingleInstanceLock();
+
 
 function createWindow () {
+
+    // windowStateKeeper
+    let mainWindowState = windowStateKeeper({
+        file: 'mainWindow.json',
+        defaultWidth: 400,
+        defaultHeight: 815
+    });
+
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        'x': mainWindowState.x,
+        'y': mainWindowState.y,
+        'width': mainWindowState.width,
+        'height': mainWindowState.height,
+        frame: false,
+        minWidth:400,
+        minHeight:815,
+        maxWidth:600,
+        maxHeight:1024,
+        titleBarStyle: 'hidden-inset',
+        webPreferences: { nodeIntegration : true }
     });
 
     const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -22,25 +72,54 @@ function createWindow () {
         slashes: true
     });
 
-    // and load the index.html of the app.
     mainWindow.loadURL(startUrl);
 
-    // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    mainWindowState.manage(mainWindow);
 
-    // Emitted when the window is closed.
+    // 개발자 도구를 엽니다.
+    if(devMode) mainWindow.webContents.openDevTools();
+
+    // 창이 닫히면 호출됩니다.
     mainWindow.on('closed', function () {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
-        mainWindow = null
+        // 윈도우 객체의 참조를 삭제합니다. 보통 멀티 윈도우 지원을 위해
+        // 윈도우 객체를 배열에 저장하는 경우가 있는데 이 경우
+        // 해당하는 모든 윈도우 객체의 참조를 삭제해 주어야 합니다.
+        mainWindow = null;
+    });
+
+    mainWindow.on('focus', () => {
+        Menu.setApplicationMenu(Menu.buildFromTemplate(_menu.mainMenuTemplate));
+        mainWindow.flashFrame(false);
+    });
+
+    // x버튼 클릭시 작은 아이콘으로 표시.
+    tray = new Tray(path.join(__dirname,'../build/logo16.png'));
+    tray.on('double-click',() => {
+        mainWindow.show();
+    });
+    tray.setContextMenu(trayContextMenu);
+    tray.on('right-click',() => {
+        tray.popUpContextMenu(trayContextMenu);
     })
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+// 중복 실행 방지 gotTheLock
+if(!gotTheLock) {
+    app.quit();
+} else {
+
+    app.on('second-instance',(event , commandLine, workingDirectory) => {
+        if(mainWindow) {
+            if(mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.show();
+        }
+    });
+
+    app.on('ready', function(){
+        createWindow();
+    });
+}
+
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

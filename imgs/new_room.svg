@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1305.152 -1322 28.152 27.739">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 3px;
+      }
+
+      .cls-2 {
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <g id="new_room" transform="translate(-1632.152 -1439)">
+    <line id="선_80" data-name="선 80" class="cls-1" y2="11.37" transform="translate(341.076 121.98)"/>
+    <line id="선_81" data-name="선 81" class="cls-1" x1="11.37" transform="translate(335.391 127.665)"/>
+    <path id="패스_428" data-name="패스 428" class="cls-2" d="M25.467,25.005h-6.99L9.894,30V24.925A5.669,5.669,0,0,1,5,19.32V10.685A5.686,5.686,0,0,1,10.685,5H25.467a5.686,5.686,0,0,1,5.685,5.685V19.32A5.686,5.686,0,0,1,25.467,25.005Z" transform="translate(323 113)"/>
+  </g>
+</svg>

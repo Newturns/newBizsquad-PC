@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2519 -1488 24 29.143">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #555;
+      }
+
+      .cls-2 {
+        fill: rgba(255,255,255,0.5);
+      }
+    </style>
+  </defs>
+  <g id="alarm_active" transform="translate(-2648 -1534)">
+    <g id="alarm">
+      <path id="패스_340" data-name="패스 340" class="cls-1" d="M12,29.179A2.936,2.936,0,0,0,15,26.2H9A3,3,0,0,0,12,29.179Z" transform="translate(129 45.821)"/>
+      <path id="패스_341" data-name="패스 341" class="cls-2" d="M21,20.062V12.613c0-4.568-2.4-8.342-6.8-9.336V2.284A2.234,2.234,0,0,0,12,0,2.212,2.212,0,0,0,9.8,2.185v.993C5.4,4.271,3,8.045,3,12.613v7.449L0,23.041v1.49H24v-1.49Z" transform="translate(129 46)"/>
+    </g>
+    <g id="심볼_82_3" data-name="심볼 82 – 3" transform="translate(0 1)">
+      <path id="ico_notification_on" class="cls-1" d="M12,29.143a3,3,0,0,0,3-2.989H9A3,3,0,0,0,12,29.143Zm9-8.967V12.7c0-4.633-2.4-8.369-6.75-9.415V2.242a2.25,2.25,0,0,0-4.5,0V3.288C5.4,4.334,3,8.07,3,12.7v7.473L0,23.165v1.495H24V23.165Z" transform="translate(129 45)"/>
+    </g>
+  </g>
+</svg>

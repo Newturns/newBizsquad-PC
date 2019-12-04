@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="787 695 28 28">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        stroke: #e2e4e5;
+      }
+
+      .cls-2 {
+        fill: #5b9ced;
+      }
+
+      .cls-3, .cls-4, .cls-6 {
+        fill: none;
+      }
+
+      .cls-3 {
+        stroke: #fff;
+      }
+
+      .cls-4 {
+        stroke: #5b9ced;
+      }
+
+      .cls-5 {
+        stroke: none;
+      }
+    </style>
+  </defs>
+  <g id="alarm_off" transform="translate(450 642)">
+    <g id="타원_8" data-name="타원 8" class="cls-1" transform="translate(337 53)">
+      <circle class="cls-5" cx="14" cy="14" r="14"/>
+      <circle class="cls-6" cx="14" cy="14" r="13.5"/>
+    </g>
+    <path id="ico_notification" class="cls-2" d="M6,14a1.473,1.473,0,0,0,1.5-1.436h-3A1.473,1.473,0,0,0,6,14Zm4.5-4.308V6.1A4.347,4.347,0,0,0,7.125,1.579v-.5a1.126,1.126,0,0,0-2.25,0v.5A4.347,4.347,0,0,0,1.5,6.1v3.59L0,11.128v.718H12v-.718Z" transform="translate(345 60)"/>
+    <line id="선_30" data-name="선 30" class="cls-3" x1="14" y2="14" transform="translate(344.5 60.5)"/>
+    <line id="선_31" data-name="선 31" class="cls-4" x1="12" y2="12" transform="translate(345.5 62.5)"/>
+  </g>
+</svg>
