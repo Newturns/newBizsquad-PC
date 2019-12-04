@@ -19,10 +19,10 @@ const routes: Routes = [
         path: '',
         redirectTo: 'tabs'
       },
-      // {
-      //   path: 'tabs',
-      //   loadChildren: () => import('../tabs/tabs.module').then(m => m.TabsPageModule),
-      // },
+      {
+        path: 'tabs',
+        loadChildren: () => import('../tabs/tabs.module').then(m => m.TabsPageModule),
+      },
       {
         path: 'selector',
         loadChildren: () => import('../selector/selector.module').then(m => m.SelectorPageModule),

@@ -136,3 +136,27 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+
+
+//electron 에서 새로운 인터넷창을 키기 위함.
+ipcMain.on('loadGH', (event, arg) => {
+    shell.openExternal(arg);
+});
+
+
+//로그인하면 로컬스토리지에 유저데이터 저장.
+ipcMain.on('saveLocalUser',(e, value) => {
+    storage.set('userData', value, function(error) {
+        if (error) throw error;
+    });
+});
+
+//로그인페이지에서 요청시 유저데이터 불러옴.
+ipcMain.on('getLocalUser',(event) => {
+    storage.get('userData', function(error, data) {
+        if (error) throw error;
+
+        event.sender.send('sendUserData',data);
+    });
+});

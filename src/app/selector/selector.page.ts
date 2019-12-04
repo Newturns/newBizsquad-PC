@@ -10,6 +10,8 @@ export class SelectorPage implements OnInit {
   constructor() { }
 
   ngOnInit() {
+
+    console.log("selector page");
   }
 
 }

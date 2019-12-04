@@ -129,7 +129,7 @@ export class BizFireService {
         return this.angularFactoryService.getFirestore();
     }
     // afAuth 는 프라이빗으로 선언.
-    private get afAuth(): AngularFireAuth {
+    get afAuth(): AngularFireAuth {
         return this.angularFactoryService.getAuth();
     }
     get afStorage(): AngularFireStorage {
@@ -266,7 +266,6 @@ export class BizFireService {
                                     // multicast current user.
                                     this._currentUser.next(userData as IUserData);
                                 });
-
 
                         } else {
 

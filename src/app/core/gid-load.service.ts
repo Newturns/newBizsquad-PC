@@ -48,46 +48,19 @@ export class GidLoadService implements CanActivate, CanLoad, CanActivateChild {
               resolve(true);
             }).catch(()=>{
               // lastMobileGid's gid not found form db.
-              
-              // set select first bizgroup
-              this.bizFire.getAllGroups().then( (groups: IBizGroup[]) => {
-                
-                if(groups.length === 0){
-                  // 속한 그룹이 하나도 없다.
-                  // 일단 more 페이지로 보낸다.
-                  this.router.navigate([`${this.bizFire.configService.firebaseName}/selector`]);
-                  resolve(true);
-                  return;
-                } else {
-                  // set select first bizgroup 첫번째 그룹을 임의로 선택해 준다.
-                  this.bizFire.loadBizGroup(groups[0].gid)
-                    .then((g: any) => {
-                      resolve(true);
-                    });
-                }
-                
-              });
+
+              this.router.navigate([`${this.bizFire.configService.firebaseName}/selector`]);
+              resolve(true);
             });
 
           } else {
             // nothing to load.
             // go back to selector
-            console.error('lastMobileGid not found. Select first group.', userData);
-            // set select first bizgroup
-            this.bizFire.getAllGroups().then( (groups: IBizGroup[]) => {
-              if(groups.length === 0){
-                // 속한 그룹이 하나도 없다.
-                // 일단 more 페이지로 보낸다.
-                this.router.navigate([`${this.bizFire.configService.firebaseName}/selector`]);
-                resolve(true);
-              } else {
-                // set select first bizgroup 첫번째 그룹을 임의로 선택해 준다.
-                this.bizFire.loadBizGroup(groups[0].gid)
-                  .then((g: any) => {
-                    resolve(true);
-                  });
-              }
-            });
+            console.error('lastPcGid not found. Select first group.', userData);
+            console.log("firebaseName ::",this.bizFire.configService.firebaseName);
+
+            this.router.navigate([`${this.bizFire.configService.firebaseName}/selector`]);
+            resolve(true);
           }
         });
     });

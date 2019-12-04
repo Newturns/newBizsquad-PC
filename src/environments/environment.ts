@@ -25,6 +25,11 @@ export const environment = {
     messagingSenderId: "247168431751",
     appId: "1:247168431751:web:d57417b40da2cdc6696a22"
   },
+
+  //일단 하드코딩.
+  bizServerUri: 'https://manager.bizsquad.net:9010',
+  webJumpBaseUrl: 'https://product.bizsquad.net/auth?token=',
+  publicWeb : 'https://www.bizsquad.net/',
 };
 
 /*

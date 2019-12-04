@@ -1,0 +1,87 @@
+chat-header {
+
+  // start header CSS //
+  .listBorder{
+    height: 84px;
+    border-bottom: 1px solid #e0e0e0 !important;
+  }
+  .electron-menu{
+    position: absolute;
+    top: 1px;
+    right: 1px;
+  }
+  .login-top-menu{
+    -webkit-app-region: no-drag;
+    color: #757272;
+  }
+  .windowMimimize{
+    padding-top: 8px;
+  }
+  .chatName-frame {
+    width: 65%;
+    margin-left: 16px;
+  }
+  .chatName{
+    font-size: 15px;
+    font-weight: 500;
+    padding-right: 18%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .members{
+    padding-top: 5px;
+    display: inline-block;
+  }
+  .header-menu{
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+    -webkit-app-region: no-drag;
+  }
+
+  .members:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  // end header CSS //
+
+
+
+  .header-frame {
+    background-color: #fcfcfc;
+
+    .chat-title-frame {
+      width: 0;
+      .chat_title {
+        font-size: 14px;
+        font-weight: 500;
+        font-stretch: normal;
+        font-style: normal;
+        color: #0d1c2e;
+        div {
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+      }
+    }
+
+
+    .memeber-count {
+      font-size: 12px;
+      font-weight: normal;
+      font-stretch: normal;
+      font-style: normal;
+      letter-spacing: normal;
+      color: #707c97;
+    }
+
+    ion-range {
+      padding: 0 !important;
+    }
+  }
+
+
+}

@@ -1,0 +1,46 @@
+<div class="d-flex flex-row align-items-top" *ngIf="userData">
+
+  <div class="flex-shrink-0">
+    <!--AVATAR IMAGE -->
+    <div class="avatar-button" *ngIf="photoURL">
+      <img [width]="size"
+           [height]="size"
+           class="avatar-photo-image"
+           src="{{photoURL}}">
+    </div>
+    <!--ROUND TEXT NAME -->
+    <div class="avatar-button" *ngIf="!photoURL">
+      <div class="font-14 mat-elevation-z avatar-photo-image d-flex justify-content-center align-items-center"
+           [style.font-size]="size / 3 + 'px'"
+           [style.width]="size + 'px'"
+           [style.height]="size + 'px'" bizGroupColor>
+        {{userData.displayName || userData.email | slice:0:2}}
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex flex-column justify-content-around" *ngIf="displayNameOn || padding">
+
+    <div [style.padding-left]="padding" >
+      <!--DISPLAY NAME-->
+      <div *ngIf="displayNameOn"
+           [style.padding-bottom]="childContentPadding"
+           [style.color]="textColor"
+           [style.text-decoration]="textDecoration">
+        <div class="avatar-displayName" (click)="onNameClick()">
+          {{userData.displayName || userData.email}}
+        </div>
+      </div>
+
+      <!-- message balloon -->
+      <div #childContent>
+        <ng-content></ng-content>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
