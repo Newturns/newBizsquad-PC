@@ -5,8 +5,6 @@ import {NavParams, PopoverController} from '@ionic/angular';
 import {BizFireService} from '../../biz-fire/biz-fire';
 
 
-
-
 @Component({
   selector: 'change-title-popover',
   templateUrl: 'change-title-popover.html'

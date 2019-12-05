@@ -1,9 +1,37 @@
-<ion-header>
+<ion-header class="px-2">
   <ion-toolbar>
-    <ion-title>selector</ion-title>
+    <ion-buttons slot="start" class="login-top-menu">
+      <ion-button fill="clear" size="small" class="titleButton">
+        Bizgroup List
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end" class="login-top-menu" no-padding>
+      <ion-button fill="clear" size="small" slot="icon-only" color="light" (click)="windowMimimize()">
+        <img src="assets/imgs/renewal/Icon_Outline_minimize.svg">
+      </ion-button>
+      <ion-button fill="clear" size="small" slot="icon-only" color="light" (click)="windowHide()">
+        <img src="assets/imgs/renewal/Icon_Outline_close.svg">
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-
+<ion-content no-padding class="content-color">
+  <div class="groupList-scroll-con py-3">
+    <div class="group-card d-flex mx-3 my-2" *ngFor="let group of groups" (click)="gotoTeam(group)">
+      <div class="d-flex align-items-center flex-shrink-0">
+        <div class="d-flex mx-3">
+          <biz-group-logo [group]="group"></biz-group-logo>
+        </div>
+      </div>
+      <div class="group-detail d-flex flex-column justify-content-center flex-grow-1 flex-shrink-1 mr-3">
+        <div class="d-flex group-name py-2">
+          <div>{{ group.data.team_name }}</div>
+        </div>
+        <div class="d-flex group-description">
+          <div>{{ group.data.team_description }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </ion-content>

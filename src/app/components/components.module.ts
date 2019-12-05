@@ -25,10 +25,11 @@ import {ChangeTitlePopoverComponent} from "./change-title-popover/change-title-p
 import {IonicModule} from '@ionic/angular';
 import {UnreadCounter} from './classes/unread-counter';
 import {PipesModule} from './pipes/pipes.module';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
-	declarations: [
-	    ProgressBarComponent,
+    declarations: [
+        ProgressBarComponent,
         ChatRoomComponent,
         LastMessageComponent,
         ChatHeaderComponent,
@@ -50,13 +51,15 @@ import {PipesModule} from './pipes/pipes.module';
         MembersPopoverComponent,
         WarnPopoverComponent,
         ChangeTitlePopoverComponent,
-  ],
-  imports: [
+    ],
+    imports: [
         CommonModule,
         IonicModule,
-        PipesModule
-  ],
-  exports: [
+        PipesModule,
+        FormsModule,
+        ReactiveFormsModule,
+    ],
+    exports: [
         ProgressBarComponent,
         ChatRoomComponent,
         LastMessageComponent,
@@ -79,20 +82,20 @@ import {PipesModule} from './pipes/pipes.module';
         MembersPopoverComponent,
         WarnPopoverComponent,
         ChangeTitlePopoverComponent
-  ],
-  entryComponents: [
+    ],
+    entryComponents: [
         MembersPopoverComponent,
         WarnPopoverComponent,
         ChangeTitlePopoverComponent
-  ],
+    ],
     providers: [
         UnreadCounter
     ]
 })
 export class ComponentsModule {
-  static forRoot(): ModuleWithProviders{
-    return {
-      ngModule: ComponentsModule,
+    static forRoot(): ModuleWithProviders{
+        return {
+            ngModule: ComponentsModule,
+        }
     }
-  }
 }

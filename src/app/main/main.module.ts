@@ -9,7 +9,6 @@ const routes: Routes = [
     path: '',
     canActivate: [
       HomeGuard, // check login
-      GidLoadService, // check last gid.
     ],
     canActivateChild:[
     
@@ -21,6 +20,9 @@ const routes: Routes = [
       },
       {
         path: 'tabs',
+        canActivate: [
+          GidLoadService, // check last gid.
+        ],
         loadChildren: () => import('../tabs/tabs.module').then(m => m.TabsPageModule),
       },
       {

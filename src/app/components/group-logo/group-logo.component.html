@@ -2,9 +2,9 @@
 <div class="group-logo-frame">
   <ng-container *ngIf="!textMode || group.data.photoURL; else textLogo">
     <span class="pointer" (click)="clickLogo.emit('click logo')">
-      <img class="custom-avatar" *ngIf="group.data.photoURL" mat-card-avatar src="{{ group.data.photoURL }}">
+      <img class="custom-avatar" *ngIf="group.data.photoURL" src="{{ group.data.photoURL }}">
       <div class="d-flex not-photo custom-avatar justify-content-center align-items-center"
-           [style.background-color]="group.data.team_color"
+           [ngStyle]="{'background-color': group.data.team_color? group.data.team_color : '#324CA8'}"
            *ngIf="!group.data.photoURL">
         {{ group.data.team_name | slice:0:2 }}
       </div>

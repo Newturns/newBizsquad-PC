@@ -352,7 +352,7 @@ export class BizFireService {
                         // save MOBILE last login group
                         if(this.currentUserValue.lastPcGid !== group.gid){
                             this.afStore.collection(STRINGS.USERS).doc(this.uid).update({
-                                lastMobileGid: group.gid
+                                lastPcGid: group.gid
                             }).then(()=>{
                                 resolve(this.currentBizGroup);
                             });
@@ -377,10 +377,11 @@ export class BizFireService {
                         //-------------------------------------------------//
                         // delete lastGetGid and go to selector
                         //-------------------------------------------------//
-                        console.error('Delete lastMobileGid, lastWebGid');
+                        console.error('Delete lastPcGid, lastWebGid,lastMobileGid');
                         this.afStore.doc(Commons.userPath(this.uid)).update({
                             lastWebGid: null,
                             lastMobileGid: null,
+                            lastPcGid: null,
                         }).then(()=> {
                             reject();
                         });

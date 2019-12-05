@@ -1,0 +1,70 @@
+.login-top-menu{
+  -webkit-app-region: no-drag;
+}
+ion-navbar{
+  -webkit-app-region: drag;
+}
+.titleButton{
+  font-family: Roboto;
+  font-size: 18px;
+  font-weight: 500;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 2.67;
+  letter-spacing: normal;
+  color: #0d1c2e;
+  cursor: none;
+  text-transform: capitalize;
+}
+
+.groupList-scroll-con {
+  height: calc(100vh - 56px);
+  overflow: auto;
+}
+
+.group-card {
+  height: 65px;
+  border-radius: 6px;
+  box-shadow: 0 10px 25px 0 #00000019;
+  //border: solid 1px #324ca8; 이건 호버시만.
+  background-color: #ffffff;
+  cursor: pointer;
+  .group-detail {
+    width: 0;
+    .group-name {
+      font-family: Roboto;
+      font-size: 17px;
+      font-weight: 500;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1;
+      letter-spacing: 0.4px;
+      color: #000000;
+      div {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+    .group-description {
+      font-family: Roboto;
+      font-size: 12px;
+      font-weight: normal;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: normal;
+      letter-spacing: -0.05px;
+      color: #707c97;
+      div {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+.group-card:hover {
+  box-sizing: border-box;
+  border: solid 1px #324ca8;
+}

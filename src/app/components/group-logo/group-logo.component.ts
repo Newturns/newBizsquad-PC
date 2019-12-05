@@ -4,6 +4,7 @@ import {IBizGroup} from '../../_models';
 @Component({
   selector: 'biz-group-logo',
   templateUrl: './group-logo.component.html',
+  styleUrls: ['./group-logo.component.scss'],
 })
 export class GroupLogoComponent implements OnInit {
 

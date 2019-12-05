@@ -2,15 +2,14 @@
 
   <div class="d-flex flex-column justify-content-between flex-wrap content-color h-100 p-3">
     <div class="d-flex justify-content-end">
-
       <!-- 헤더  -->
       <div class="d-flex">
-        <button class="top-side-menu" ion-button icon-only clear small color="light" (click)="windowMimimize()">
+        <ion-button class="top-side-menu" fill="clear" size="small" slot="icon-only"  color="light" (click)="windowMimimize()">
           <img src="assets/imgs/renewal/Icon_Outline_minimize.svg">
-        </button>
-        <button class="top-side-menu" ion-button icon-only clear small color="light" (click)="windowHide()">
+        </ion-button>
+        <ion-button class="top-side-menu" fill="clear" size="small" slot="icon-only"  color="light" (click)="windowHide()">
           <img src="assets/imgs/renewal/Icon_Outline_close.svg">
-        </button>
+        </ion-button>
       </div>
     </div>
 
@@ -27,7 +26,7 @@
           <input type="email" class="form-control input-text mb-3" formControlName="email">
           <div class="inputTitle mb-2">Password</div>
           <input type="password" class="form-control input-text mb-4" formControlName="password">
-          <button #submitBtn (click)="onLogin()" ion-button full class="login-btn mb-3">Sign In</button>
+          <ion-button (click)="onLogin()" expand="full" class="login-btn mb-3">Sign In</ion-button>
         </div>
       </form>
       <div class="w-100 mx-5 px-5">
