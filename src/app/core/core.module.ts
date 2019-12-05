@@ -5,6 +5,8 @@ import {LangService} from './lang.service';
 import {HttpClientModule} from '@angular/common/http';
 import {BizFireModule} from '../biz-fire/biz-fire.module';
 import {Electron} from '../providers/electron';
+import {NotificationService} from './notification.service';
+import {UserStatusProvider} from './user-status';
 
 
 @NgModule({
@@ -17,7 +19,9 @@ import {Electron} from '../providers/electron';
   providers:[
     HomeGuard,
     LangService,
-    Electron
+    Electron,
+    NotificationService,
+    UserStatusProvider
   ]
 })
 export class CoreModule { }

@@ -94,7 +94,7 @@ export class LoginPage implements OnInit {
           this.loginForm.get('company').setValue('');
           this.electronService.showErrorMessages("company not found",e.message);
         } else {
-          this.electronService.showErrorMessages("Login failed.","you entered an incorrect email address or password.");
+          this.electronService.showErrorMessages("Login failed.",e.message);
         }
       }
     }

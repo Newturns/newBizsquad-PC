@@ -1,0 +1,24 @@
+<div class="customApps-frame d-flex flex-column">
+  <div class="d-flex justify-content-between align-items-center p-3 biz-border-bottom">
+    <div class="apps-title">
+      {{langPack['add_apps']}}
+    </div>
+    <div>
+      <img class="pointer" src="assets/imgs/renewal/Icon_Outline_close.svg" (click)="closePopup()">
+    </div>
+  </div>
+  <form [formGroup]="addLinkForm">
+    <div class="d-flex flex-column p-3">
+      <div class="inputTitle">Title</div>
+      <input type="text" class="form-control input-text" formControlName="linkTitle" placeholder="{{langPack['length_limit_10']}}">
+    </div>
+    <div class="d-flex flex-column p-3">
+      <div class="inputTitle">URL</div>
+      <input type="url" class="form-control input-text font-13" placeholder="https://" formControlName="linkUrl">
+    </div>
+  </form>
+  <div class="d-flex justify-content-center align-items-center biz-border-top pt-2">
+    <biz-button [title]="'cancel'" (click)="closePopup()"></biz-button>
+    <biz-button [title]="'ok'" [teamColor]="true" (click)="submitAddLink()" [disabled]="addLinkForm.invalid"></biz-button>
+  </div>
+</div>

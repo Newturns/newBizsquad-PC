@@ -2,9 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import {LangService} from '../core/lang.service';
 import {TakeUntil} from '../biz-common/take-until';
 import {BizFireService} from '../biz-fire/biz-fire';
-import {IBizGroup} from '../_models';
+import {IBizGroup, INotification} from '../_models';
 import {Router} from '@angular/router';
 import {Electron} from '../providers/electron';
+import {NotificationService} from '../core/notification.service';
+import {filter} from 'rxjs/operators';
 
 @Component({
   selector: 'app-tabs',
@@ -19,12 +21,14 @@ export class TabsPage extends TakeUntil implements OnInit {
   teamColor : string = '#324CA8';
   selectTabName : string;
 
+  newNotifyCount: number = 0;
 
   constructor(
       private lang : LangService,
       private bizFire : BizFireService,
       private router : Router,
-      private electronService : Electron,) {
+      private electronService : Electron,
+      private noifictionServie : NotificationService) {
     super();
 
     // 채팅이 아닌 메인 윈도우를 우클릭으로 완전 종료시 유저상태변경하는 리스너.(파이어베이스의 유저상태);
@@ -48,6 +52,13 @@ export class TabsPage extends TakeUntil implements OnInit {
       }
     });
 
+    this.noifictionServie.onNotifications
+        .pipe(this.takeUntil,filter(m => m != null))
+        .subscribe(async (m: INotification[]) => {
+          const unreadNotify = m.filter(n => n.data.statusInfo.done === false);
+          console.log("unreadNotify :::",unreadNotify);
+          this.newNotifyCount = unreadNotify.filter(notify => notify.data.gid === this.bizFire.gid).length;
+        });
   }
 
   changeTabs(e) {

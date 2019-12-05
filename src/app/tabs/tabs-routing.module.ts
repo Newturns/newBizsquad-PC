@@ -53,6 +53,16 @@ const routes: Routes = [
           }
         ]
       },
+      {
+        path: 'notify',
+        children: [
+          {
+            path: '',
+            loadChildren: () =>
+                import('./notify/notify.module').then(m => m.NotifyPageModule)
+          }
+        ]
+      },
     ]
   }
 ];

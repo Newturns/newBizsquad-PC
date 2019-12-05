@@ -1,35 +1,51 @@
-app-avatar-button{
-  .avatar-button {
-    button {
-      color: white;
-    }
-    .avatar-photo-image {
-      border-radius: 50%;
-    }
+
+.avatar-button {
+  button {
+    color: white;
   }
-
-  .avatar-displayName {
-
-    //height: 20px;
-    font-size: 14px;
-    font-weight: normal;
-    font-stretch: normal;
-    font-style: normal;
-    line-height: 1.29;
-    letter-spacing: normal;
-    color: #0d1c2e;
-    cursor: pointer;
-
-    //padding-bottom: 6px;
+  .avatar-photo-image {
+    border-radius: 50%;
   }
+}
 
-  .avatar-displayName:hover {
-    text-decoration: underline;
-    color: #2a8bf2;
-  }
+.avatar-displayName {
 
-  ::ng-deep p {
-    word-wrap: break-word;
-    margin: 0 !important;
-  }
+  //height: 20px;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.29;
+  letter-spacing: normal;
+  color: #0d1c2e;
+  cursor: pointer;
+
+  //padding-bottom: 6px;
+}
+
+.avatar-displayName:hover {
+  text-decoration: underline;
+  color: #2a8bf2;
+}
+
+::ng-deep p {
+  word-wrap: break-word;
+  margin: 0 !important;
+}
+
+
+.statusBadge {
+  position: absolute;
+  border-radius: 100%;
+  padding:0;
+  width: 13px;
+  height: 13px;
+  left:28px;
+  bottom: 0;
+  color: transparent;
+  font-size: 7px;
+  line-height: 1.5;
+  background-color: #32db64;
+  border: 2px solid white;
+  cursor: pointer;
 }

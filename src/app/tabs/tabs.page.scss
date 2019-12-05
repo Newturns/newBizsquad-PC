@@ -1,6 +1,11 @@
+ion-tab-bar {
+  padding-bottom: 10px;
+}
+
 ion-tab-button {
   ion-label{
-    font-size: 14px;
+    margin-top: 3px;
+    font-size: 13px;
     font-weight: bold;
   }
 }
@@ -14,4 +19,13 @@ ion-tab-button {
   line-height: 2.67;
   letter-spacing: normal;
   color: #0d1c2e;
+}
+
+.new-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  background-color: #ff3366;
+  font-size: 10px;
+  font-weight: bold;
 }

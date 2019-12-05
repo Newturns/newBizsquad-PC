@@ -3,6 +3,17 @@ import {STRINGS} from "../biz-common/commons";
 import {IChat, IMessage, IMessageData} from "./message";
 import {ISquad} from '../providers/squad.service';
 
+export interface userLinks {
+  mid: string,
+  data: {
+    create: string,
+    img : string,
+    title : string,
+    url : string,
+    hidden?: boolean
+  }
+}
+
 export interface IMetaData {
   serverUrl?: string,
   databaseUrl?: string,

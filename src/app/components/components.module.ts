@@ -26,6 +26,9 @@ import {IonicModule} from '@ionic/angular';
 import {UnreadCounter} from './classes/unread-counter';
 import {PipesModule} from './pipes/pipes.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {TokenProvider} from '../biz-common/token';
+import {LoadingProvider} from '../providers/loading';
+import {CustomLinkComponent} from './custom-link/custom-link.component';
 
 @NgModule({
     declarations: [
@@ -51,6 +54,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
         MembersPopoverComponent,
         WarnPopoverComponent,
         ChangeTitlePopoverComponent,
+        CustomLinkComponent,
     ],
     imports: [
         CommonModule,
@@ -81,15 +85,19 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
         MessageBalloonComponent,
         MembersPopoverComponent,
         WarnPopoverComponent,
-        ChangeTitlePopoverComponent
+        ChangeTitlePopoverComponent,
+        CustomLinkComponent
     ],
     entryComponents: [
         MembersPopoverComponent,
         WarnPopoverComponent,
-        ChangeTitlePopoverComponent
+        ChangeTitlePopoverComponent,
+        CustomLinkComponent
     ],
     providers: [
-        UnreadCounter
+        UnreadCounter,
+        TokenProvider,
+        LoadingProvider,
     ]
 })
 export class ComponentsModule {

@@ -8,7 +8,7 @@ import {AngularFirestore} from '@angular/fire/firestore';
 import {InitProcess} from './init-process';
 import {BizGroupBuilder} from './biz-group';
 import {LangService} from '../core/lang.service';
-import {IBizGroup, IMetaData, IUserData} from '../_models';
+import {IBizGroup, IMetaData, IUserData, userLinks} from '../_models';
 import {AngularFireStorage} from '@angular/fire/storage';
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import {AngularFactoryService} from './angular-factory.service';
@@ -18,6 +18,12 @@ import {ConfigService} from '../config.service';
     providedIn: 'root'
 })
 export class BizFireService {
+
+    userCustomLinks = new BehaviorSubject<userLinks[]>(null);
+
+    get _userCustomLinks(): userLinks[] {
+        return this.userCustomLinks.getValue();
+    }
 
     onUserSignOut: Subject<boolean> = new Subject<boolean>();
 
@@ -242,6 +248,11 @@ export class BizFireService {
 
                         if(user){
 
+
+                            if(this._userCustomLinks == null) {
+                                this.getCustomLinks(user.uid);
+                            }
+
                             // ------------------------------------------------------------------
                             // * update user info.
                             // ------------------------------------------------------------------
@@ -425,6 +436,7 @@ export class BizFireService {
         // * MUST call AFTER afAuth.auth.signOut();
         timer(0).subscribe(()=>{
             this.configService.firebaseName = null;
+            this.userCustomLinks.next(null);
         });
 
     }
@@ -458,6 +470,20 @@ export class BizFireService {
 
     updateProfile(data: any){
         return this.afAuth.auth.currentUser.updateProfile(data);
+    }
+
+    getCustomLinks(uid) {
+        this.afStore.collection(`users/${uid}/customlinks`)
+            .snapshotChanges().pipe(takeUntil(this.onUserSignOut))
+            .subscribe(snaps => {
+                const links = snaps.map(snap => {
+                    return {mid: snap.payload.doc.id, data: snap.payload.doc.data()} as userLinks;
+                });
+                this.userCustomLinks.next(links);
+            });
+    }
+    deleteLink(link){
+        return this.afStore.collection(`users/${this.currentUID}/customlinks`).doc(link.mid).delete();
     }
 
 }

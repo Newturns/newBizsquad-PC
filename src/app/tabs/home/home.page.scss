@@ -1,0 +1,216 @@
+.badge-btn {
+  position: relative;
+
+  .notifiBadge {
+    position: absolute;
+    right: 20px;
+    top: 3px;
+    z-index: 1;
+    width: 18px;
+    height: 16px;
+    border-radius: 6px;
+    font-size: 10px;
+    background-color: #0082c9;
+    color: white;
+    cursor: pointer;
+  }
+}
+
+.avatar-btn {
+  .statusMenu{
+    width: 70px !important;
+    left:55px !important;
+    top:50px !important;
+  }
+  .statusMenu li {
+    padding-right: 5px;
+    text-align: left !important;
+  }
+}
+
+.popup {
+  width: 100px;
+  max-width: 110px;
+  font-size: 12px;
+  color: #434343;
+  background-color: white;
+  //border: 1px solid #E2E4E5;
+  border-radius: 5px;
+  // display: none;
+  position: absolute;
+  z-index: 1;
+  right:15px;
+  top:35px;
+  box-shadow: 0 10px 25px 0 #00000019;
+}
+
+.popup ul, li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.popup ul {
+  margin: 4px;
+}
+
+.popup li {
+  height: 26px;
+  text-align: left;
+  padding-top: 3px;
+  padding-left: 5px;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.popup li:hover {
+  background-color: rgba(91, 156, 237, 0.1)
+}
+
+.menu-text {
+  font-size: 12px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #707c97;
+}
+.text-55 {
+  width: 55px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.home-con-frame {
+  background-color: white;
+  .home-con {
+    padding: 15px 0;
+    .menu-con {
+      position: relative;
+
+      .customLinkDesc {
+        font-size: 13px;
+        color: #707c97;
+      }
+
+      .default-grid {
+        height: 160px;
+        overflow: hidden;
+      }
+      .more-grid {
+        height: 350px;
+        overflow: auto;
+      }
+
+      .more-apps-text {
+        font-size: 12px;
+        font-weight: normal;
+        font-stretch: normal;
+        font-style: normal;
+        line-height: 1.33;
+        letter-spacing: 0.4px;
+        color: #707c97;
+      }
+      .menu-box {
+        width: 55px;
+        height: 55px;
+        border-radius: 22px;
+        background-color: #e3e7f280;
+        cursor: pointer;
+        position: relative;
+        .white-circle {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background-color: #ffffff;
+        }
+        .favicon-img {
+          width: 32px;
+          height: 32px;
+          border-radius: 5px;
+        }
+
+        .link-remove{
+          position: absolute;
+          right: 0;
+          top: 0;
+          padding:5px;
+          font-size: 16px;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .menu-title {
+      font-size: 13px;
+      font-weight: 500;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.14;
+      letter-spacing: 0.4px;
+      color: #0d1c2e;
+    }
+  }
+}
+
+.notice-con {
+  .menu-title {
+    border-bottom: 1px solid #e3e7f2;
+    font-size: 13px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.14;
+    letter-spacing: 0.4px;
+    color: #0d1c2e;
+  }
+
+  .notice-msg-con {
+
+    //height
+    height: 35px;
+
+    .notice-title {
+      font-size: 14px;
+      font-weight: normal;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.14;
+      letter-spacing: 0.4px;
+      color: #707c97;
+      min-width: 0;
+      span {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .notice-time {
+      font-size: 11px;
+      font-weight: normal;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.45;
+      letter-spacing: 0.4px;
+      color: #b4b9cc;
+    }
+  }
+}
+
+.home-footer {
+  height: 45px;
+  font-size: 11px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.45;
+  letter-spacing: 0.4px;
+  color: #b4b9cc;
+  .link-newturns {
+    color: #707c97;
+    font-weight: bold;
+  }
+}

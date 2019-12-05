@@ -13,6 +13,7 @@ import {CacheService} from '../../core/cache/cache';
 @Component({
   selector: 'app-avatar-button',
   templateUrl: './avatar-button.component.html',
+  styleUrls: ['./avatar-button.component.scss'],
 })
 export class AvatarButtonComponent extends TakeUntil implements OnInit {
 
@@ -73,10 +74,19 @@ export class AvatarButtonComponent extends TakeUntil implements OnInit {
 
   isMyMessage = false;
   photoURL: string;
+  statusColor : string;
 
   // padding from displayName to child ng-content
   @Input()
   childContentPadding = '0px';
+
+
+  //pc 메신저 전용
+  @Input()
+  statusOn : boolean = false;
+
+  @Output()
+  changeStatus = new EventEmitter<boolean>();
 
   constructor(private bizFire: BizFireService,
               private cacheService: CacheService
@@ -90,7 +100,7 @@ export class AvatarButtonComponent extends TakeUntil implements OnInit {
     
     if(userData == null){
       // get user data from cache
-      this.cacheService.userGetObserver(uid)
+      this.cacheService.userGetObserver(uid,true)
         .pipe(this.takeUntil)
         .subscribe((data: IUser) => {
           if(data != null){
@@ -107,18 +117,23 @@ export class AvatarButtonComponent extends TakeUntil implements OnInit {
     if(userData != null){
       const photoURL = userData.photoURL;
       if(photoURL){
-        /*
-        // 아바타 이름은 profile.jpeg 에서 자유형식으로 수정.
-        // thumbnail 도 사용안함.
-        if(photoURL.indexOf('profile.jpeg') !== -1){
-          //photoURL 을 그대로 쓰지않고 썸네일을 표시한다.
-          this.thumbUrl = photoURL.replace('profile.jpeg', 'thumb_512_profile.jpeg');
-          this.photoURL = this.thumbUrl;
-        }*/
         this.photoURL = photoURL;
-
       }
-
+      const userStatus = this.userData.onlineStatus;
+      switch (userStatus) {
+        case 'online':
+          this.statusColor = '#32db64';
+          break;
+        case 'wait':
+          this.statusColor = '#FEA926';
+          break;
+        case 'busy':
+          this.statusColor = '#f53d3d';
+          break;
+        case 'offline':
+          this.statusColor = '#C7C7C7';
+          break;
+      }
     } else {
 
       // deleted user.
@@ -147,5 +162,9 @@ export class AvatarButtonComponent extends TakeUntil implements OnInit {
   * */
   onError(e){
 
+  }
+
+  editStatus(){
+    this.changeStatus.emit(true);
   }
 }

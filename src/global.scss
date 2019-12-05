@@ -46,7 +46,11 @@ button.focus,button:active.focus,button.active.focus {
 }
 
 ::ng-deep ion-button {
-  ::ng-deep .button-native {
+  --padding-end : 0;
+  --padding-start: 0;
+  ::ng-deep button {
+    --padding-end : 0;
+    --padding-start: 0;
     padding: 0 !important;
   }
 }

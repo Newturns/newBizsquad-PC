@@ -6,6 +6,11 @@ export const language = {
         "en": "Agile",
         "ja": "アジャイル"
       },
+      "addLinkDesc": {
+        "ko": "자주 사용하는 앱을 추가해 주세요.",
+        "en": "Please add your favorite apps.",
+        "ja": "よく使用するアプリを追加してください。"
+      },
       "general": {
         "ko": "제네럴",
         "en": "General",
