@@ -1,4 +1,4 @@
-<ion-content no-padding>
+<ion-content ion-no-padding class="content-color">
   <div class="d-flex justify-content-between align-items-center px-3 py-2" style="border-bottom: 1px solid #e3e7f2">
     <div class="avatar-btn">
       <app-avatar-button [uid]="bizFire.uid" [statusOn]="true" [displayNameOn]="true"
@@ -20,7 +20,7 @@
       <ion-button class="mr-2" no-padding fill="clear" slot="ioon-only" [hidden]="!bizFire.currentBizGroup.isManager">
         <ion-icon src="assets/imgs/renewal/Icon_Outline_settings.svg"></ion-icon>
       </ion-button>
-      <ion-button clas="mr-1" no-padding fill="clear" slot="ioon-only" (click)="showNotify()">
+      <ion-button class="mr-1" no-padding fill="clear" slot="ioon-only" (click)="showNotify()">
         <ion-icon src="assets/imgs/renewal/Icon_Outline_bell.svg"></ion-icon>
       </ion-button>
       <ion-button no-padding fill="clear" slot="ioon-only" (click)="showMenu()">
@@ -40,7 +40,7 @@
     </div>
   </div>
 
-  <div class="home-con-frame d-flex flex-column justify-content-between align-content-between">
+  <div class="home-con-frame d-flex flex-column justify-content-between align-content-between flex-grow-1 flex-shrink-1">
     <div class="home-con bg-white d-flex flex-column justify-content-center">
       <div class="menu-title pl-3 pb-3 flex-shrink-0">{{ langPack['taskbox'] }}</div>
       <div class="menu-con d-flex flex-column justify-content-center">
@@ -97,12 +97,12 @@
         <ion-grid [ngClass]="moreAppsMode === true ? 'more-grid' : 'default-grid'">
           <ng-container *ngIf="userCustomLinks.length > 0; else addCutomLinksDesc">
             <ion-row class="justify-content-start mx-3">
-              <ion-col class="col-3 mb-3" *ngFor="let link of userCustomLinks">
+              <ion-col class="col-3 mb-2" *ngFor="let link of userCustomLinks">
                 <div class="d-flex flex-column align-items-center justify-content-center">
                   <div class="menu-box d-flex align-items-center justify-content-center" (mouseenter)="link.data.hidden=false" (mouseleave)="link.data.hidden=true">
                     <div class="white-circle d-flex align-items-center justify-content-center">
-                      <img class="favicon-img pointer" (click)="goLink(link)" *ngIf="link.data.img" src="{{ link.data.img }}">
-                      <img class="favicon-img pointer" (click)="goLink(link)" *ngIf="!link.data.img" src="{{ getFavicons + link.data.url }}">
+                      <img class="favicon-img pointer" (click)="goLink(link.data.url)" *ngIf="link.data.img" src="{{ link.data.img }}">
+                      <img class="favicon-img pointer" (click)="goLink(link.data.url)" *ngIf="!link.data.img" src="{{ getFavicons + link.data.url }}">
                     </div>
                     <ion-icon name="remove-circle" class="link-remove" (click)="removeLink(link)" [hidden]="link.data.hidden"></ion-icon>
                   </div>
@@ -117,7 +117,7 @@
             </div>
           </ng-template>
         </ion-grid>
-        <div class="d-flex justify-content-center pointer mt-3" *ngIf="userCustomLinks && userCustomLinks.length > 8" (click)="clickMore()">
+        <div class="d-flex justify-content-center pointer mt-2" *ngIf="userCustomLinks && userCustomLinks.length > 8" (click)="clickMore()">
           <span class="more-apps-text" *ngIf="!moreAppsMode">{{langPack['more_apps']}}</span>
           <span class="more-apps-text" *ngIf="moreAppsMode">{{langPack['end_more']}}</span>
         </div>
@@ -149,9 +149,12 @@
 
     <div class="biz-border-line d-flex flex-grow-1 flex-shrink-1"></div>
 
-    <div class="home-footer bg-white d-flex justify-content-center align-items-center">
-      Bizsquad is powered by<span class="link-newturns pointer" (click)="goLink('https://www.bizsquad.net/')">&nbsp;Newturns&nbsp;</span>Inc.
-    </div>
   </div>
 
 </ion-content>
+
+<ion-footer>
+  <div class="home-footer bg-white d-flex justify-content-center align-items-center">
+    Bizsquad is powered by<span class="link-newturns pointer" (click)="goLink('https://www.bizsquad.net/')">&nbsp;Newturns&nbsp;</span>Inc.
+  </div>
+</ion-footer>

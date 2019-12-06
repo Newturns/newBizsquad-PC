@@ -1,5 +1,4 @@
 <div class="squad-filter-frame">
-
   <button type="button" class="btn {{'btn-'+size}}"
           (click)="onClickFilter(null)"
           [ngStyle]="{'background-color': filterButtonText === null ? subcolor : 'inherit'}"
@@ -22,10 +21,13 @@
     <i class="fa fa-star"></i>
   </button>
 
+  <button type="button" class="btn {{'btn-'+size}}"
+          (click)="onClickSort('name')"
+          [ngStyle]="{'background-color': currentSort === 'name' ? subcolor :'inherit'}"
+          [ngClass]="{'select-button': currentSort === 'name'}">N</button>
+
+  <button type="button" class="btn {{'btn-'+size}}"
+          (click)="onClickSort('created')"
+          [ngStyle]="{'background-color': currentSort === 'created' ? subcolor :'inherit'}"
+          [ngClass]="{'select-button': currentSort === 'created'}">C</button>
 </div>
-
-
-
-<!--[ngStyle]="{'background-color': isMyMessage ? defaultMyColor : team_color}">-->
-
-<!--#c4c4c4-->

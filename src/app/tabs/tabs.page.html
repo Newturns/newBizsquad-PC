@@ -1,19 +1,19 @@
 <ion-tabs (ionTabsWillChange)="changeTabs($event)">
 
   <ion-header no-border class="drag">
-    <ion-toolbar>
+    <ion-toolbar class="drag">
       <ion-buttons slot="start" class="no-drag">
-        <ion-button fill="clear" size="small" (click)="groupSelect()">
+        <ion-button fill="clear" size="small" (click)="groupSelectPage()">
           <span class="groupName">{{ group.data.team_name }}</span>
           <ion-icon class="font-14" name="md-arrow-dropdown"></ion-icon>
         </ion-button>
       </ion-buttons>
-      <div class="new-badge d-flex text-white align-items-center justify-content-center" *ngIf="newNotifyCount > 0">N</div>
+      <div class="new-badge drag d-flex text-white align-items-center justify-content-center" *ngIf="newNotifyCount > 0">N</div>
       <ion-buttons slot="end" class="no-drag">
-        <ion-button no-padding fill="clear" size="small" slot="icon-only" color="light" (click)="windowMimimize()">
+        <ion-button ion-no-padding fill="clear" size="small" slot="icon-only" color="light" (click)="windowMimimize()">
           <img src="assets/imgs/renewal/Icon_Outline_minimize.svg">
         </ion-button>
-        <ion-button no-padding fill="clear" size="small" slot="icon-only" color="light" (click)="windowHide()">
+        <ion-button ion-no-padding fill="clear" size="small" slot="icon-only" color="light" (click)="windowHide()">
           <img src="assets/imgs/renewal/Icon_Outline_close.svg">
         </ion-button>
       </ion-buttons>

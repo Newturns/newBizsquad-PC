@@ -9,7 +9,7 @@ export class LoadingProvider {
   async show() {
     const loading = await this.loadingCtrl.create({
       duration: 2000,
-      showBackdrop: false,
+      showBackdrop: true,
       spinner: "circles",
     });
     await loading.present();

@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { NotifyPageRoutingModule } from './notify-routing.module';
 
 import { NotifyPage } from './notify.page';
+import {ComponentsModule} from '../../components/components.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    NotifyPageRoutingModule
+    NotifyPageRoutingModule,
+    ComponentsModule
   ],
   declarations: [NotifyPage]
 })

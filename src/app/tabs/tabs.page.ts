@@ -6,7 +6,11 @@ import {IBizGroup, INotification} from '../_models';
 import {Router} from '@angular/router';
 import {Electron} from '../providers/electron';
 import {NotificationService} from '../core/notification.service';
-import {filter} from 'rxjs/operators';
+import {filter, switchMap} from 'rxjs/operators';
+import {SquadService} from '../providers/squad.service';
+import {of} from 'rxjs';
+import {IChat} from '../_models/message';
+import {Chat} from '../biz-common/chat';
 
 @Component({
   selector: 'app-tabs',
@@ -28,7 +32,8 @@ export class TabsPage extends TakeUntil implements OnInit {
       private bizFire : BizFireService,
       private router : Router,
       private electronService : Electron,
-      private noifictionServie : NotificationService) {
+      private noifictionServie : NotificationService,
+      private squadService : SquadService) {
     super();
 
     // 채팅이 아닌 메인 윈도우를 우클릭으로 완전 종료시 유저상태변경하는 리스너.(파이어베이스의 유저상태);
@@ -41,24 +46,45 @@ export class TabsPage extends TakeUntil implements OnInit {
     this.lang.onLangMap.pipe(this.takeUntil).subscribe(l => { this.langPack = l });
 
     this.bizFire.onBizGroupSelected
-    .pipe(this.takeUntil)
-    .subscribe((group: IBizGroup)=>{
+    .pipe(this.takeUntil,switchMap((group:IBizGroup) => {
       if(group && group.data) {
-        this.group = group;
         if(group.data.team_color) {
           this.teamColor = group.data.team_color;
-          console.log("teamColor:",this.teamColor);
+        }
+        if(!group.data.members[this.bizFire.uid] && group.data.status === false) {
+          this.groupSelectPage();
+        }
+        //* have group changed?
+        let reloadGroup = true;
+        if(this.group != null){
+          reloadGroup = this.group.gid !== group.gid;
+        }
+        this.group = group;
+
+        if(reloadGroup === true){
+          // group squads reloading...
+          return this.squadService.getMySquadLisObserver(this.group.gid);
+        } else {
+          // gid not changed.
+          return of(null);
         }
       }
+    }),filter(l => l != null))
+    .subscribe((list : IChat[])=>{
+      console.log("스쿼드 리스트 :",list);
+      const newChat = list.map(l => {
+        return new Chat(l.sid , l.data, this.bizFire.uid, l.ref);
+      });
+      this.squadService.onSquadListChanged.next(newChat);
     });
 
     this.noifictionServie.onNotifications
-        .pipe(this.takeUntil,filter(m => m != null))
-        .subscribe(async (m: INotification[]) => {
-          const unreadNotify = m.filter(n => n.data.statusInfo.done === false);
-          console.log("unreadNotify :::",unreadNotify);
-          this.newNotifyCount = unreadNotify.filter(notify => notify.data.gid === this.bizFire.gid).length;
-        });
+    .pipe(this.takeUntil,filter(m => m != null))
+    .subscribe(async (m: INotification[]) => {
+      const unreadNotify = m.filter(n => n.data.statusInfo.done === false);
+      console.log("unreadNotify :::",unreadNotify);
+      this.newNotifyCount = unreadNotify.filter(notify => notify.data.gid === this.bizFire.gid).length;
+    });
   }
 
   changeTabs(e) {
@@ -68,7 +94,7 @@ export class TabsPage extends TakeUntil implements OnInit {
     console.log("selectTabName : ",this.selectTabName);
   }
 
-  groupSelect() {
+  groupSelectPage() {
     this.router.navigate([`/${this.bizFire.configService.firebaseName}/selector`], {replaceUrl: true});
   }
 

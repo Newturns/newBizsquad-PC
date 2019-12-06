@@ -9,6 +9,7 @@ import {BizFireService} from '../../biz-fire/biz-fire';
 @Component({
   selector: 'biz-squad-item',
   templateUrl: './squad-item.component.html',
+  styleUrls: ['./squad-item.component.scss']
 })
 
 export class SquadItemComponent extends TakeUntil implements OnInit {

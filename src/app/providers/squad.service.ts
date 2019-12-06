@@ -31,7 +31,7 @@ export interface ISquadData {
   color?:string,
   photoURL?: string,
   photoPath?: string
-
+  default?: boolean,
   // general squad flag.
   general?: boolean,
   agile?: boolean,

@@ -1,3 +1,37 @@
+<div class="p-3" [ngStyle]="{'background-color': currentBizGroup.data.team_color ? currentBizGroup.data.team_color : '#324ca8'}">
+  <biz-squad-filter [size]="'md'" (onFilter)="onSquadTypeFilter($event)" (onSort)="onSquadTypeFilter($event)">
+
+  </biz-squad-filter>
+</div>
+
 <ion-content>
-Squad Page
+  <div class="squad-frame w-100 h-100 px-3" bizGroupColor [useMainBackGround]="true">
+    <!-- 북마크 스쿼드  -->
+    <div class="mb-3" *ngIf="bookmark.length > 0 && squadfilterValue === null || squadfilterValue === 'bookmark'">
+      <div class="squad-list-title mb-2">{{langPack['bookmark']}}</div>
+      <ng-container *ngFor="let squad of bookmark">
+        <div class="mb-1">
+          <biz-squad-item class="w-100" [squad]="squad" [star]="true"></biz-squad-item>
+        </div>
+      </ng-container>
+    </div>
+    <!-- 제네럴 스쿼드  -->
+    <div class="mb-3" *ngIf="publicSquads.length > 0 && squadfilterValue === null || squadfilterValue === 'general'">
+      <div class="squad-list-title mb-2">{{langPack['squad_count_label']}}</div>
+      <ng-container *ngFor="let squad of publicSquads">
+        <div class="mb-1">
+          <biz-squad-item class="w-100" [squad]="squad" [star]="false"></biz-squad-item>
+        </div>
+      </ng-container>
+    </div>
+    <!-- 에자일 스쿼드  -->
+    <div *ngIf="privateSquads.length > 0 && squadfilterValue === null || squadfilterValue === 'agile'">
+      <div class="squad-list-title mb-2">{{langPack['my_squad_count_label']}}</div>
+      <ng-container *ngFor="let squad of privateSquads">
+        <div class="mb-1">
+          <biz-squad-item class="w-100" [squad]="squad" [star]="false"></biz-squad-item>
+        </div>
+      </ng-container>
+    </div>
+  </div>
 </ion-content>

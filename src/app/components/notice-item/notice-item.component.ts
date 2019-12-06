@@ -14,6 +14,7 @@ import {TokenProvider} from '../../biz-common/token';
 @Component({
   selector: 'biz-notice-item',
   templateUrl: './notice-item.component.html',
+  styleUrls: ['./notice-item.component.scss'],
 })
 
 export class NoticeItemComponent extends BizComponent implements OnInit {

@@ -4,7 +4,8 @@ import {NavParams, PopoverController} from '@ionic/angular';
 
 @Component({
   selector: 'warn-popover',
-  templateUrl: 'warn-popover.html'
+  templateUrl: 'warn-popover.html',
+  styleUrls: ['./warn-popover.scss'],
 })
 
 export class WarnPopoverComponent {

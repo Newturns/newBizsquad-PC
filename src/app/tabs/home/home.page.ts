@@ -154,8 +154,8 @@ export class HomePage extends TakeUntil implements OnInit {
     this.bizFire.signOut();
   }
 
-  goLink(link : userLinks) {
-    this.electronService.goLink(link.data.url);
+  goLink(url) {
+    this.electronService.goLink(url);
   }
 
   windowClose() {

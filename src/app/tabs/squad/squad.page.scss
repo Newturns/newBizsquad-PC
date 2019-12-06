@@ -1,0 +1,19 @@
+
+.squad-frame {
+  overflow: auto;
+
+  .squad-list-title {
+    font-size: 12px;
+    font-weight: 500;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.33;
+    letter-spacing: 0.4px;
+    color: #ffffffa6;
+  }
+}
+
+//스크롤바와 그룹배경색이 어울리기 위함.
+//::-webkit-scrollbar-track {
+//  background:rgba(0, 0, 0, 1) !important;
+//}

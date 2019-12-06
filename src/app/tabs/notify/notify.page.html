@@ -1,3 +1,38 @@
-<ion-content>
- notify Page
+<ion-content no-padding class="content-color">
+
+ <div class="notify-title-frame p-3 d-flex justify-content-between align-items-center border-bottom">
+  <div class="notify-title">{{langPack['notification']}}</div>
+  <div class="pointer" (click)="back()"><img src="assets/imgs/renewal/Icon_Outline_close.svg"></div>
+ </div>
+
+ <div class="d-flex justify-content-between align-items-center px-3 py-2">
+  <div class="d-flex select-div p-1 pl-2">
+   <select (change)="selectTypeSelected($event.target.value)">
+    <option *ngFor="let t of noticeTypes" value="{{t.id}}">{{t.title}}</option>
+   </select>
+  </div>
+  <div>
+   <a class="notice-button" (click)="onDeleteFinished()">
+    {{langPack['delete_finished']}}
+   </a>
+   <a class="notice-button" (click)="onDeleteAll()">
+    {{langPack['delete_all']}}
+   </a>
+  </div>
+ </div>
+
+ <div class="notify-scroll-con px-3">
+
+  <!--  알람 내용  -->
+  <biz-notice-item *ngFor="let item of messages"
+                   [item]="item"
+                   (onAccept)="onAccept($event)">
+  </biz-notice-item>
+
+
+ </div>
+
+ <div class="notify-footer bg-white d-flex justify-content-center align-items-center">
+  Bizsquad is powered by<span class="link-newturns pointer" (click)="electronService.goLink('https://www.bizsquad.net/')">&nbsp;Newturns&nbsp;</span>Inc.
+ </div>
 </ion-content>
