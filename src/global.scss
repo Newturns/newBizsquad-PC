@@ -468,6 +468,39 @@ ion-grid {
   border-top: 1px solid #e3e7f2;
 }
 
+// search input design
+.search-frame {
+  border-top: 1px solid #e3e7f2;
+  border-bottom: 1px solid #e3e7f2;
+  .search-group {
+    border: 1px solid #e3e7f2;
+    border-radius: 6px;
+    .input-field{
+      width: 100%;
+      height: 40px;
+      border-top-left-radius: 2px;
+      border-bottom-left-radius: 2px;
+      border-left: solid 1px rgba(255,255,255,0.1);
+      border-top: solid 1px rgba(255,255,255,0.1);
+      border-bottom: solid 1px rgba(255,255,255,0.1);
+      border-right: 0px;
+      outline: none;
+      padding: 5px;
+    }
+    .input-icon{
+      height: 30px;
+      border-top-left-radius: 2px;
+      border-bottom-left-radius: 2px;
+      border-left: solid 1px rgba(255,255,255,0.1);
+      border-top: solid 1px rgba(255,255,255,0.1);
+      border-bottom: solid 1px rgba(255,255,255,0.1);
+      img{
+        margin-left: 7px;
+      }
+    }
+  }
+}
+
 
 
 //그룹 스타일에 맞는 그림자 + 그라데이션 설정

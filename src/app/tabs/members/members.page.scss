@@ -1,0 +1,12 @@
+.searchBar{
+  border-top: 1px solid #e3e7f2;
+  border-bottom: 1px solid #e3e7f2;
+  height: 57px;
+  background-color: #fcfcfc;
+  ::ng-deep .searchbar-input {
+    border-radius: 6px;
+    border: solid 1px #e3e7f2;
+    background-color: #ffffff;
+    text-align: center;
+  }
+}
