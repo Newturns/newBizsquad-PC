@@ -16,12 +16,14 @@ import {Electron} from './electron';
 import {LangService} from '../core/lang.service';
 import {CacheService} from '../core/cache/cache';
 import {environment} from '../../environments/environment';
+import {Chat} from '../biz-common/chat';
+import {TakeUntil} from '../biz-common/take-until';
 
 @Injectable({
     providedIn: 'root'
 })
 
-export class ChatService {
+export class ChatService extends TakeUntil {
 
     var_chatRooms: any;
 
@@ -30,6 +32,8 @@ export class ChatService {
     onSelectChatRoom = new BehaviorSubject<IChat>(null);
 
     fileUploadProgress = new BehaviorSubject<number>(null);
+
+    chatRooms = [];
 
     get unreadCountMap$(): Observable<IUnreadMap> {
       return this.unreadCounter.unreadChanged$.asObservable()
@@ -49,6 +53,8 @@ export class ChatService {
         private cacheService : CacheService,
         private squadService: SquadService,
         private unreadCounter: UnreadCounter) {
+
+      super();
 
       this.langService.onLangMap
         .pipe(takeUntil(this.bizFire.onUserSignOut))
@@ -79,6 +85,51 @@ export class ChatService {
         };
 
         this.createRoom(newRoom);
+    }
+
+    startGetChatList() {
+      this.bizFire.afStore.collection(Commons.chatPath(this.bizFire.gid),ref => {
+        return ref.where('status', '==' ,true).where(`members.${this.bizFire.currentUID}`, '==', true);
+      })
+      .stateChanges()
+      .pipe(this.takeUntil,this.bizFire.takeUntilUserSignOut)
+      .subscribe((changes : any) => {
+        changes.forEach(change => {
+          const data = change.payload.doc.data();
+          const mid = change.payload.doc.id;
+          if(change.type === 'added') {
+            const item = new Chat(mid, data, this.bizFire.uid, change.payload.doc.ref);
+            this.chatRooms.push(item);
+            if(this.unreadCounter){
+              this.unreadCounter.register(mid, item);
+            }
+          } else if(change.type === 'modified') {
+            for(let index = 0 ; index < this.chatRooms.length; index ++){
+              if(this.chatRooms[index].cid === mid){
+                // find replacement
+                const item = new Chat(mid, data, this.bizFire.uid, change.payload.doc.ref);
+                //---------- 껌벅임 테스트 -------------//
+                this.chatRooms[index] = item; // data 만 경신 한다.
+                console.log("Type Modified : ",this.chatRooms[index]);
+                //-----------------------------------//
+                break;
+              }
+            }
+          } else if (change.type === 'removed') {
+            for (let index = 0; index < this.chatRooms.length; index++) {
+              if (this.chatRooms[index].cid === mid) {
+                // remove from array
+                this.chatRooms.splice(index, 1);
+                if(this.unreadCounter){
+                  this.unreadCounter.unRegister(mid);
+                }
+                break;
+              }
+            }
+          }
+        });
+        this.onChatRoomListChanged.next(this.chatRooms);
+      });
     }
 
     createRoomByFabs(isChecked) {
@@ -383,6 +434,12 @@ export class ChatService {
           'body': msg,
           });
       })
+  }
+
+
+  clearUnreadCount() {
+      this.unreadCounter.clear();
+      this.unreadCounter = null;
   }
 
 }

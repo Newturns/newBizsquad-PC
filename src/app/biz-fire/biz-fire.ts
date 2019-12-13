@@ -468,8 +468,19 @@ export class BizFireService {
         return ret;
     }
 
-    updateProfile(data: any){
+    async updateProfile(data: any){
         return this.afAuth.auth.currentUser.updateProfile(data);
+    }
+
+    async editUserProfile(editData) {
+        if(editData){
+            return this.afStore.doc(`users/${this.currentUID}`).set({
+                displayName : editData.displayName,
+                phoneNumber : editData.phoneNumber,
+                user_visible_firstname : editData.user_visible_firstname,
+                user_visible_lastname : editData.user_visible_lastname,
+            }, {merge: true})
+        }
     }
 
     getCustomLinks(uid) {

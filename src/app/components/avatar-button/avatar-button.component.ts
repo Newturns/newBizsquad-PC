@@ -133,6 +133,8 @@ export class AvatarButtonComponent extends TakeUntil implements OnInit {
         case 'offline':
           this.statusColor = '#C7C7C7';
           break;
+        case null:
+          this.statusColor = '#C7C7C7';
       }
     } else {
 

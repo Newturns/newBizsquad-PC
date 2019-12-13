@@ -11,6 +11,16 @@ export const language = {
         "en": "Please add your favorite apps.",
         "ja": "よく使用するアプリを追加してください。"
       },
+      "update_success": {
+        "ko": "변경하였습니다.",
+        "en": "Update finished successfully",
+        "ja": "更新されました。"
+      },
+      "failed_update_profile":{
+        "ko": "프로필 변경을 실패했습니다.",
+        "en": "Failed to update profile image",
+        "ja": "プロフィールの変更に失敗しました。"
+      },
       "general": {
         "ko": "제네럴",
         "en": "General",
@@ -135,11 +145,6 @@ export const language = {
         "ko": "신규작성",
         "en": "New",
         "ja": "新規"
-      }
-      ,"update_success": {
-        "ko": "변경하였습니다.",
-        "en": "Update finished successfully",
-        "ja": "更新されました。"
       }
       ,"bizgroup": {
         "ko": "비즈그룹",

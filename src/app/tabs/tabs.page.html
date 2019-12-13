@@ -10,10 +10,10 @@
       </ion-buttons>
       <div class="new-badge drag d-flex text-white align-items-center justify-content-center" *ngIf="newNotifyCount > 0">N</div>
       <ion-buttons slot="end" class="no-drag">
-        <ion-button ion-no-padding fill="clear" size="small" slot="icon-only" color="light" (click)="windowMimimize()">
+        <ion-button no-padding fill="clear" size="small" slot="icon-only" color="light" (click)="windowMimimize()">
           <img src="assets/imgs/renewal/Icon_Outline_minimize.svg">
         </ion-button>
-        <ion-button ion-no-padding fill="clear" size="small" slot="icon-only" color="light" (click)="windowHide()">
+        <ion-button no-padding fill="clear" size="small" slot="icon-only" color="light" (click)="windowHide()">
           <img src="assets/imgs/renewal/Icon_Outline_close.svg">
         </ion-button>
       </ion-buttons>
@@ -53,6 +53,9 @@
       <ion-label [ngStyle]="{'color': selectTabName === 'chat' ? teamColor : '#707C97'}">
         {{langPack['chat']}}
       </ion-label>
+      <div class="msg-badge d-flex text-white mr-2 align-items-center justify-content-center flex-shrink-0" *ngIf="chatCount">
+        {{ chatCount | badgeLimit: 99 }}
+      </div>
     </ion-tab-button>
     <ion-tab-button tab="members">
       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="none" viewBox="0 0 30 30">

@@ -160,3 +160,12 @@ ipcMain.on('getLocalUser',(event) => {
         event.sender.send('sendUserData',data);
     });
 });
+
+
+ipcMain.on('windowsFlashFrame',(event, count) => {
+    if(count > 0) {
+        win.flashFrame(true);
+    } else {
+        win.flashFrame(false);
+    }
+});

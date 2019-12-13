@@ -29,6 +29,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {TokenProvider} from '../biz-common/token';
 import {LoadingProvider} from '../providers/loading';
 import {CustomLinkComponent} from './custom-link/custom-link.component';
+import {ProfilePopoverComponent} from './profile-popover/profile-popover.component';
 
 @NgModule({
     declarations: [
@@ -54,6 +55,7 @@ import {CustomLinkComponent} from './custom-link/custom-link.component';
         MembersPopoverComponent,
         WarnPopoverComponent,
         ChangeTitlePopoverComponent,
+        ProfilePopoverComponent,
         CustomLinkComponent,
     ],
     imports: [
@@ -86,12 +88,14 @@ import {CustomLinkComponent} from './custom-link/custom-link.component';
         MembersPopoverComponent,
         WarnPopoverComponent,
         ChangeTitlePopoverComponent,
+        ProfilePopoverComponent,
         CustomLinkComponent
     ],
     entryComponents: [
         MembersPopoverComponent,
         WarnPopoverComponent,
         ChangeTitlePopoverComponent,
+        ProfilePopoverComponent,
         CustomLinkComponent
     ],
     providers: [

@@ -1,5 +1,40 @@
 
 
-<ion-content>
- Chat page
+<ion-content no-padding class="content-color">
+ <ion-segment (ionChange)="segmentChanged($event)" class="bg-white px-2">
+  <ion-segment-button value="chatRoom" checked class="w-50">
+   <ion-label>{{ langPack['chatroom'] }}</ion-label>
+   <div class="msg-badge d-flex text-white mr-2 align-items-center justify-content-center flex-shrink-0" *ngIf="memberUnreadTotalCount">
+    {{ memberUnreadTotalCount | badgeLimit: 99 }}
+   </div>
+   <div class="segment-line w-100" *ngIf="segmentName === 'chatRoom'" [ngStyle]="{'background-color': group.data.team_color}"></div>
+  </ion-segment-button>
+  <ion-segment-button value="squadChatRoom" class="w-50">
+   <ion-label>{{ langPack['squad_chatroom'] }}</ion-label>
+   <div class="msg-badge d-flex text-white mr-2 align-items-center justify-content-center flex-shrink-0" *ngIf="squadUnreadTotalCount">
+    {{ squadUnreadTotalCount | badgeLimit: 99 }}
+   </div>
+   <div class="segment-line w-100" *ngIf="segmentName === 'squadChatRoom'" [ngStyle]="{'background-color': group.data.team_color}"></div>
+  </ion-segment-button>
+ </ion-segment>
+
+ <ion-list class="searchBar d-flex align-items-center">
+  <ion-searchbar [placeholder]="langPack['search']" mode="ios" debounce="500" (ionChange)="onSearch($event)" [(ngModel)]="searchKeyword"></ion-searchbar>
+ </ion-list>
+
+ <!-- segment con -->
+ <div *ngIf="segmentName === 'chatRoom'">
+  chatRoom
+ </div>
+
+ <div *ngIf="segmentName === 'squadChatRoom'">
+  squadChatRoom
+ </div>
+
+
 </ion-content>
+
+
+<div class="biz-footer d-flex justify-content-center align-items-center">
+ Bizsquad is powered by<span class="link-newturns pointer" (click)="goLink('https://www.bizsquad.net/')">&nbsp;Newturns&nbsp;</span>Inc.
+</div>

@@ -9,8 +9,8 @@ export class LoadingProvider {
   async show() {
     const loading = await this.loadingCtrl.create({
       duration: 2000,
-      showBackdrop: true,
       spinner: "circles",
+      cssClass: "custom-loading"
     });
     await loading.present();
     return loading;

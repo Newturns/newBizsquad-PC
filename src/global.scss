@@ -94,7 +94,7 @@ ion-item:hover a {
     top:25% !important;
     left:7% !important;
     width: 85% !important;
-    height: 420px;
+    height: 450px;
     border-radius: 10px;
     background-color: white !important;
   }
@@ -498,6 +498,13 @@ ion-grid {
         margin-left: 7px;
       }
     }
+  }
+}
+
+ion-loading.custom-loading {
+  .loading-wrapper {
+    background: transparent !important;
+    box-shadow: none !important;
   }
 }
 

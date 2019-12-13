@@ -1,25 +1,19 @@
-<!--<div class="search-frame px-4 py-3">-->
-<!-- <div class="search-group d-flex align-items-center justify-content-start">-->
-<!--  <div class="input-icon d-flex justify-content-start align-items-center">-->
-<!--   <img src="assets/imgs/renewal/Icon_Outline_search.svg">-->
-<!--  </div>-->
-<!--  <input [(ngModel)]="serachValue" class="input-field" type="text" placeholder="{{langPack['search']}}">-->
-<!-- </div>-->
-<!--</div>-->
 <ion-list class="searchBar d-flex align-items-center">
- <ion-searchbar mode="ios" debounce="500" (ionChange)="onSearch($event)" [(ngModel)]="serachValue"></ion-searchbar>
+  <ion-searchbar [placeholder]="langPack['search']" mode="ios" debounce="500" (ionChange)="onSearch($event)" [(ngModel)]="searchKeyword"></ion-searchbar>
 </ion-list>
 
 <ion-content>
- <ng-container *ngFor="let user of userList$">
-  <ng-container *ngIf="!serachValue || user.data.displayName.indexOf(serachValue.trim())>-1;">
-   <div class="userList d-flex flex-column justify-content-center px-4" bizGroupColor [hover]="true" [selected]="false">
-    <app-avatar-button [user]="user" [displayNameOn]="true" (onClick)="clickAvatar(user)" [statusOn]="true"></app-avatar-button>
-   </div>
+  <ng-container *ngFor="let uid of filteredUserList">
+    <ng-container *ngIf="getUserObserver(uid) | async as user">
+      <div *ngIf="!searchKeyword || user.data.displayName.indexOf(searchKeyword.trim())>-1;"
+           class="biz-border-bottom d-flex flex-column justify-content-center px-4 py-2"
+           bizGroupColor [hover]="true" [selected]="false">
+        <app-avatar-button [user]="user" [displayNameOn]="true" (onClick)="presentPopover(user)" [statusOn]="true"></app-avatar-button>
+      </div>
+    </ng-container>
   </ng-container>
- </ng-container>
 </ion-content>
 
 <div class="biz-footer d-flex justify-content-center align-items-center">
- Bizsquad is powered by<span class="link-newturns pointer" (click)="goLink('https://www.bizsquad.net/')">&nbsp;Newturns&nbsp;</span>Inc.
+  Bizsquad is powered by<span class="link-newturns pointer" (click)="goLink('https://www.bizsquad.net/')">&nbsp;Newturns&nbsp;</span>Inc.
 </div>

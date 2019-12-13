@@ -84,11 +84,12 @@ export class LoginPage implements OnInit {
         const user = await this.bizFire.loginWithEmail(email, password);
         console.log(`[${this.configService.firebaseName}] ${user.email}[${user.uid}] logged in.`);
 
-        await loading.dismiss();
         this.electronService.saveLocalUser(email,password,this.autoLoign,company);
 
         // go to main/tabs
         await this.router.navigate([`/${this.configService.firebaseName}`], {replaceUrl: true});
+
+        await loading.dismiss();
       } catch (e) {
         if(e.code === 'companyNotFound') {
           this.loginForm.get('company').setValue('');

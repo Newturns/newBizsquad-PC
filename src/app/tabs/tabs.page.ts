@@ -11,6 +11,8 @@ import {SquadService} from '../providers/squad.service';
 import {of} from 'rxjs';
 import {IChat} from '../_models/message';
 import {Chat} from '../biz-common/chat';
+import {IUnreadMap, UnreadCounter} from '../components/classes/unread-counter';
+import {ChatService} from '../providers/chat.service';
 
 @Component({
   selector: 'app-tabs',
@@ -27,12 +29,16 @@ export class TabsPage extends TakeUntil implements OnInit {
 
   newNotifyCount: number = 0;
 
+  chatCount = 0;
+
   constructor(
       private lang : LangService,
       private bizFire : BizFireService,
       private router : Router,
       private electronService : Electron,
       private noifictionServie : NotificationService,
+      private chatService : ChatService,
+      private unreadCounter: UnreadCounter,
       private squadService : SquadService) {
     super();
 
@@ -85,6 +91,15 @@ export class TabsPage extends TakeUntil implements OnInit {
       console.log("unreadNotify :::",unreadNotify);
       this.newNotifyCount = unreadNotify.filter(notify => notify.data.gid === this.bizFire.gid).length;
     });
+
+    this.chatService.unreadCountMap$
+    .pipe(this.takeUntil)
+    .subscribe((list: IUnreadMap) => {
+      this.chatCount = list.totalUnreadCount();
+      // this.electronService.setAppBadge(this.chatCount);
+    });
+
+    this.chatService.startGetChatList();
   }
 
   changeTabs(e) {
@@ -104,5 +119,10 @@ export class TabsPage extends TakeUntil implements OnInit {
 
   windowHide() {
     this.electronService.windowHide();
+  }
+
+  ngOnDestroy(): void {
+    this.chatService.clearUnreadCount();
+    // this.electronService.setAppBadge(0);
   }
 }

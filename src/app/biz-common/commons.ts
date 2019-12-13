@@ -212,6 +212,10 @@ export class Commons {
         return `${STRINGS.STRING_BIZGROUPS}/${gid}/squads/${sid}/chat/${mid}`;
       }
 
+      static FindText(text: string): FilterFinder {
+        return new FilterFinder(text);
+      }
+
       static chatInputConverter(test: string): string | null {
 
         let comment = String(test.trim());
@@ -357,4 +361,30 @@ export class Commons {
     }
   }
 
+}
+
+
+class FilterFinder {
+  text: string;
+  private _result: boolean = false;
+  constructor( text: string) {
+    if(text){
+      this.text = text.trim().toLowerCase();
+    }
+  }
+
+  from(data: string): FilterFinder {
+    if(this._result !== true){
+      if(data){
+        if(this.text){
+          this._result = data.trim().toLowerCase().indexOf(this.text) !== -1;
+        }
+      }
+    }
+    return this;
+  }
+
+  get result(){
+    return this._result;
+  }
 }

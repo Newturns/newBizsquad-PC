@@ -5,7 +5,11 @@ import {TakeUntil} from '../../biz-common/take-until';
 import {IBizGroup, IUser} from '../../_models';
 import {CacheService} from '../../core/cache/cache';
 import {Commons} from '../../biz-common/commons';
-import {BehaviorSubject, timer} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, timer} from 'rxjs';
+import {CustomLinkComponent} from '../../components/custom-link/custom-link.component';
+import {PopoverController} from '@ionic/angular';
+import {ProfilePopoverComponent} from '../../components/profile-popover/profile-popover.component';
+import {filter} from 'rxjs/operators';
 
 @Component({
   selector: 'app-members',
@@ -14,17 +18,18 @@ import {BehaviorSubject, timer} from 'rxjs';
 })
 export class MembersPage extends TakeUntil implements OnInit {
 
-  userList$ = new BehaviorSubject<IUser[]>(null);
-
-  serachValue : string;
+  filteredUserList: string[] = null;
 
   langPack = {};
 
   group: IBizGroup;
 
+  searchKeyword = '';
+
   constructor(private bizFire : BizFireService,
               private cacheService : CacheService,
-              private electronService : Electron) {
+              private electronService : Electron,
+              private popoverCtrl : PopoverController) {
     super();
   }
 
@@ -33,33 +38,43 @@ export class MembersPage extends TakeUntil implements OnInit {
     this.bizFire.onLang.subscribe((l: any) => this.langPack = l.pack());
 
     this.bizFire.onBizGroupSelected
-        .pipe(this.takeUntil)
-        .subscribe((g: IBizGroup) =>{
+    .pipe(filter(g=>g!=null),this.takeUntil)
+    .subscribe((group:IBizGroup) => {
+      this.group = group;
 
-          this.group = g;
-
-          this.reloadUsers();
-        })
+      if(this.filteredUserList === null) {
+        this.filteredUserList = this.group.getMemberIds(true);
+      } else {
+        if(this.filteredUserList.length !== group.getMemberIds().length) {
+          this.filteredUserList = this.group.getMemberIds(true);
+        }
+      }
+    });
 
   }
 
-  private reloadUsers(){
-
-    this.cacheService.resolvedUserList(this.group.getMemberIds(), Commons.userInfoSorter)
-        .subscribe((list: IUser[]) => {
-          timer(0).subscribe(()=> this.userList$.next(list));
-        });
+  getUserObserver(uid: string): Observable<IUser>{
+    return this.cacheService.userGetObserver(uid,true);
   }
 
-  clickAvatar(user : IUser) {
-
+  async presentPopover(user : IUser) {
+    const popover = await this.popoverCtrl.create({
+      component: ProfilePopoverComponent,
+      animated: false,
+      componentProps : {user : user},
+      cssClass: ['page-profile']
+    });
+    await popover.present();
   }
 
   goLink(url) {
     this.electronService.goLink(url);
   }
 
-  onSearch(e) {}
+  onSearch(e) {
+      const value = e.target.value;
+      this.searchKeyword = value;
+  }
 
 
 }
