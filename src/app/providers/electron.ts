@@ -70,8 +70,9 @@ export class Electron {
         this.ipcRenderer.send('notification');
     }
 
-    openChatRoom(ChatRoom) {
-        this.ipcRenderer.send('createChatRoom',ChatRoom);
+    openChatRoom(ChatRoom,dbName : string) {
+        const data = {chat : ChatRoom, db: dbName};
+        this.ipcRenderer.send('createChatRoom',data);
     }
 
     resetValue(){

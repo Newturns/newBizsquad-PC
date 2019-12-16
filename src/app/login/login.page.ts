@@ -58,19 +58,26 @@ export class LoginPage implements OnInit {
     this.electronService.ipcRenderer.send('getLocalUser', 'ping');
 
     this.electronService.ipcRenderer.once('sendUserData',(e, data) => {
-      console.log("datadatadatadatadata:::",data);
       this.loginForm.get('email').setValue(data.id);
       this.autoLoign = data.auto;
       this.loginForm.get('company').setValue(data.company);
 
       //오토로그인 체크되어있을때 비밀번호 값 넣기
       if(this.autoLoign) this.loginForm.get('password').setValue(data.pwd);
+
+      //채팅방 정보가 있으면 자동로그인 후 채팅프레임으로..
+      this.electronService.ipcRenderer.invoke('test-channel','getChatData').then((result) => {
+        if(result.chat) {
+          console.log("getChatData:",result);
+          this.onLogin();
+        }
+      });
     });
   }
 
-  async onLogin() {
+  async onLogin(goChat? : boolean) {
 
-    if(this.loginForm.valid) {
+    if(this.loginForm.valid && !goChat) {
       try {
         const loading = await this.loading.show();
 

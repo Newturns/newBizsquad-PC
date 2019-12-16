@@ -9,6 +9,7 @@ import {CacheService} from '../../core/cache/cache';
 @Component({
   selector: 'biz-team-icon',
   templateUrl: './team-icon.component.html',
+  styleUrls: ['./team-icon.component.scss'],
 })
 export class TeamIconComponent extends TakeUntil implements OnInit {
 

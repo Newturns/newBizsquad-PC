@@ -3,7 +3,7 @@ import {BizFireService} from '../../biz-fire/biz-fire';
 import {TokenProvider} from '../../biz-common/token';
 import {TakeUntil} from '../../biz-common/take-until';
 import {NotificationService} from '../../core/notification.service';
-import {filter, map} from 'rxjs/operators';
+import {filter, map, takeUntil} from 'rxjs/operators';
 import {INotification, userLinks} from '../../_models';
 import {UserStatusProvider} from '../../core/user-status';
 import {Electron} from '../../providers/electron';
@@ -13,13 +13,14 @@ import {IonGrid, PopoverController} from '@ionic/angular';
 import {CustomLinkComponent} from '../../components/custom-link/custom-link.component';
 import {Router} from '@angular/router';
 import {ConfigService} from '../../config.service';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
 })
-export class HomePage extends TakeUntil implements OnInit {
+export class HomePage implements OnInit {
 
   getFavicons = 'https://www.google.com/s2/favicons?domain=';
 
@@ -38,6 +39,8 @@ export class HomePage extends TakeUntil implements OnInit {
   //최신 공지사항 4개.
   latelyNotice : IMessage[] = [];
 
+  private _unsubscribeAll;
+
   constructor(public bizFire : BizFireService,
               public tokenService : TokenProvider,
               private electronService : Electron,
@@ -47,15 +50,18 @@ export class HomePage extends TakeUntil implements OnInit {
               private router : Router,
               private configService : ConfigService
   ) {
-    super();
+    this._unsubscribeAll = new Subject<any>();
   }
 
   ngOnInit() {
 
-    this.bizFire.onLang.subscribe((l: any) => this.langPack = l.pack());
+    this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => {
+      this.langPack = l.pack();
+      console.log("언어팩구독.")
+    });
 
     this.notificationService.onNotifications
-        .pipe(filter(n => n != null),this.takeUntil)
+        .pipe(filter(n => n != null),takeUntil(this._unsubscribeAll))
         .subscribe((msgs : INotification[]) => {
           if(msgs) {
             this.badgeCount = msgs.filter(m => {
@@ -72,7 +78,7 @@ export class HomePage extends TakeUntil implements OnInit {
         });
 
     //앱스 불러오기.
-    this.bizFire.userCustomLinks.pipe(filter(g=>g!=null),this.takeUntil)
+    this.bizFire.userCustomLinks.pipe(filter(g=>g!=null),takeUntil(this._unsubscribeAll))
         .subscribe((links : userLinks[]) => {
           links.forEach(link => {
             if(link){
@@ -87,7 +93,6 @@ export class HomePage extends TakeUntil implements OnInit {
               return 0;
             }
           });
-          console.log("userCustomLinks",this.userCustomLinks);
         });
 
     //공지사항 불러오기.
@@ -95,7 +100,7 @@ export class HomePage extends TakeUntil implements OnInit {
     this.bizFire.afStore.collection(path,ref => ref.orderBy('created','desc')
         .limit(4))
         .snapshotChanges()
-        .pipe(this.takeUntil,
+        .pipe(takeUntil(this._unsubscribeAll),
         map((docs: any[]) => {
           return docs.map(s => new Message(s.payload.doc.id, s.payload.doc.data(), s.payload.doc.ref));
         }))
@@ -123,7 +128,6 @@ export class HomePage extends TakeUntil implements OnInit {
     this.bizFire.deleteLink(link).then(() => {
       if(this.userCustomLinks) {
         if(this.userCustomLinks.length < 9) {
-          console.log("링크삭제 모어버튼 삭제",this.userCustomLinks.length);
           this.moreAppsMode = false;
         }
       }
@@ -162,5 +166,10 @@ export class HomePage extends TakeUntil implements OnInit {
     this.bizFire.signOut().then(() => {
       this.electronService.windowClose();
     });
+  }
+
+  ngOnDestroy(): void {
+    this._unsubscribeAll.next();
+    this._unsubscribeAll.complete();
   }
 }

@@ -11,7 +11,7 @@ const routes: Routes = [
       HomeGuard, // check login
     ],
     canActivateChild:[
-    
+
     ],
     children: [
       {
@@ -28,6 +28,10 @@ const routes: Routes = [
       {
         path: 'selector',
         loadChildren: () => import('../selector/selector.module').then(m => m.SelectorPageModule),
+      },
+      {
+        path: 'chat-frame',
+        loadChildren: () => import('../tabs/chat/chat-frame/chat-frame.module').then(m => m.ChatFramePageModule)
       },
     ]
   }

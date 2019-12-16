@@ -1,34 +1,46 @@
 
+<ion-segment (ionChange)="segmentChanged($event)" class="bg-white px-2">
+ <ion-segment-button value="chatRoom" checked class="w-50">
+  <ion-label>{{ langPack['chatroom'] }}</ion-label>
+  <div class="msg-badge d-flex text-white ml-1 align-items-center justify-content-center" *ngIf="memberUnreadTotalCount">
+   {{ memberUnreadTotalCount | badgeLimit: 99 }}
+  </div>
+  <div class="segment-line w-100" *ngIf="segmentName === 'chatRoom'" [ngStyle]="{'background-color': group.data.team_color}"></div>
+ </ion-segment-button>
+ <ion-segment-button value="squadChatRoom" class="w-50">
+  <ion-label>{{ langPack['squad_chatroom'] }}</ion-label>
+  <div class="msg-badge d-flex text-white ml-1 align-items-center justify-content-center" *ngIf="squadUnreadTotalCount">
+   {{ squadUnreadTotalCount | badgeLimit: 99 }}
+  </div>
+  <div class="segment-line w-100" *ngIf="segmentName === 'squadChatRoom'" [ngStyle]="{'background-color': group.data.team_color}"></div>
+ </ion-segment-button>
+</ion-segment>
 
-<ion-content no-padding class="content-color">
- <ion-segment (ionChange)="segmentChanged($event)" class="bg-white px-2">
-  <ion-segment-button value="chatRoom" checked class="w-50">
-   <ion-label>{{ langPack['chatroom'] }}</ion-label>
-   <div class="msg-badge d-flex text-white mr-2 align-items-center justify-content-center flex-shrink-0" *ngIf="memberUnreadTotalCount">
-    {{ memberUnreadTotalCount | badgeLimit: 99 }}
-   </div>
-   <div class="segment-line w-100" *ngIf="segmentName === 'chatRoom'" [ngStyle]="{'background-color': group.data.team_color}"></div>
-  </ion-segment-button>
-  <ion-segment-button value="squadChatRoom" class="w-50">
-   <ion-label>{{ langPack['squad_chatroom'] }}</ion-label>
-   <div class="msg-badge d-flex text-white mr-2 align-items-center justify-content-center flex-shrink-0" *ngIf="squadUnreadTotalCount">
-    {{ squadUnreadTotalCount | badgeLimit: 99 }}
-   </div>
-   <div class="segment-line w-100" *ngIf="segmentName === 'squadChatRoom'" [ngStyle]="{'background-color': group.data.team_color}"></div>
-  </ion-segment-button>
- </ion-segment>
+<ion-list class="searchBar d-flex align-items-center">
+ <ion-searchbar [placeholder]="langPack['search']" mode="ios" debounce="500" (ionChange)="onSearch($event)" [(ngModel)]="searchKeyword"></ion-searchbar>
+</ion-list>
 
- <ion-list class="searchBar d-flex align-items-center">
-  <ion-searchbar [placeholder]="langPack['search']" mode="ios" debounce="500" (ionChange)="onSearch($event)" [(ngModel)]="searchKeyword"></ion-searchbar>
- </ion-list>
+<ion-content class="content-color ion-no-padding">
 
  <!-- segment con -->
  <div *ngIf="segmentName === 'chatRoom'">
-  chatRoom
+  <ng-container *ngFor="let room of chatRooms">
+   <ng-container *ngIf="!searchKeyword || room.data.title.indexOf(searchKeyword.trim())>-1;">
+    <div class="px-3 chat-item-frame" bizGroupColor [hover]="true" [selected]="false">
+     <biz-chat-item  (clickedFunc)="gotoRoom($event)" [chat]="room"></biz-chat-item>
+    </div>
+   </ng-container>
+  </ng-container>
  </div>
 
  <div *ngIf="segmentName === 'squadChatRoom'">
-  squadChatRoom
+  <ng-container *ngFor="let room of squadChatRooms">
+   <ng-container *ngIf="!searchKeyword || room.data.title.indexOf(searchKeyword.trim())>-1;">
+    <div class="px-3 chat-item-frame" bizGroupColor [hover]="true" [selected]="false">
+     <biz-chat-item  (clickedFunc)="gotoRoom($event)" [chat]="room" bizGroupColor [hover]="true" [selected]="false"></biz-chat-item>
+    </div>
+   </ng-container>
+  </ng-container>
  </div>
 
 

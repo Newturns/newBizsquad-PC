@@ -13,6 +13,7 @@ import {
 import {take} from 'rxjs/operators';
 import {BizFireService} from '../biz-fire/biz-fire';
 import {IBizGroup, IUserData} from '../_models';
+import {ChatService} from '../providers/chat.service';
 
 
 @Injectable({
@@ -21,6 +22,7 @@ import {IBizGroup, IUserData} from '../_models';
 export class GidLoadService implements CanActivate, CanLoad, CanActivateChild {
 
   constructor(private bizFire: BizFireService,
+              private chatService : ChatService,
               private router: Router) { }
 
   canLoad(route: Route, segments: UrlSegment[]): Promise<boolean>  {

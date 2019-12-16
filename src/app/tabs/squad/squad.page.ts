@@ -8,13 +8,14 @@ import {SquadService} from '../../providers/squad.service';
 import {Router} from '@angular/router';
 import {ConfigService} from '../../config.service';
 import {Commons} from '../../biz-common/commons';
+import {takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-squad',
   templateUrl: './squad.page.html',
   styleUrls: ['./squad.page.scss'],
 })
-export class SquadPage extends TakeUntil implements OnInit {
+export class SquadPage implements OnInit {
 
   langPack = {};
   currentBizGroup : IBizGroup;
@@ -29,23 +30,25 @@ export class SquadPage extends TakeUntil implements OnInit {
 
   private userDataChanged = new Subject<IUserData>(); // userData monitor.
 
+  private _unsubscribeAll;
+
   constructor(private bizFire : BizFireService,
               private squadService : SquadService,
               private configService : ConfigService,
               private router : Router) {
-    super();
+    this._unsubscribeAll = new Subject<any>();
   }
 
   ngOnInit() {
 
-    this.bizFire.onLang.subscribe((l: any) => this.langPack = l.pack());
+    this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
 
     this.bizFire.onBizGroupSelected
-    .pipe(this.takeUntil)
+    .pipe(takeUntil(this._unsubscribeAll))
     .subscribe((g:IBizGroup) => this.currentBizGroup = g);
 
     combineLatest(this.bizFire.userData, this.squadService.onSquadListChanged,this.sortSquadBy$)
-    .pipe(this.takeUntil)
+    .pipe(takeUntil(this._unsubscribeAll))
     .subscribe(([userData, squadList, sortSquadBy]) => {
       console.log("filterBroadCast() combineLatest start");
       this.filterBroadCast(userData, squadList,sortSquadBy);
@@ -97,6 +100,11 @@ export class SquadPage extends TakeUntil implements OnInit {
       this.squadfilterValue = type;
     }
     console.log(type);
+  }
+
+  ngOnDestroy(): void {
+    this._unsubscribeAll.next();
+    this._unsubscribeAll.complete();
   }
 
 }

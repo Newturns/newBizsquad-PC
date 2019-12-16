@@ -17,13 +17,13 @@
     </div>
 
     <div class="badge-btn">
-      <ion-button class="mr-2" no-padding fill="clear" slot="ioon-only" [hidden]="!bizFire.currentBizGroup.isManager">
+      <ion-button class="mr-2 ion-no-padding" fill="clear" slot="ioon-only" [hidden]="!bizFire.currentBizGroup.isManager">
         <ion-icon src="assets/imgs/renewal/Icon_Outline_settings.svg"></ion-icon>
       </ion-button>
-      <ion-button class="mr-1" no-padding fill="clear" slot="ioon-only" (click)="showNotify()">
+      <ion-button class="mr-1 ion-no-padding" fill="clear" slot="ioon-only" (click)="showNotify()">
         <ion-icon src="assets/imgs/renewal/Icon_Outline_bell.svg"></ion-icon>
       </ion-button>
-      <ion-button no-padding fill="clear" slot="ioon-only" (click)="showMenu()">
+      <ion-button class="ion-no-padding" fill="clear" slot="ioon-only" (click)="showMenu()">
         <ion-icon name="more" style="color: #707c97"></ion-icon>
       </ion-button>
       <div *ngIf="badgeCount" class="notifiBadge d-flex justify-content-center align-items-center"
@@ -44,7 +44,7 @@
     <div class="home-con bg-white d-flex flex-column justify-content-center">
       <div class="menu-title pl-3 pb-3 flex-shrink-0">{{ langPack['taskbox'] }}</div>
       <div class="menu-con d-flex flex-column justify-content-center">
-        <ion-grid no-margin>
+        <ion-grid class="ion-no-margin">
           <ion-row>
             <ion-col class="col-3">
               <div class="d-flex flex-column align-items-center">

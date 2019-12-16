@@ -16,6 +16,15 @@ const _menu = require('./menu');
 
 //메인 윈도우.
 let mainWindow;
+
+//채팅 윈도우들
+let chatWindows = {};
+
+//현재 만드는 채팅방(임시저장)
+let selectChatRoom;
+//접속한 firebase dbName 저장.
+let dbName;
+
 //dev tool on/off
 const devMode = true;
 // 트레이(최소화)상태일때의 메뉴.
@@ -161,6 +170,107 @@ ipcMain.on('getLocalUser',(event) => {
     });
 });
 
+ipcMain.on('createChatRoom', (event, data) => {
+
+    const chatRoom = data.chat;
+    dbName = data.db;
+
+    let chatRoomId;
+
+    if(chatRoom.cid == null){
+        // 스쿼드 채팅 일때 스쿼드의 doc id
+        chatRoomId = chatRoom.sid;
+    } else {
+        // 개인 채팅 일떄 채팅방의 doc id
+        chatRoomId = chatRoom.cid;
+    }
+
+    if(chatWindows[chatRoomId]) {
+
+        chatWindows[chatRoomId].focus();
+
+    } else {
+        selectChatRoom = chatRoom;
+
+        // console.log(selectChatRoom);
+
+        // windowStateKeeper
+        let chatWindowState = windowStateKeeper({
+            file: `${chatRoomId}_01.json`,
+            defaultWidth: 400,
+            defaultHeight: 700,
+        });
+
+        chatWindows[chatRoomId] = new BrowserWindow({
+            'x': chatWindowState.x,
+            'y': chatWindowState.y,
+            'width': chatWindowState.width,
+            'height': chatWindowState.height,
+            frame: false,
+            minWidth:400,
+            minHeight:700,
+            maxWidth:800,
+            maxHeight:1024,
+            titleBarStyle: 'hidden-inset',
+            opacity: 1,
+            webPreferences: { nodeIntegration : true }
+        });
+
+        chatWindows[chatRoomId].loadURL(url.format({
+            pathname: path.join(__dirname,'../www/index.html'),
+            protocol: 'file:',
+            slashes: true,
+        }));
+
+        const menuTemplate = Menu.buildFromTemplate([
+            {
+                label: "Quit",
+                submenu: [
+                    {
+                        label: "close",
+                        accelerator: process.platform === 'darwin' ? 'CmdOrCtrl+W' : 'Escape',
+                        click: () => chatWindows[chatRoomId].close()
+                    },
+                ]},
+            {
+                label: "Edit",
+                submenu: [
+                    { label: "Undo", accelerator: "CmdOrCtrl+Z", selector: "undo:" },
+                    { label: "Redo", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:" },
+                    { type: "separator" },
+                    { label: "Cut", accelerator: "CmdOrCtrl+X", selector: "cut:" },
+                    { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+                    { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+                    { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
+                ]}
+        ]);
+
+        chatWindows[chatRoomId].on('focus', () => {
+            Menu.setApplicationMenu(menuTemplate);
+        });
+
+        chatWindowState.manage(chatWindows[chatRoomId]);
+    }
+
+    // 개발자 도구를 엽니다. 개발완료 시 주석.
+    if(devMode) {
+        chatWindows[chatRoomId].webContents.openDevTools();
+    }
+
+    // 창이 닫히면 호출됩니다.
+    chatWindows[chatRoomId].on('closed', () => {
+        chatWindows[chatRoomId] = null;
+    });
+});
+
+ipcMain.on('resetValue',(e) =>{
+    selectChatRoom = null;
+});
+
+ipcMain.handle('test-channel',async (e,value) => {
+   const result = {chat: selectChatRoom,dbName: dbName};
+   return result;
+});
 
 ipcMain.on('windowsFlashFrame',(event, count) => {
     if(count > 0) {

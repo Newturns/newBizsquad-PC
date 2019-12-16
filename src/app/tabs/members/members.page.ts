@@ -5,18 +5,18 @@ import {TakeUntil} from '../../biz-common/take-until';
 import {IBizGroup, IUser} from '../../_models';
 import {CacheService} from '../../core/cache/cache';
 import {Commons} from '../../biz-common/commons';
-import {BehaviorSubject, combineLatest, Observable, timer} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, Subject, timer} from 'rxjs';
 import {CustomLinkComponent} from '../../components/custom-link/custom-link.component';
 import {PopoverController} from '@ionic/angular';
 import {ProfilePopoverComponent} from '../../components/profile-popover/profile-popover.component';
-import {filter} from 'rxjs/operators';
+import {filter, takeUntil} from 'rxjs/operators';
 
 @Component({
   selector: 'app-members',
   templateUrl: './members.page.html',
   styleUrls: ['./members.page.scss'],
 })
-export class MembersPage extends TakeUntil implements OnInit {
+export class MembersPage implements OnInit {
 
   filteredUserList: string[] = null;
 
@@ -26,19 +26,22 @@ export class MembersPage extends TakeUntil implements OnInit {
 
   searchKeyword = '';
 
+  private _unsubscribeAll;
+
   constructor(private bizFire : BizFireService,
               private cacheService : CacheService,
               private electronService : Electron,
               private popoverCtrl : PopoverController) {
-    super();
+
+    this._unsubscribeAll = new Subject<any>();
   }
 
   ngOnInit() {
 
-    this.bizFire.onLang.subscribe((l: any) => this.langPack = l.pack());
+    this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
 
     this.bizFire.onBizGroupSelected
-    .pipe(filter(g=>g!=null),this.takeUntil)
+    .pipe(filter(g=>g!=null),takeUntil(this._unsubscribeAll))
     .subscribe((group:IBizGroup) => {
       this.group = group;
 
@@ -76,5 +79,8 @@ export class MembersPage extends TakeUntil implements OnInit {
       this.searchKeyword = value;
   }
 
-
+  ngOnDestroy(): void {
+    this._unsubscribeAll.next();
+    this._unsubscribeAll.complete();
+  }
 }

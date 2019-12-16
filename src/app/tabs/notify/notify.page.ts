@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {ConfigService} from '../../config.service';
 import {Router} from '@angular/router';
 import {IBizGroupData, ICustomMenu, INotification, INotificationItem} from '../../_models';
-import {BehaviorSubject, combineLatest} from 'rxjs';
+import {BehaviorSubject, combineLatest, Subject} from 'rxjs';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {Commons} from '../../biz-common/commons';
 import {TakeUntil} from '../../biz-common/take-until';
@@ -10,7 +10,7 @@ import {NotificationService} from '../../core/notification.service';
 import {Electron} from '../../providers/electron';
 import {PopoverController} from '@ionic/angular';
 import {WarnPopoverComponent} from '../../components/warn-popover/warn-popover';
-import {filter, take} from 'rxjs/operators';
+import {filter, take, takeUntil} from 'rxjs/operators';
 import {CacheService} from '../../core/cache/cache';
 
 @Component({
@@ -18,7 +18,7 @@ import {CacheService} from '../../core/cache/cache';
   templateUrl: './notify.page.html',
   styleUrls: ['./notify.page.scss'],
 })
-export class NotifyPage extends TakeUntil implements OnInit {
+export class NotifyPage implements OnInit {
 
   langPack = {};
 
@@ -40,6 +40,8 @@ export class NotifyPage extends TakeUntil implements OnInit {
   // DELETE READ button show/hide
   hasFinished = false;
 
+  private _unsubscribeAll;
+
   constructor(private configService : ConfigService,
               private notificationService : NotificationService,
               private bizFire : BizFireService,
@@ -47,14 +49,14 @@ export class NotifyPage extends TakeUntil implements OnInit {
               private popoverCtrl : PopoverController,
               private cacheService : CacheService,
               private router : Router) {
-    super();
+    this._unsubscribeAll = new Subject<any>();
   }
 
   ngOnInit() {
-    this.bizFire.onLang.subscribe((l: any) => this.langPack = l.pack());
+    this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
 
     combineLatest(this.originalList$, this.filterNoticeType$, this.currentFilteredGid$)
-        .pipe(this.takeUntil)
+        .pipe(takeUntil(this._unsubscribeAll))
         .subscribe(([list, type, gid])=>{
           if(type == null || type.id === 'all'){
             // set to new received full list.
@@ -71,7 +73,7 @@ export class NotifyPage extends TakeUntil implements OnInit {
         });
 
     this.notificationService.onNotifications
-    .pipe(this.takeUntil,filter(m=> m!=null))
+    .pipe(takeUntil(this._unsubscribeAll),filter(m=> m!=null))
     .subscribe(async (m: INotification[]) => {
 
       this.noticeTypes = [];
@@ -210,4 +212,8 @@ export class NotifyPage extends TakeUntil implements OnInit {
     this.router.navigate([`/${this.configService.firebaseName}/tabs/home`], {replaceUrl: true});
   }
 
+  ngOnDestroy(): void {
+    this._unsubscribeAll.next();
+    this._unsubscribeAll.complete();
+  }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, CanLoad, Route, Router, RouterStateSnapshot, UrlSegment} from '@angular/router';
 import {ConfigService} from '../config.service';
 import {BizFireService} from '../biz-fire/biz-fire';
+import {Electron} from '../providers/electron';
 
 
 @Injectable({
@@ -9,16 +10,17 @@ import {BizFireService} from '../biz-fire/biz-fire';
 })
 
 export class HomeGuard implements CanLoad, CanActivate {
-    
+
     constructor(private bizFire: BizFireService,
                 private configService: ConfigService,
+                private electronService : Electron,
                 private router: Router) {
-        
+
     }
-    
+
     private checkLogin(){
         return new Promise<boolean>( resolve => {
-        
+
             if(this.configService.firebaseName == null){
                 console.error('HomeGuard:, ConfigService.firebaseName is null.');
                 console.error('redirect to /login');
@@ -48,7 +50,18 @@ export class HomeGuard implements CanLoad, CanActivate {
     }
     
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean>{
-        return this.checkLogin();
+        return new Promise<boolean>( resolve => {
+            this.electronService.ipcRenderer.invoke('test-channel','getChatData').then((result) => {
+                console.log("getChatData:",result);
+                if(result.chat) {
+                    this.router.navigate(['/chat-frame']);
+                    resolve(false);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+        // return this.checkLogin();
     }
     
 }

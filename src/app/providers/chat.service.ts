@@ -2,405 +2,349 @@
 import { Injectable } from '@angular/core';
 
 import {SquadService, ISquad} from './squad.service';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 import * as firebase from 'firebase';
 import {Commons, STRINGS} from '../biz-common/commons';
 
-import {debounceTime, filter, takeUntil} from "rxjs/operators";
+import {takeUntil} from 'rxjs/operators';
 import {IChat, IChatData, IFiles, IMessage, IMessageData} from "../_models/message";
-import {IUser} from "../_models";
+import {IBizGroup, IUser} from '../_models';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {IUnreadMap, UnreadCounter} from '../components/classes/unread-counter';
 import {BizFireService} from '../biz-fire/biz-fire';
 import {Electron} from './electron';
 import {LangService} from '../core/lang.service';
 import {CacheService} from '../core/cache/cache';
 import {environment} from '../../environments/environment';
-import {Chat} from '../biz-common/chat';
-import {TakeUntil} from '../biz-common/take-until';
+import {ConfigService} from '../config.service';
 
 @Injectable({
     providedIn: 'root'
 })
 
-export class ChatService extends TakeUntil {
+export class ChatService {
 
-    var_chatRooms: any;
+  var_chatRooms: any;
 
-    onChatRoomListChanged = new BehaviorSubject<IChat[]>([]);
+  onChatRoomListChanged = new BehaviorSubject<IChat[]>([]);
 
-    onSelectChatRoom = new BehaviorSubject<IChat>(null);
+  onSelectChatRoom = new BehaviorSubject<IChat>(null);
 
-    fileUploadProgress = new BehaviorSubject<number>(null);
+  fileUploadProgress = new BehaviorSubject<number>(null);
 
-    chatRooms = [];
+  unreadCountMap$ = new BehaviorSubject<any[]>(null);
 
-    get unreadCountMap$(): Observable<IUnreadMap> {
-      return this.unreadCounter.unreadChanged$.asObservable()
-        .pipe(
-          filter(d=>d!=null),
-          debounceTime(500), // 0.5 sec
-        );
-    }
+  langPack: any = {};
 
-    langPack: any = {};
+  constructor(
+      public bizFire : BizFireService,
+      public electron: Electron,
+      private langService : LangService,
+      private http: HttpClient,
+      private cacheService : CacheService,
+      private configService: ConfigService,
+      private squadService: SquadService) {
 
-    constructor(
-        public bizFire : BizFireService,
-        public electron: Electron,
-        private langService : LangService,
-        private http: HttpClient,
-        private cacheService : CacheService,
-        private squadService: SquadService,
-        private unreadCounter: UnreadCounter) {
-
-      super();
-
-      this.langService.onLangMap
+    this.langService.onLangMap
         .pipe(takeUntil(this.bizFire.onUserSignOut))
-            .subscribe((l: any) => {
+        .subscribe((l: any) => {
           this.langPack = l;
         });
-    }
-    getChatRooms(){
-        let chatRooms = this.onChatRoomListChanged.getValue();
-        chatRooms.forEach(room =>{
-            const newData = room;
-            newData['uid'] = this.bizFire.currentUID;
-          });
-        return chatRooms;
+  }
+  getChatRooms(){
+    let chatRooms = this.onChatRoomListChanged.getValue();
+    chatRooms.forEach(room =>{
+      const newData = room;
+      newData['uid'] = this.bizFire.currentUID;
+    });
+    return chatRooms;
+  }
+
+  createRoomByProfile(target: IUser) {
+    const now = new Date();
+    const newRoom:IChatData = {
+      created:  now,
+      gid: this.bizFire.gid,
+      members: {
+        [this.bizFire.uid] : true,
+        [target.uid] : true
+      },
+      status: true,
+      type: 'member'
+    };
+
+    this.createRoom(newRoom);
+  }
+
+  createRoomByFabs(isChecked) {
+
+    const now = new Date();
+    const myValue = this.bizFire.currentUserValue;
+    // fabs invite에서 초대 한 멤버가 한명일 경우 그룹채팅이 아니다.
+
+    const newRoom:IChatData = {
+      created:  now,
+      gid: this.bizFire.gid,
+      members : {
+        [myValue.uid] : true
+      },
+      status: true,
+      type: 'member'
+    };
+    if(isChecked.length > 0){
+      isChecked.forEach(u => { newRoom.members[u.uid] = true; });
     }
 
-    createRoomByProfile(target: IUser) {
-        const now = new Date();
-        const newRoom:IChatData = {
-            created:  now,
-            gid: this.bizFire.currentBizGroup.gid,
-            members: {
-                [this.bizFire.currentUserValue.uid] : true,
-                [target.uid] : true
-            },
-            status: true,
-            type: 'member'
-        };
+    console.log("newRoomnewRoom",newRoom);
+    this.createRoom(newRoom);
+  }
 
-        this.createRoom(newRoom);
-    }
+  createRoom(newRoom:IChatData) {
+    if(newRoom != null){
+      this.bizFire.afStore.collection(Commons.chatPath(newRoom.gid)).add(newRoom).then(room => {
+        room.get().then(snap =>{
 
-    startGetChatList() {
-      this.bizFire.afStore.collection(Commons.chatPath(this.bizFire.gid),ref => {
-        return ref.where('status', '==' ,true).where(`members.${this.bizFire.currentUID}`, '==', true);
-      })
-      .stateChanges()
-      .pipe(this.takeUntil,this.bizFire.takeUntilUserSignOut)
-      .subscribe((changes : any) => {
-        changes.forEach(change => {
-          const data = change.payload.doc.data();
-          const mid = change.payload.doc.id;
-          if(change.type === 'added') {
-            const item = new Chat(mid, data, this.bizFire.uid, change.payload.doc.ref);
-            this.chatRooms.push(item);
-            if(this.unreadCounter){
-              this.unreadCounter.register(mid, item);
-            }
-          } else if(change.type === 'modified') {
-            for(let index = 0 ; index < this.chatRooms.length; index ++){
-              if(this.chatRooms[index].cid === mid){
-                // find replacement
-                const item = new Chat(mid, data, this.bizFire.uid, change.payload.doc.ref);
-                //---------- 껌벅임 테스트 -------------//
-                this.chatRooms[index] = item; // data 만 경신 한다.
-                console.log("Type Modified : ",this.chatRooms[index]);
-                //-----------------------------------//
-                break;
-              }
-            }
-          } else if (change.type === 'removed') {
-            for (let index = 0; index < this.chatRooms.length; index++) {
-              if (this.chatRooms[index].cid === mid) {
-                // remove from array
-                this.chatRooms.splice(index, 1);
-                if(this.unreadCounter){
-                  this.unreadCounter.unRegister(mid);
-                }
-                break;
-              }
-            }
-          }
-        });
-        this.onChatRoomListChanged.next(this.chatRooms);
+          this.var_chatRooms = {
+            cid : snap.id,
+            data: snap.data(),
+          } as IChat;
+          this.makeRoomNoticeMessage('member-chat','init',newRoom.gid,snap.id)
+              .then(() => {
+                this.onSelectChatRoom.next(this.var_chatRooms);
+                this.electron.openChatRoom(this.var_chatRooms,this.configService.firebaseName);
+              });
+        })
       });
     }
+  }
 
-    createRoomByFabs(isChecked) {
+  getMessagePath(type,gid,id){
+    switch(type){
+      case 'member-chat':
+        return Commons.chatMsgPath(gid,id);
+      case 'squad-chat':
+        return Commons.chatSquadMsgPath(gid,id);
+      case 'member-chat-room':
+        return Commons.chatDocPath(gid,id);
+      case 'squad-chat-room':
+        return Commons.chatSquadPath(gid,id);
+    }
+  }
 
-        const now = new Date();
-        const myValue = this.bizFire.currentUserValue;
-        // fabs invite에서 초대 한 멤버가 한명일 경우 그룹채팅이 아니다.
+  async addChatMessage(text: string, currentChat: IChat, files?: File[]) {
 
-        const newRoom:IChatData = {
-            created:  now,
-            gid: this.bizFire.currentBizGroup.gid,
-            members : {
-                [myValue.uid] : true
-            },
-            status: true,
-            type: 'member'
-        };
-        if(isChecked.length > 0){
-          isChecked.forEach(u => { newRoom.members[u.uid] = true; });
-        }
-
-        console.log("newRoomnewRoom",newRoom);
-        this.createRoom(newRoom);
+    if(currentChat.ref == null) {
+      console.error('addChatMessage', currentChat);
+      throw new Error('currentChat.ref is null.');
     }
 
-    createRoom(newRoom:IChatData) {
-        if(newRoom != null){
-            this.bizFire.afStore.collection(Commons.chatPath(newRoom.gid)).add(newRoom).then(room => {
-                room.get().then(snap =>{
+    const members = currentChat.isPublic() ? this.bizFire.currentBizGroup.data.members : currentChat.data.members;
 
-                  this.var_chatRooms = {
-                    cid : snap.id,
-                    data: snap.data(),
-                  } as IChat;
+    const msg = await this.addMessage(text,currentChat.ref,members,files);
 
-                  this.makeRoomNoticeMessage('member-chat','init',newRoom.gid,snap.id)
-                    .then(() => {
-                      this.onSelectChatRoom.next(this.var_chatRooms);
-                      this.electron.openChatRoom(this.var_chatRooms);
-                    });
-                })
-            });
-        }
-    }
+    const pushTitle = `[${this.bizFire.currentBizGroup.data.team_name}] ${this.bizFire.currentUserValue.displayName}`;
+    const pushData = { cid: currentChat.cid, type: currentChat.data.type, gid: currentChat.data.gid };
+    pushData.type = pushData.type === 'member' ? STRINGS.GROUP_CHAT : STRINGS.SQUAD_CHAT;
+    console.log("pushDatapushData",pushData);
 
-    getMessagePath(type,gid,id){
-        switch(type){
-            case 'member-chat':
-              return Commons.chatMsgPath(gid,id);
-            case 'squad-chat':
-              return Commons.chatSquadMsgPath(gid,id);
-            case 'member-chat-room':
-              return Commons.chatDocPath(gid,id);
-            case 'squad-chat-room':
-              return Commons.chatSquadPath(gid,id);
-        }
-    }
+    this.sendPush(Commons.memberUID(members),pushTitle,this.convertMessage(text),pushData);
 
-    async addChatMessage(text: string, currentChat: IChat, files?: File[]) {
+    return msg;
+  }
 
-      if(currentChat.ref == null) {
-        console.error('addChatMessage', currentChat);
-        throw new Error('currentChat.ref is null.');
+  async addMessage(text: string,parentRef: any,unreadMembers : any,
+                   files?: any[],saveLastMessage = true) {
+    try{
+      if(parentRef == null) {
+        throw new Error('parentRef has no data.');
       }
+      const membersUids = [];
+      const now = new Date();
+      const msg: IMessageData = {
+        message: {
+          text : text
+        },
+        sender: this.bizFire.uid,
+        created: now,
+        isNotice : false,
+        read : null,
+        type : 'chat',
+        file: false
+      };
 
-      const members = currentChat.isPublic() ? this.bizFire.currentBizGroup.data.members : currentChat.data.members;
-
-      const msg = await this.addMessage(text,currentChat.ref,members,files);
-
-      const pushTitle = `[${this.bizFire.currentBizGroup.data.team_name}] ${this.bizFire.currentUserValue.displayName}`;
-      const pushData = { cid: currentChat.cid, type: currentChat.data.type, gid: currentChat.data.gid };
-      pushData.type = pushData.type === 'member' ? STRINGS.GROUP_CHAT : STRINGS.SQUAD_CHAT;
-
-      this.sendPush(Commons.memberUID(members),pushTitle,this.convertMessage(text),pushData);
-
-      return msg;
-    }
-
-    async addMessage(text: string,parentRef: any,unreadMembers : any,
-                    files?: any[],saveLastMessage = true) {
-      try{
-        if(parentRef == null) {
-          throw new Error('parentRef has no data.');
-        }
-        const membersUids = [];
-        const now = new Date();
-        const msg: IMessageData = {
-          message: {
-            text : text
-          },
-          sender: this.bizFire.uid,
-          created: now,
-          isNotice : false,
-          read : null,
-          type : 'chat',
-          file: false
-        };
-
-        if(unreadMembers) {
-          msg.read = Commons.makeReadFrom(unreadMembers, this.bizFire.uid);
-          Object.keys(unreadMembers)
+      if(unreadMembers) {
+        msg.read = Commons.makeReadFrom(unreadMembers, this.bizFire.uid);
+        Object.keys(unreadMembers)
             .filter(uid => uid !== this.bizFire.uid)
             .forEach(uid => {
               membersUids.push(uid);
-          })
-        }
-
-        const newChatRef = parentRef.collection('chat').doc();
-
-        if(files && files.length > 0) {
-          msg.file = true;
-          const storageChatPath = parentRef.path;
-          const mid = newChatRef.id;
-          msg.message.files = [];
-          const loads = files.map(async file => {
-            const storagePath = `${storageChatPath}/chat/${mid}/${file.name}`;
-            const storageRef = this.bizFire.afStorage.storage.ref(storagePath);
-            const fileSnapshot = await storageRef.put(file);
-
-            this.fileUploadProgress.next(fileSnapshot.bytesTransferred / fileSnapshot.totalBytes * 100);
-
-            // get download url
-            const downloadUrl = await fileSnapshot.ref.getDownloadURL();
-
-            msg.message.files.push({
-              name: file.name,
-              size: file.size,
-              type: file.type,
-              url : downloadUrl,
-              storagePath: storagePath
-            } as IFiles)
-          });
-          await Promise.all(loads);
-        }
-        await newChatRef.set(msg);
-
-        const newMessage = {mid: newChatRef.id, data: msg};
-
-        if(saveLastMessage){
-          await parentRef.update({
-            lastMessage: msg,
-          });
-        }
-        return newMessage;
-
-      } catch (e) {
-        console.log('addMessage',e,text);
-        return null;
+            })
       }
-    }
 
-    makeRoomNoticeMessage(room_type,type,gid,cid,uid?) {
+      const newChatRef = parentRef.collection('chat').doc();
 
-      const newMessage : IMessageData = {
-        message: {
-          notice: {
-            type: type
-          }
-        },
-        created: new Date(),
-        isNotice: true,
-        sender: this.bizFire.uid,
-        type: 'chat'
+      if(files && files.length > 0) {
+        msg.file = true;
+        const storageChatPath = parentRef.path;
+        const mid = newChatRef.id;
+        msg.message.files = [];
+        const loads = files.map(async file => {
+          const storagePath = `${storageChatPath}/chat/${mid}/${file.name}`;
+          const storageRef = this.bizFire.afStorage.storage.ref(storagePath);
+          const fileSnapshot = await storageRef.put(file);
 
-      };
+          this.fileUploadProgress.next(fileSnapshot.bytesTransferred / fileSnapshot.totalBytes * 100);
 
-      if(uid){
-        newMessage.message.notice.uid = uid;
-      }
-        return this.bizFire.afStore.firestore.collection(this.getMessagePath(room_type,gid,cid)).add(newMessage)
-    }
+          // get download url
+          const downloadUrl = await fileSnapshot.ref.getDownloadURL();
 
-    removeMember(uid,gid,cid) {
-        return new Promise<void>( (resolve, reject) => {
-            this.bizFire.afStore.firestore.doc(Commons.chatDocPath(gid,cid)).update({
-                ['members.' + uid]: firebase.firestore.FieldValue.delete()
-            }).then(()=>{
-              // insert exit room message
-              const text = this.langPack['chat_exit_user_notice'].replace('$DISPLAYNAME', this.bizFire.currentUserValue.displayName);
-              this.makeRoomNoticeMessage('member-chat','exit',gid,cid,[this.bizFire.uid]).then(() => this.electron.windowClose());
-
-              resolve();
-            }).catch(error=>{
-                reject(error);
-            });
+          msg.message.files.push({
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            url : downloadUrl,
+            storagePath: storagePath
+          } as IFiles)
         });
+        await Promise.all(loads);
+      }
+      await newChatRef.set(msg);
+
+      const newMessage = {mid: newChatRef.id, data: msg};
+
+      if(saveLastMessage){
+        await parentRef.update({
+          lastMessage: msg,
+        });
+      }
+      return newMessage;
+
+    } catch (e) {
+      console.log('addMessage',e,text);
+      return null;
     }
+  }
 
-    async sendPush(targetUids: any[],pushTitle:any, msg:string, data: any){
+  makeRoomNoticeMessage(room_type,type,gid,cid,uid?) {
 
-      const payload = {
-        notification: {
-          title: pushTitle,
-          body: msg,
-        },
-        data: {
-          cid: data.cid,
-          type: data.type,
-          gid: data.gid
+    const newMessage : IMessageData = {
+      message: {
+        notice: {
+          type: type
         }
-      };
+      },
+      created: new Date(),
+      isNotice: true,
+      sender: this.bizFire.uid,
+      type: 'chat'
 
-      const userWithPushAllowed = await this.getPushAllowedUserListFrom(data.gid, data.cid, targetUids);
+    };
 
-      const body = {
-        usersUid: userWithPushAllowed,
-        payload: payload
-      };
+    if(uid){
+      newMessage.message.notice.uid = uid;
+    }
+    return this.bizFire.afStore.firestore.collection(this.getMessagePath(room_type,gid,cid)).add(newMessage)
+  }
 
-      //-----------------------------------------------//
-      // send push
-      //-----------------------------------------------//
-      const path = `${environment.bizServerUri}/sendFCM`;
+  removeMember(uid,gid,cid) {
+    return new Promise<void>( (resolve, reject) => {
+      this.bizFire.afStore.firestore.doc(Commons.chatDocPath(gid,cid)).update({
+        ['members.' + uid]: firebase.firestore.FieldValue.delete()
+      }).then(()=>{
+        // insert exit room message
+        const text = this.langPack['chat_exit_user_notice'].replace('$DISPLAYNAME', this.bizFire.currentUserValue.displayName);
+        this.makeRoomNoticeMessage('member-chat','exit',gid,cid,[this.bizFire.uid]).then(() => this.electron.windowClose());
 
-      const headers = {
-        headers: new HttpHeaders({
-          'authorization': this.bizFire.uid
-        })
-      };
+        resolve();
+      }).catch(error=>{
+        reject(error);
+      });
+    });
+  }
 
-      this.http.post(path, body, headers)
+  async sendPush(targetUids: any[],pushTitle:any, msg:string, data: any){
+
+    const payload = {
+      notification: {
+        title: pushTitle,
+        body: msg,
+      },
+      data: {
+        cid: data.cid,
+        type: data.type,
+        gid: data.gid
+      }
+    };
+
+    const userWithPushAllowed = await this.getPushAllowedUserListFrom(data.gid, data.cid, targetUids);
+    console.log(userWithPushAllowed);
+
+    const body = {
+      usersUid: userWithPushAllowed,
+      payload: payload
+    };
+
+    //-----------------------------------------------//
+    // send push
+    //-----------------------------------------------//
+    const path = `${environment.bizServerUri}/sendFCM`;
+
+    const headers = {
+      headers: new HttpHeaders({
+        'authorization': this.bizFire.uid
+      })
+    };
+
+    this.http.post(path, body, headers)
         .subscribe((result: any) => {
           console.log("resultresult",result);
         },(error => {
           console.error("sendPush error",error);
         }));
 
-      return true;
-    }
+    return true;
+  }
 
-    private async getPushAllowedUserListFrom(gid: string, cid: string, userList: string[]){
-      const promises = userList.map(async uid => {
-        const snap = await this.bizFire.afStore.doc(Commons.userDataPath(gid, uid)).get().toPromise();
-        let ret = uid;
-        if(snap.exists){
-          const userData = snap.data();
-          if(userData[cid] && userData[cid]['notify'] === false){
-            //console.log(`${uid} 는 제외`);
-            ret = null;
-          }
-        }
-        // userData 가 없으면,
-        // 일단 PUSH는 보낸다.
-        return ret;
-      });
-
-      const userWithPushAllowed = await Promise.all(promises);
-      return userWithPushAllowed.filter(uid => uid != null);
-    }
-
-    private convertMessage(text: string): string {
-      let ret = '';
-      if(text != null){
-        ret = text ? String(text).replace(/<[^>]+>/gm, '') : '';
-        if(ret.indexOf('\n') !== -1){
-          // replace \n
-          ret = text.split('\n').join('<br>');
+  private async getPushAllowedUserListFrom(gid: string, cid: string, userList: string[]){
+    const promises = userList.map(async uid => {
+      const snap = await this.bizFire.afStore.doc(Commons.userDataPath(gid, uid)).get().toPromise();
+      let ret = uid;
+      if(snap.exists){
+        const userData = snap.data();
+        if(userData[cid] && userData[cid]['notify'] === false){
+          //console.log(`${uid} 는 제외`);
+          ret = null;
         }
       }
+      // userData 가 없으면,
+      // 일단 PUSH는 보낸다.
       return ret;
-    }
+    });
 
-    scrollBottom(content : any) : boolean {
-      const contentArea = content.getContentDimensions();
-      // content.scrollTop == content.scrollHeight - content.contentHeight;
-      const top = contentArea.scrollTop; // 스크롤 현재 top
-      const height = contentArea.scrollHeight; // 내 화면에 보이지 않는 내용을 포함한 내용 높이.
-      const offset = contentArea.contentHeight; // 현재 보이는 높이.
+    const userWithPushAllowed = await Promise.all(promises);
+    return userWithPushAllowed.filter(uid => uid != null);
+  }
 
-      return 150 > height - (top + offset);
+  private convertMessage(text: string): string {
+    let ret = '';
+    if(text != null){
+      ret = text ? String(text).replace(/<[^>]+>/gm, '') : '';
+      if(ret.indexOf('\n') !== -1){
+        // replace \n
+        ret = text.split('\n').join('<br>');
+      }
     }
+    return ret;
+  }
+
+  scrollBottom(content) : boolean {
+    const contentArea = content.getContentDimensions();
+    // content.scrollTop == content.scrollHeight - content.contentHeight;
+    const top = contentArea.scrollTop; // 스크롤 현재 top
+    const height = contentArea.scrollHeight; // 내 화면에 보이지 않는 내용을 포함한 내용 높이.
+    const offset = contentArea.contentHeight; // 현재 보이는 높이.
+
+    return 150 > height - (top + offset);
+  }
 
 
   findChat(cid: string): IChat| null {
@@ -429,17 +373,11 @@ export class ChatService extends TakeUntil {
   }
 
   onNotification(name,msg) {
-      Notification.requestPermission().then(() => {
-          let myNotification = new Notification(name,{
-          'body': msg,
-          });
-      })
-  }
-
-
-  clearUnreadCount() {
-      this.unreadCounter.clear();
-      this.unreadCounter = null;
+    Notification.requestPermission().then(() => {
+      let myNotification = new Notification(name,{
+        'body': msg,
+      });
+    })
   }
 
 }

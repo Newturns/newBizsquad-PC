@@ -7,27 +7,31 @@ import {Electron} from '../providers/electron';
 import {BizGroupBuilder} from '../biz-fire/biz-group';
 import {STRINGS} from '../biz-common/commons';
 import * as firebase from 'firebase';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 @Component({
   selector: 'app-selector',
   templateUrl: './selector.page.html',
   styleUrls: ['./selector.page.scss'],
 })
-export class SelectorPage extends TakeUntil implements OnInit {
+export class SelectorPage implements OnInit {
 
   groups: IBizGroup[];
   langPack = {};
+
+  private _unsubscribeAll;
 
   constructor(
       private bizFire : BizFireService,
       private router : Router,
       private electronService : Electron,
   ) {
-    super();
+    this._unsubscribeAll = new Subject<any>();
   }
 
   ngOnInit() {
 
-    this.bizFire.onLang.subscribe((l: any) => this.langPack = l.pack());
+    this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
 
     this.loadGroups();
   }
@@ -43,7 +47,7 @@ export class SelectorPage extends TakeUntil implements OnInit {
       query = query.where('status', '==', true);
       return query;
     }).snapshotChanges()
-        .pipe(this.bizFire.takeUntilUserSignOut,this.takeUntil)
+        .pipe(this.bizFire.takeUntilUserSignOut,takeUntil(this._unsubscribeAll))
         .subscribe((changes: any[]) => {
           this.groups = changes.map(d=>(BizGroupBuilder.buildWithOnStateChangeAngularFire(d, this.bizFire.uid)));
 
@@ -82,6 +86,11 @@ export class SelectorPage extends TakeUntil implements OnInit {
 
   windowHide() {
     this.electronService.windowHide();
+  }
+
+  ngOnDestroy(): void {
+    this._unsubscribeAll.next();
+    this._unsubscribeAll.complete();
   }
 
 }

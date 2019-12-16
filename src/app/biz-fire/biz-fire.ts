@@ -221,7 +221,7 @@ export class BizFireService {
 
 
         // v2
-        // - wait till new user login or change his code, broadcast LangService to child.
+        // - wait till new user logFin or change his code, broadcast LangService to child.
         // - deprecated. Use LangService.onLangMap()
         this._lang.onLangMap.subscribe( (totalLanguageMap: any) => {
             // resolved when load lang.ts finished.
