@@ -53,8 +53,6 @@ export class TabsPage implements OnInit {
     window.addEventListener('unload', () => {
       this.bizFire.signOut();
     });
-
-
   }
 
   ngOnInit() {

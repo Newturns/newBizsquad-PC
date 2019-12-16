@@ -64,26 +64,18 @@ export class LoginPage implements OnInit {
 
       //오토로그인 체크되어있을때 비밀번호 값 넣기
       if(this.autoLoign) this.loginForm.get('password').setValue(data.pwd);
-
-      //채팅방 정보가 있으면 자동로그인 후 채팅프레임으로..
-      this.electronService.ipcRenderer.invoke('test-channel','getChatData').then((result) => {
-        if(result.chat) {
-          console.log("getChatData:",result);
-          this.onLogin();
-        }
-      });
     });
   }
 
-  async onLogin(goChat? : boolean) {
+  async onLogin() {
 
-    if(this.loginForm.valid && !goChat) {
+    if(this.loginForm.valid) {
       try {
         const loading = await this.loading.show();
 
+        const company = this.loginForm.value['company'];
         const email = this.loginForm.value['email'];
         const password = this.loginForm.value['password'];
-        const company = this.loginForm.value['company'];
 
         let companyCheckOk = false;
         companyCheckOk = await this.configService.checkCompanyName(company);

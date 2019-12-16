@@ -23,7 +23,6 @@ let chatWindows = {};
 //현재 만드는 채팅방(임시저장)
 let selectChatRoom;
 //접속한 firebase dbName 저장.
-let dbName;
 
 //dev tool on/off
 const devMode = true;
@@ -94,6 +93,7 @@ function createWindow () {
         // 윈도우 객체를 배열에 저장하는 경우가 있는데 이 경우
         // 해당하는 모든 윈도우 객체의 참조를 삭제해 주어야 합니다.
         mainWindow = null;
+        chatWindows = null;
     });
 
     mainWindow.on('focus', () => {
@@ -172,8 +172,7 @@ ipcMain.on('getLocalUser',(event) => {
 
 ipcMain.on('createChatRoom', (event, data) => {
 
-    const chatRoom = data.chat;
-    dbName = data.db;
+    const chatRoom = data;
 
     let chatRoomId;
 
@@ -263,12 +262,18 @@ ipcMain.on('createChatRoom', (event, data) => {
     });
 });
 
+//로그아웃했을때 로그인페이지로 제대로 가도록..
 ipcMain.on('resetValue',(e) =>{
     selectChatRoom = null;
 });
 
+//로그아웃시 활성화 되있는 채팅방 윈도우를 모두 닫음.
+ipcMain.on('userLogOut',(e) => {
+   chatWindows = {};
+});
+
 ipcMain.handle('test-channel',async (e,value) => {
-   const result = {chat: selectChatRoom,dbName: dbName};
+   const result = selectChatRoom;
    return result;
 });
 

@@ -147,7 +147,7 @@ export class AvatarButtonComponent extends TakeUntil implements OnInit {
 
     if(this.displayNameOn === true && this.padding == null){
       // set to default padding
-      this._padding = '16px';
+      this._padding = '8px';
     }
   }
 

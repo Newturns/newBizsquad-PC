@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { LoginPageRoutingModule } from './login-routing.module';
+import { DirectionPageRoutingModule } from './direction-routing.module';
 
-import { LoginPage } from './login.page';
+import { DirectionPage } from './direction.page';
 import {LoadingProvider} from '../providers/loading';
 
 @NgModule({
@@ -14,12 +14,11 @@ import {LoadingProvider} from '../providers/loading';
     CommonModule,
     FormsModule,
     IonicModule,
-    ReactiveFormsModule,
-    LoginPageRoutingModule,
+    DirectionPageRoutingModule
   ],
-  declarations: [LoginPage],
+  declarations: [DirectionPage],
   providers: [
     LoadingProvider,
   ]
 })
-export class LoginPageModule {}
+export class DirectionPageModule {}

@@ -110,7 +110,7 @@ export class ChatService {
           this.makeRoomNoticeMessage('member-chat','init',newRoom.gid,snap.id)
               .then(() => {
                 this.onSelectChatRoom.next(this.var_chatRooms);
-                this.electron.openChatRoom(this.var_chatRooms,this.configService.firebaseName);
+                this.electron.openChatRoom(this.var_chatRooms);
               });
         })
       });

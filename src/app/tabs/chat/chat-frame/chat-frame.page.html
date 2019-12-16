@@ -1,9 +1,40 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>chat-frame</ion-title>
-  </ion-toolbar>
+  <chat-header [chat]="chatRoom"></chat-header>
 </ion-header>
 
-<ion-content>
-
+<ion-content #scrollContent (ionScroll)="scrollHandler($event)">
+  <div class="message-wrap">
+    <ng-container *ngFor="let message of chatContent; let i = index">
+      <div class="d-flex align-items-center mb-3" *ngIf="isDifferentDay(i)">
+        <div class="d-flex flex-grow-1 ml-3" style="background-color: #ECECEC; height:1px"></div>
+        <div class="differentDay pl-3 pr-3">{{ getMessageDate(i) }}</div>
+        <div class="d-flex flex-grow-1 mr-3" style="background-color: #ECECEC; height:1px"></div>
+      </div>
+      <biz-message-balloon [message]="message"></biz-message-balloon>
+      <!--      <app-message [menu]="false" [comment]="false" [message]="message" [showUnreadCount]=true></app-message>-->
+    </ng-container>
+  </div>
 </ion-content>
+
+<ion-footer no-border>
+  <form [formGroup]="chatForm">
+    <div class="chat-input-frame p-2 d-flex align-items-end">
+      <div class="file-attach-div d-flex align-items-center justify-content-center pointer mb-2" (click)="fileAttach.click()">
+        <img src="assets/imgs/renewal/Icon_circle_attach.svg">
+        <input type="file" style="display: none;" accept="*" #fileAttach (change)="file($event)">
+      </div>
+
+      <div class="flex-grow-1 mx-3">
+        <ion-textarea #msgInput rows="1" formControlName="chat" placeholder="Type a message here"
+                      (keydown)="keydown($event)" autosize="100">
+        </ion-textarea>
+      </div>
+      <div class="mb-2">
+        <div class="circle_send d-flex align-items-center justify-content-center pointer" (click)="sendMsg(chatForm.value.chat)"
+             [ngStyle]="{'background-color': selectBizGroup != null ? selectBizGroup.data.team_color : 'silver'}">
+          <img src="assets/imgs/renewal/Icon_Fill_navigation.svg">
+        </div>
+      </div>
+    </div>
+  </form>
+</ion-footer>

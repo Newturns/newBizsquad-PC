@@ -58,19 +58,28 @@ export class ChatPage implements OnInit {
       this.group = group;
     });
 
-    // this.chatService.unreadCountMap$
-    // .pipe(takeUntil(this._unsubscribeAll))
-    // .subscribe((list : IUnreadItem) => {
-    //   this.memberUnreadTotalCount = 0;
-    //   this.squadUnreadTotalCount = 0;
-    //   list.getValues().forEach( (item: MapIt) => {
-    //     if(item.chat.data.type === 'member') {
-    //       this.memberUnreadTotalCount += item.unreadList.length;
-    //     } else {
-    //       this.squadUnreadTotalCount += item.unreadList.length;
-    //     }
-    //   });
-    // });
+    this.chatService.unreadCountMap$
+    .pipe(takeUntil(this._unsubscribeAll))
+    .subscribe((list : IUnreadItem[]) => {
+      // temp array for counting.
+      const typeMember = [];
+      const typeSquad = [];
+
+      // get chat data
+      list.filter(i => {
+        const chat = this.chatService.findChat(i.cid);
+        if(chat){
+          if(chat.data.type === 'member'){
+            typeMember.push(chat);
+          } else {
+            typeSquad.push(chat);
+          }
+        }
+      });
+      this.memberUnreadTotalCount = typeMember.length;
+      this.squadUnreadTotalCount = typeSquad.length;
+
+    });
 
     // 멤버 채팅방
     this.chatService.onChatRoomListChanged
@@ -162,7 +171,7 @@ export class ChatPage implements OnInit {
   gotoRoom(c : IChat) {
     const cutRefValue = {cid: c.cid, data: c.data};
     this.chatService.onSelectChatRoom.next(c);
-    this.electronService.openChatRoom(cutRefValue,this.configService.firebaseName);
+    this.electronService.openChatRoom(cutRefValue);
     console.log(c);
   }
 

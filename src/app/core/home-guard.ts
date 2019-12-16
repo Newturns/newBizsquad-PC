@@ -50,18 +50,7 @@ export class HomeGuard implements CanLoad, CanActivate {
     }
     
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean>{
-        return new Promise<boolean>( resolve => {
-            this.electronService.ipcRenderer.invoke('test-channel','getChatData').then((result) => {
-                console.log("getChatData:",result);
-                if(result.chat) {
-                    this.router.navigate(['/chat-frame']);
-                    resolve(false);
-                } else {
-                    resolve(true);
-                }
-            });
-        });
-        // return this.checkLogin();
+        return this.checkLogin();
     }
     
 }

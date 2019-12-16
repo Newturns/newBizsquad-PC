@@ -1,5 +1,5 @@
 
-<div class="d-flex px-4 py-4 drag header-frame">
+<div class="d-flex p-3 drag header-frame">
   <!-- 채팅방 아이콘 -->
   <div class="d-flex align-items-center mr-2" *ngIf="!memberChat; else personal">
     <biz-team-icon [teamData]="room?.data"  [size]="40"></biz-team-icon>
@@ -14,12 +14,12 @@
     <!--  위 : 채팅방제목, 아래 : 멤버수 -->
     <div class="d-flex chat-title-frame flex-column flex-grow-1 flex-shrink-1">
       <!--   채팅방 제목   -->
-      <div class="d-flex chat_title mb-2">
+      <div class="d-flex chat_title">
         <div> {{ chatTitle }} </div>
       </div>
       <!--   멤버 수   -->
       <div class="d-flex align-items-center memeber-count pointer no-drag" (click)="chatMemberList($event)">
-        <img src="imgs/renewal/Icon_Outline_user.svg"> {{ userCount }}
+        <img src="assets/imgs/renewal/Icon_Outline_user.svg"> {{ userCount }}
       </div>
     </div>
 
@@ -28,16 +28,16 @@
       <div class="d-flex flex-column">
         <!--   최소화 | 종료   -->
         <div class="d-flex align-items-center justify-content-end no-drag mb-2">
-          <img class="pointer" src="imgs/renewal/Icon_Outline_minimize.svg" (click)="electron.windowMimimize()">
-          <img class="pointer ml-1" src="imgs/renewal/Icon_Outline_close.svg" (click)="electron.windowClose()">
+          <img class="pointer" src="assets/imgs/renewal/Icon_Outline_minimize.svg" (click)="electron.windowMimimize()">
+          <img class="pointer ml-1" src="assets/imgs/renewal/Icon_Outline_close.svg" (click)="electron.windowClose()">
         </div>
         <!--   채팅방 메뉴들   -->
         <div class="d-flex align-items-center justify-content-end no-drag">
 <!--          <ion-item>-->
 <!--            <ion-range [(ngModel)]="opacity" color="dark" (ionChange)="electron.setOpacity(opacity)"></ion-range>-->
 <!--          </ion-item>-->
-          <img class="pointer ml-2" src="imgs/renewal/{{notifications}}.svg" width="22" height="22" (click)="notificationOnOff()">
-          <img *ngIf="memberChat" class="pointer ml-2" src="imgs/renewal/Icon_Outline_more.svg" width="20" height="22" (tap)="presentPopover($event)">
+          <img class="pointer ml-2" src="assets/imgs/renewal/{{notifications}}.svg" width="22" height="22" (click)="notificationOnOff()">
+          <img *ngIf="memberChat" class="pointer ml-2" src="assets/imgs/renewal/Icon_Outline_more.svg" width="20" height="22" (tap)="presentPopover($event)">
         </div>
       </div>
     </div>

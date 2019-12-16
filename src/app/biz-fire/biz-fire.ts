@@ -1,7 +1,7 @@
 import {Injectable, Optional, SkipSelf} from '@angular/core';
 import * as firebase from 'firebase/app';
 import {AngularFireAuth} from '@angular/fire/auth';
-import {BehaviorSubject, Observable, Subscription,Subject,timer} from 'rxjs';
+import {BehaviorSubject, Observable, Subscription, Subject, timer, concat} from 'rxjs';
 import {filter, takeUntil, take} from 'rxjs/operators';
 import {Commons, STRINGS} from '../biz-common/commons';
 import {AngularFirestore} from '@angular/fire/firestore';
@@ -13,6 +13,8 @@ import {AngularFireStorage} from '@angular/fire/storage';
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 import {AngularFactoryService} from './angular-factory.service';
 import {ConfigService} from '../config.service';
+import {Router} from '@angular/router';
+import {Electron} from '../providers/electron';
 
 @Injectable({
     providedIn: 'root'
@@ -157,8 +159,8 @@ export class BizFireService {
         private angularFactoryService: AngularFactoryService,
         private _lang: LangService,
         public configService: ConfigService,
-
-
+        private router : Router,
+        private electronService : Electron,
     ) {
 
         console.error('bizFire created.');
@@ -246,8 +248,7 @@ export class BizFireService {
                             this.currentUserSubscription = null;
                         }
 
-                        if(user){
-
+                        if(user) {
 
                             if(this._userCustomLinks == null) {
                                 this.getCustomLinks(user.uid);
@@ -291,7 +292,6 @@ export class BizFireService {
 
             });
 
-
     }
 
     /*
@@ -299,6 +299,9 @@ export class BizFireService {
     * clear current user, group data.
     * */
     private clear(){
+
+        //electron chat windows clear
+        this.electronService.clearChatWindows();
 
         // unsubscribe old one for UserData
         if(this.currentUserSubscription != null){

@@ -70,9 +70,8 @@ export class Electron {
         this.ipcRenderer.send('notification');
     }
 
-    openChatRoom(ChatRoom,dbName : string) {
-        const data = {chat : ChatRoom, db: dbName};
-        this.ipcRenderer.send('createChatRoom',data);
+    openChatRoom(ChatRoom) {
+        this.ipcRenderer.send('createChatRoom',ChatRoom);
     }
 
     resetValue(){
@@ -87,5 +86,9 @@ export class Electron {
     saveLocalUser(id:string,pwd:any,auto:boolean,company:string) {
         const data = {id:id,pwd:pwd,auto:auto,company:company};
         this.ipcRenderer.send('saveLocalUser',data);
+    }
+
+    clearChatWindows() {
+        this.ipcRenderer.send('userLogOut');
     }
 }

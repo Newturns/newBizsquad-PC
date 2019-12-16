@@ -10,6 +10,7 @@ import {CacheService} from '../../core/cache/cache';
 @Component({
   selector: 'biz-message-balloon',
   templateUrl: './message-balloon.component.html',
+  styleUrls: ['./message-balloon.component.scss'],
 })
 export class MessageBalloonComponent extends TakeUntil implements OnInit {
 

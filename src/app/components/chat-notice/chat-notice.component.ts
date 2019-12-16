@@ -11,6 +11,7 @@ import {CacheService} from '../../core/cache/cache';
 @Component({
   selector: 'biz-chat-notice',
   templateUrl: './chat-notice.component.html',
+  styleUrls: ['./chat-notice.component.scss'],
 })
 export class ChatNoticeComponent extends TakeUntil implements OnInit {
 
