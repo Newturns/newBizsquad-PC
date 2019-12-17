@@ -2,7 +2,7 @@ import {Injectable, Optional, SkipSelf} from '@angular/core';
 import * as firebase from 'firebase/app';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {BehaviorSubject, Observable, Subscription, Subject, timer, concat} from 'rxjs';
-import {filter, takeUntil, take} from 'rxjs/operators';
+import {filter, takeUntil, take, concatMap} from 'rxjs/operators';
 import {Commons, STRINGS} from '../biz-common/commons';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {InitProcess} from './init-process';
@@ -291,7 +291,6 @@ export class BizFireService {
                 }
 
             });
-
     }
 
     /*

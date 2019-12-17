@@ -11,6 +11,10 @@ import {Commons} from '../../biz-common/commons';
 import {CacheService} from '../../core/cache/cache';
 import {SquadService} from '../../providers/squad.service';
 import {ConfigService} from '../../config.service';
+import {GroupColorProvider} from '../../biz-common/group-color';
+import {PopoverController} from '@ionic/angular';
+
+import {CreateChatPopoverComponent} from '../../components/create-chat-popover/create-chat-popover.component';
 
 @Component({
   selector: 'app-chat',
@@ -38,12 +42,13 @@ export class ChatPage implements OnInit {
 
   private _unsubscribeAll;
 
-
   constructor(private electronService : Electron,
               private chatService : ChatService,
               private cacheService : CacheService,
               private squadService : SquadService,
               private configService: ConfigService,
+              private groupColorProvider: GroupColorProvider,
+              private popoverCtrl : PopoverController,
               private bizFire : BizFireService) {
     this._unsubscribeAll = new Subject<any>();
   }
@@ -179,4 +184,18 @@ export class ChatPage implements OnInit {
     this.electronService.goLink(url);
   }
 
+  async createChatPopover() {
+    const popover = await this.popoverCtrl.create({
+      component: CreateChatPopoverComponent,
+      animated: false,
+      cssClass: ['page-invite'],
+      showBackdrop: false,
+    });
+    await popover.present();
+  }
+
+  ngOnDestroy(): void {
+    this._unsubscribeAll.next();
+    this._unsubscribeAll.complete();
+  }
 }

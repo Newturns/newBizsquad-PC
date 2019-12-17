@@ -29,6 +29,19 @@ ion-segment-button{
 
 }
 
+.custom-fab {
+  position: fixed;
+  right: 25px;
+  bottom: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  color: white;
+  background-color: #324ca8;
+  font-size: 28px;
+  opacity: 0.9;
+}
+
 .searchBar{
   border-top: 1px solid #e3e7f2;
   border-bottom: 1px solid #e3e7f2;

@@ -16,6 +16,7 @@ import {LangService} from '../core/lang.service';
 import {CacheService} from '../core/cache/cache';
 import {environment} from '../../environments/environment';
 import {ConfigService} from '../config.service';
+import {IonContent} from '@ionic/angular';
 
 @Injectable({
     providedIn: 'root'
@@ -76,6 +77,8 @@ export class ChatService {
   }
 
   createRoomByFabs(isChecked) {
+
+    console.log("newRoomnewRoom",isChecked);
 
     const now = new Date();
     const myValue = this.bizFire.currentUserValue;
@@ -335,17 +338,6 @@ export class ChatService {
     }
     return ret;
   }
-
-  scrollBottom(content) : boolean {
-    const contentArea = content.getContentDimensions();
-    // content.scrollTop == content.scrollHeight - content.contentHeight;
-    const top = contentArea.scrollTop; // 스크롤 현재 top
-    const height = contentArea.scrollHeight; // 내 화면에 보이지 않는 내용을 포함한 내용 높이.
-    const offset = contentArea.contentHeight; // 현재 보이는 높이.
-
-    return 150 > height - (top + offset);
-  }
-
 
   findChat(cid: string): IChat| null {
     let currentChat = this.onChatRoomListChanged.getValue().find(c => c.cid === cid);

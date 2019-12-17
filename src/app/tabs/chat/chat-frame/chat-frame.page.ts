@@ -57,9 +57,6 @@ export class ChatFramePage implements OnInit {
   private start : any;
   private end : any;
 
-  // 메세지를 더 로딩했을때 그 전(메세지가추가되기 전) 높이 저장
-  private oldScrollHeight : number;
-
   // 채팅 input
   chatForm : FormGroup;
   //메세지 개수 초과 에러 텍스트
@@ -68,6 +65,18 @@ export class ChatFramePage implements OnInit {
 
   //max file size
   maxFileSize = 20000000; // max file size = 20mb;
+
+  //스크롤컨텐츠를 포함한 전체 높이.
+  private scrollHeight = 0;
+  //스크롤이 늘어나기전 높이
+  private oldHeight = 0;
+
+  //스크롤이 가장 밑일 때 입력창을 누르면 스크롤을 맨 밑으로 보낸다.
+  bottomCheck = false;
+  // true if ion-content scrolled more than 100px
+  private scrolled = false;
+
+  private startToast = false;
 
   constructor(private configService : ConfigService,
               private activatedRoute: ActivatedRoute,
@@ -129,6 +138,7 @@ export class ChatFramePage implements OnInit {
       }
     });
 
+
   }
 
   async onWindowChat(gid:string,cid:string,type:string) {
@@ -159,7 +169,7 @@ export class ChatFramePage implements OnInit {
       this.chatService.addChatMessage(converterText,this.chatRoom,[attachedFile]).then(() => {
         timer(800).subscribe(() => {
           // call ion-content func
-          // this.contentArea.scrollToBottom(0);
+          this.contentArea.scrollToBottom(0);
         });
       });
     }
@@ -196,7 +206,7 @@ export class ChatFramePage implements OnInit {
 
       if(text.length > 0) {
         this.chatService.addChatMessage(text,this.chatRoom).then(() => {
-          // timer(100).subscribe(() => this.contentArea.scrollToBottom(0));
+          timer(0).subscribe(() => this.contentArea.scrollToBottom(0));
         });
         this.chatForm.setValue({chat:''});
         //textarea 높이 초기화를 위한 이벤트 전달.
@@ -236,7 +246,7 @@ export class ChatFramePage implements OnInit {
             timer(2500).subscribe(async () => {
               // call ion-content func
               this.showContent = true;
-              // this.contentArea.scrollToBottom(0);
+              this.contentArea.scrollToBottom(0);
               await loading.dismiss();
             });
           }
@@ -256,9 +266,9 @@ export class ChatFramePage implements OnInit {
           if(list.length > 0){
             list.forEach((l) => {
               this.chatContent.push(l);
-              // if(!this.chatService.scrollBottom(this.contentArea) && l.data.sender !== this.bizFire.uid) {
-              //   this.toastProvider.showToast(this.langPack['new_message']);
-              // }
+              if(!this.bottomCheck && l.data.sender !== this.bizFire.uid && this.startToast) {
+                this.toastProvider.showToast(this.langPack['new_message'],'top');
+              }
             });
             this.addAddedMessages(list.filter(m => m.data.sender !== this.bizFire.uid));
           }
@@ -275,12 +285,14 @@ export class ChatFramePage implements OnInit {
               }
             });
           }
-          // if(this.chatService.scrollBottom(this.contentArea)) {
-          //   timer(100).subscribe(() => {
-          //     // call ion-content func
-          //     this.contentArea.scrollToBottom(0);
-          //   });
-          // }
+          if(this.bottomCheck) {
+            timer(100).subscribe(() => {
+              // call ion-content func
+              this.contentArea.scrollToBottom(0);
+              this.startToast = true;
+            });
+          }
+          console.log(this.contentArea.ionScrollEnd)
         });
   }
 
@@ -323,21 +335,34 @@ export class ChatFramePage implements OnInit {
                   });
                 }
 
-                // timer(100).subscribe(() => {
-                //   this.contentArea.scrollTo(0,this.contentArea.getContentDimensions().scrollHeight - this.oldScrollHeight,0);
-                //   console.log("메세지 배열에 넣은 후 스크롤길이 :",this.contentArea.getContentDimensions().scrollHeight);
-                // });
+                timer(100).subscribe(() => {
+                  this.contentArea.getScrollElement().then(el => {
+                    this.contentArea.scrollToPoint(0,el.scrollHeight - this.oldHeight);
+                  });
+                });
 
               });
         })
   }
 
-  scrollHandler($event) {
-    //스크롤이 가장 상단일때
-    if($event.scrollTop === 0) {
-      // this.oldScrollHeight = this.contentArea.getContentDimensions().scrollHeight;
-      this.getMoreMessages();
-    }
+  scrollHandler(e) {
+    this.contentArea.getScrollElement().then(el => {
+      const top = el.scrollTop; // 스크롤 현재 top
+      const height = el.scrollHeight; // 내부적 전체 높이
+      const offset = el.offsetHeight; // 외부에 보이는 높이.
+
+      //소수점인경우 소수첫째자리에서 반올림
+      this.bottomCheck = Number(top.toFixed(0))+offset === height;
+
+      // 100px 보다 크면 스크롤 판정.
+      this.scrolled = height - (offset + top) > 100;
+      // console.log('top:', top, 'height', height, 'offset', offset, this.scrolled);
+
+      if(el.scrollTop === 0) {
+        this.getMoreMessages();
+        this.oldHeight = el.scrollHeight;
+      }
+    });
   }
 
 

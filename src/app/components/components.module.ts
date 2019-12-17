@@ -30,6 +30,9 @@ import {TokenProvider} from '../biz-common/token';
 import {LoadingProvider} from '../providers/loading';
 import {CustomLinkComponent} from './custom-link/custom-link.component';
 import {ProfilePopoverComponent} from './profile-popover/profile-popover.component';
+import {ChatMenuPopoverComponent} from './chat-menu-popover/chat-menu-popover.component';
+import {InviteChatPopoverComponent} from './invite-chat-popover/invite-chat-popover.component';
+import {CreateChatPopoverComponent} from './create-chat-popover/create-chat-popover.component';
 
 @NgModule({
     declarations: [
@@ -57,6 +60,9 @@ import {ProfilePopoverComponent} from './profile-popover/profile-popover.compone
         ChangeTitlePopoverComponent,
         ProfilePopoverComponent,
         CustomLinkComponent,
+        ChatMenuPopoverComponent,
+        InviteChatPopoverComponent,
+        CreateChatPopoverComponent
     ],
     imports: [
         CommonModule,
@@ -87,16 +93,22 @@ import {ProfilePopoverComponent} from './profile-popover/profile-popover.compone
         MessageBalloonComponent,
         MembersPopoverComponent,
         WarnPopoverComponent,
+        ChatMenuPopoverComponent,
         ChangeTitlePopoverComponent,
         ProfilePopoverComponent,
-        CustomLinkComponent
+        InviteChatPopoverComponent,
+        CustomLinkComponent,
+        CreateChatPopoverComponent
     ],
     entryComponents: [
         MembersPopoverComponent,
         WarnPopoverComponent,
         ChangeTitlePopoverComponent,
         ProfilePopoverComponent,
-        CustomLinkComponent
+        ChatMenuPopoverComponent,
+        InviteChatPopoverComponent,
+        CustomLinkComponent,
+        CreateChatPopoverComponent
     ],
     providers: [
         UnreadCounter,

@@ -14,11 +14,16 @@ import {BizFireService} from '../../biz-fire/biz-fire';
 import {Electron} from '../../providers/electron';
 import {CacheService} from '../../core/cache/cache';
 import {ChatService} from '../../providers/chat.service';
+import {ProfilePopoverComponent} from '../profile-popover/profile-popover.component';
+import {ChatMenuPopoverComponent} from '../chat-menu-popover/chat-menu-popover.component';
+import {eventNames} from 'cluster';
+import {InviteChatPopoverComponent} from '../invite-chat-popover/invite-chat-popover.component';
 
 
 @Component({
   selector: 'chat-header',
-  templateUrl: 'chat-header.html'
+  templateUrl: 'chat-header.html',
+  styleUrls: ['./chat-header.scss'],
 })
 export class ChatHeaderComponent extends TakeUntil {
 
@@ -35,7 +40,7 @@ export class ChatHeaderComponent extends TakeUntil {
   set chat(room: IChat) {
     if(room) {
       let reload = true;
-      this.senderUid = room.data.lastMessage.sender;
+      if(room.data.lastMessage) { this.senderUid = room.data.lastMessage.sender; }
       if(this.room){
         const oldCount = this._room.isPublic()? this.bizFire.currentBizGroup.getMemberCount() : this._room.getMemberCount();
         const newCount = room.isPublic() ? this.bizFire.currentBizGroup.getMemberCount() : room.getMemberCount();
@@ -44,6 +49,8 @@ export class ChatHeaderComponent extends TakeUntil {
       }
 
       this._room = room;
+
+      this.getUserData();
 
       if(reload){
         this.reloadTitle();
@@ -74,24 +81,23 @@ export class ChatHeaderComponent extends TakeUntil {
     private chatService : ChatService
   ) {
     super();
+    this.bizFire.onLang.pipe(this.takeUntil).subscribe((l: any) => this.langPack = l.pack());
+  }
 
-    this.bizFire.onLang
-      .pipe(this.takeUntil)
-      .subscribe((l: any) => {
-        this.langPack = l.pack();
-      });
-
+  getUserData() {
     this.bizFire.userData
-      .pipe(this.takeUntil)
-      .subscribe(data => {
-        this.userCustomData = data;
-        if(this.userCustomData[this.room.cid] == null ||
+    .pipe(this.takeUntil)
+    .subscribe(data => {
+      this.userCustomData = data;
+      console.log("userCustomData::",this.userCustomData);
+      console.log(this.room);
+      if(this.userCustomData[this.room.cid] == null ||
           this.userCustomData[this.room.cid]['notify'] == null){
-          this.notifications = 'Icon_Outline_bell';
-        } else {
-          this.notifications = this.userCustomData[this.room.cid]['notify'] === true ? 'Icon_Outline_bell' : 'Icon_Outline_bell_off';
-        }
-      });
+        this.notifications = 'Icon_Outline_bell';
+      } else {
+        this.notifications = this.userCustomData[this.room.cid]['notify'] === true ? 'Icon_Outline_bell' : 'Icon_Outline_bell_off';
+      }
+    });
   }
 
   notificationOnOff() {
@@ -150,69 +156,89 @@ export class ChatHeaderComponent extends TakeUntil {
 
 
   //Chat invite Popover
-  presentPopover(ev): void {
-    console.log(this.memberChat);
-    console.log(this.room.data.type);
-    // let popover = this.popoverCtrl.create('page-member-chat-menu',{}, {cssClass: 'page-member-chat-menu'});
+  async presentPopover() {
+    const popover = await this.popoverCtrl.create({
+      component: ChatMenuPopoverComponent,
+      animated: false,
+      cssClass: ['page-member-chat-menu'],
+      showBackdrop: false
+    });
+    await popover.present();
 
-    // popover.present({ev: ev});
-    //
-    // popover.onDidDismiss(data => {
-    //   if(data === 'title') {
-    //
-    //     console.log("채팅방 이름변경 시작");
-    //     this.changeTitle(ev);
-    //
-    //   } else if(data === 'leave') {
-    //
-    //     console.log("채팅방 나가기 클릭");
-    //     this.leaveChatRoom(ev);
-    //
-    //   } else {
-    //     return;
-    //   }
-    // });
+    await popover.onDidDismiss().then((e: any) => {
+      const eventText = e.data;
+      if(eventText === 'leave') {
+        this.leaveChatRoom();
+      } else if (eventText === 'title') {
+        this.changeTitle();
+      } else if (eventText === 'invite') {
+        this.inviteChatRoom();
+      } else {
+        console.error("not event");
+      }
+    });
   }
 
   //chat member list
-  chatMemberList(ev): void {
-    // let popover = this.popoverCtrl.create(MembersPopoverComponent,{}, {cssClass: 'members-popover'});
-    // popover.present({ev: ev});
+  async chatMemberList() {
+    const popover = await this.popoverCtrl.create({
+      component: MembersPopoverComponent,
+      animated: false,
+      componentProps: {title: this.chatTitle},
+      cssClass: ['members-popover'],
+      showBackdrop: false
+    });
+    await popover.present();
   }
 
-  changeTitle(ev): void {
-    // let titlePopover = this.popoverCtrl.create(ChangeTitlePopoverComponent,
-    //   {title: this.chatTitle}, {cssClass: 'change-title-popover'});
-    // titlePopover.present({ev: ev});
-    //
-    // titlePopover.onDidDismiss(data => {
-    //   if(data) {
-    //     console.log("헤더에서 받는 변경된 채팅방 명 ::",data);
-    //     this._room.ref.set({ title: data },{merge : true});
-    //   }
-    // });
+  async changeTitle() {
+    const popover = await this.popoverCtrl.create({
+      component: ChangeTitlePopoverComponent,
+      animated: false,
+      componentProps: {title: this.chatTitle},
+      cssClass: ['change-title-popover'],
+    });
+    await popover.present();
+
+    popover.onDidDismiss().then((e : any) => {
+      const title = e.data;
+      if(title) {
+        this._room.ref.set({ title: title },{merge : true});
+      }
+    });
   }
 
-  leaveChatRoom(ev): void {
-    // let warnPopover = this.popoverCtrl.create(WarnPopoverComponent,
-    //   {title:this.langPack['leave_chat'],description:this.langPack['leave_chat_desc']}, {cssClass: 'warn-popover'});
-    // warnPopover.present({ev: ev});
-    //
-    // warnPopover.onDidDismiss(value => {
-    //   if(value) {
-    //     console.log("방나가기");
-    //     this._room.ref.update({
-    //       ['members.'+this.bizFire.uid]: firebase.firestore.FieldValue.delete()
-    //     }).then(() => {
-    //       const text = this.langPack['chat_exit_user_notice'].replace('$DISPLAYNAME', this.bizFire.currentUserValue.displayName);
-    //       this.chatService.makeRoomNoticeMessage('member-chat','exit',this.bizFire.gid,this._room.cid,[this.bizFire.uid])
-    //         .then(() => {
-    //           this.electron.windowClose();
-    //         });
-    //     })
-    //   }else {
-    //     return;
-    //   }
-    // });
+  async inviteChatRoom() {
+    const popover = await this.popoverCtrl.create({
+      component: InviteChatPopoverComponent,
+      animated: false,
+      cssClass: ['page-invite-room'],
+    });
+    await popover.present();
+  }
+
+  async leaveChatRoom() {
+    const popover = await this.popoverCtrl.create({
+      component: WarnPopoverComponent,
+      animated: false,
+      componentProps: {title:this.langPack['leave_chat'],description:this.langPack['leave_chat_desc']},
+      cssClass: ['warn-popover'],
+    });
+    await popover.present();
+
+    await popover.onDidDismiss().then((e :any) => {
+      const ok = e.data;
+      if(ok) {
+        this._room.ref
+        .update({['members.'+this.bizFire.uid]: firebase.firestore.FieldValue.delete()})
+        .then(() => {
+          this.chatService
+          .makeRoomNoticeMessage('member-chat','exit',this.bizFire.gid,this._room.cid,[this.bizFire.uid])
+          .then(() => this.electron.windowClose());
+        })
+      } else {
+        return;
+      }
+    });
   }
 }

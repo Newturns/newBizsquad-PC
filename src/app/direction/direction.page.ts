@@ -28,9 +28,9 @@ export class DirectionPage implements OnInit {
     this.electronService.ipcRenderer.invoke('test-channel','getChatData').then((result) => {
       if(result) {
         console.log("getChatData:",result);
-        this.electronService.ipcRenderer.once('sendUserData',(e, data) => {
+        this.electronService.ipcRenderer.once('sendUserData',async (e, data) => {
           console.log("getUserData : ",data);
-          this.goChatFrame(data,result);
+          await this.goChatFrame(data,result);
         });
       } else {
         this.router.navigate(['/login']);
@@ -40,6 +40,7 @@ export class DirectionPage implements OnInit {
   }
 
   async goChatFrame(loginData,roomData) {
+    console.log("start goChatFrame functions");
     try{
       const loading = await this.loading.show();
 
@@ -55,6 +56,7 @@ export class DirectionPage implements OnInit {
       await loading.dismiss();
 
     }catch (e) {
+      console.error("go chat room error",e);
       this.electronService.showErrorMessages("ERROR.",e.message);
       this.electronService.windowClose();
     }

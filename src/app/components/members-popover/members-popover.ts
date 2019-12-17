@@ -12,7 +12,8 @@ import {PopoverController} from '@ionic/angular';
 
 @Component({
   selector: 'members-popover',
-  templateUrl: 'members-popover.html'
+  templateUrl: 'members-popover.html',
+  styleUrls: ['./members-popover.scss'],
 })
 
 export class MembersPopoverComponent extends TakeUntil {

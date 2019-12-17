@@ -7,7 +7,8 @@ import {BizFireService} from '../../biz-fire/biz-fire';
 
 @Component({
   selector: 'change-title-popover',
-  templateUrl: 'change-title-popover.html'
+  templateUrl: 'change-title-popover.html',
+  styleUrls: ['./change-title-popover.scss'],
 })
 export class ChangeTitlePopoverComponent extends TakeUntil {
 

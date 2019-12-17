@@ -4,6 +4,7 @@ import {BizFireService} from '../../biz-fire/biz-fire';
 @Component({
   selector: 'biz-check-btn',
   templateUrl: './biz-check-btn.component.html',
+  styleUrls: ['./biz-check-btn.component.scss'],
 })
 export class BizCheckBtnComponent implements OnInit {
 

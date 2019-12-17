@@ -141,9 +141,9 @@ ion-item:hover a {
 // member page - popover template
 .page-member-chat-menu{
   .popover-content{
-    top: 65px !important;
+    top: 75px !important;
     left: auto !important;
-    right: 18px;
+    right: 25px;
     width: 130px;
     border: 3px;
     background-color: #f6f6f6 !important;
@@ -190,13 +190,11 @@ ion-item:hover a {
 
 //custom toast
 .toast-wrapper {
-  top: 90px !important;
   width: 80% !important;
   text-align: center !important;
   border-radius: 15px !important;
   opacity: 0.8 !important;
   transform: translateY(0%)!important;
-  bottom: initial !important;
 
   .toast-container{
 

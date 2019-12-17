@@ -7,6 +7,7 @@ import {NavParams, PopoverController, ToastController} from '@ionic/angular';
 import {LoadingProvider} from '../../providers/loading';
 import {ChatService} from '../../providers/chat.service';
 import {IChat} from '../../_models/message';
+import {Electron} from '../../providers/electron';
 
 @Component({
   selector: 'app-profile-popover',
@@ -48,6 +49,7 @@ export class ProfilePopoverComponent extends TakeUntil implements OnInit {
               private popoverCtrl : PopoverController,
               private toastCtrl: ToastController,
               private chatService : ChatService,
+              private electronService : Electron,
               private loading : LoadingProvider) {
     super();
   }
@@ -174,6 +176,26 @@ export class ProfilePopoverComponent extends TakeUntil implements OnInit {
   gotoChat() {
     const chatRooms = this.chatService.getChatRooms();
     console.log("chatRooms :",chatRooms);
+    let selectedRoom: IChat;
+    for(let room of chatRooms) {
+      const member_list = room.data.members;
+
+      if(Object.keys(member_list).length == 2) {
+        if(member_list.hasOwnProperty(this.targetValue.uid)) {
+          console.log("조건에 맞는 채팅방이 있습니다.",room);
+          selectedRoom = {cid: room.cid,data : room.data} as IChat;
+          break;
+        }
+      }
+    }
+
+    if(selectedRoom == null){
+      this.chatService.createRoomByProfile(this.targetValue);
+    } else {
+      this.chatService.onSelectChatRoom.next(selectedRoom);
+      this.electronService.openChatRoom(selectedRoom);
+    }
+    this.closePopover();
   }
 
 

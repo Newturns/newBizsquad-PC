@@ -43,6 +43,12 @@
   </ng-container>
  </div>
 
+ <div class="custom-fab d-flex align-items-center justify-content-center pointer"
+      [style.background-color]="group.data.team_color"
+      *ngIf="segmentName === 'chatRoom'"
+      (click)="createChatPopover()">
+  <ion-icon name="add"></ion-icon>
+ </div>
 
 </ion-content>
 

@@ -9,7 +9,8 @@ import {BizFireService} from '../../biz-fire/biz-fire';
 
 @Component({
   selector: 'biz-img',
-  templateUrl: 'img.component.html'
+  templateUrl: './img.component.html',
+  styleUrls: ['./img.component.scss'],
 })
 export class ImgComponent extends TakeUntil implements OnInit {
 

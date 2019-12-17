@@ -1,0 +1,26 @@
+<div class="create-chat-header d-flex justify-content-between align-items-center">
+  <div class="header-text">
+    {{langPack['select_member_invite']}}
+    <span *ngIf="isChecked.length > 0" [ngStyle]="{'color': groupSubColor ? groupSubColor : '#2a8bf2'}">{{isChecked.length}}</span>
+  </div>
+  <div>
+    <img src="assets/imgs/renewal/Icon_Outline_close.svg" (click)="closePopup()">
+  </div>
+</div>
+<ion-content>
+  <div class="invite-scroll-con">
+    <ng-container *ngIf="userList$ | async as userList">
+      <ng-container *ngFor="let user of userList">
+        <div class="user-frame d-flex align-items-center justify-content-between px-3 py-2" bizGroupColor [hover]="true" [selected]="false">
+          <app-avatar-button class="mr-2" [user]="user" [displayNameOn]="true" [textColor]="'#333333'"></app-avatar-button>
+          <biz-check-btn [checked]="user['checked']" (click)="checkedUsers(user)"></biz-check-btn>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</ion-content>
+
+<div class="create-chat-footer d-flex justify-content-center align-items-center">
+  <biz-button [title]="'cancel'" [teamColor]="false" (click)="closePopup()"></biz-button>
+  <biz-button [title]="'invite'" [teamColor]="true" (click)="invite()"></biz-button>
+</div>

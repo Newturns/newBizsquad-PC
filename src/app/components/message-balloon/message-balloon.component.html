@@ -26,7 +26,7 @@
     <div class="m-3">
       <!--childContentPadding 추가 됨.-->
       <app-avatar-button [user]="currentUserData" [displayNameOn]="true" [childContentPadding]="'7px'">
-        <div class="d-flex justify-content-start">
+        <div class="d-flex justify-content-center">
 
           <div class="otherMessage p-2" [ngClass]="groupColorBalloon()">
             <ng-container *ngIf="message.data.message.files &&  message.data.message.files.length > 0; else otherText">

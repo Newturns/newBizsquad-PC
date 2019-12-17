@@ -14,12 +14,12 @@
     <!--  위 : 채팅방제목, 아래 : 멤버수 -->
     <div class="d-flex chat-title-frame flex-column flex-grow-1 flex-shrink-1">
       <!--   채팅방 제목   -->
-      <div class="d-flex chat_title">
+      <div class="d-flex chat_title mb-1">
         <div> {{ chatTitle }} </div>
       </div>
       <!--   멤버 수   -->
-      <div class="d-flex align-items-center memeber-count pointer no-drag" (click)="chatMemberList($event)">
-        <img src="assets/imgs/renewal/Icon_Outline_user.svg"> {{ userCount }}
+      <div class="d-flex align-items-center memeber-count no-drag">
+        <img src="assets/imgs/renewal/Icon_Outline_user.svg" (click)="chatMemberList()"> {{ userCount }}
       </div>
     </div>
 
@@ -37,7 +37,7 @@
 <!--            <ion-range [(ngModel)]="opacity" color="dark" (ionChange)="electron.setOpacity(opacity)"></ion-range>-->
 <!--          </ion-item>-->
           <img class="pointer ml-2" src="assets/imgs/renewal/{{notifications}}.svg" width="22" height="22" (click)="notificationOnOff()">
-          <img *ngIf="memberChat" class="pointer ml-2" src="assets/imgs/renewal/Icon_Outline_more.svg" width="20" height="22" (tap)="presentPopover($event)">
+          <img *ngIf="memberChat" class="pointer ml-2" src="assets/imgs/renewal/Icon_Outline_more.svg" width="20" height="22" (click)="presentPopover()">
         </div>
       </div>
     </div>
