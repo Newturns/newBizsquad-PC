@@ -14,6 +14,7 @@ import {Chat} from '../biz-common/chat';
 import { UnreadCounter } from '../components/classes/unread-counter';
 import {ChatService} from '../providers/chat.service';
 import {Commons} from '../biz-common/commons';
+import {UserStatusProvider} from '../core/user-status';
 
 @Component({
   selector: 'app-tabs',
@@ -45,9 +46,12 @@ export class TabsPage implements OnInit {
       private electronService : Electron,
       private notificationService : NotificationService,
       private chatService : ChatService,
+      private userStatusService: UserStatusProvider,
       private squadService : SquadService) {
 
     this._unsubscribeAll = new Subject<any>();
+
+    this.userStatusService.onUserStatusChange();
 
     // 채팅이 아닌 메인 윈도우를 우클릭으로 완전 종료시 유저상태변경하는 리스너.(파이어베이스의 유저상태);
     window.addEventListener('unload', () => {
@@ -70,11 +74,12 @@ export class TabsPage implements OnInit {
 
               //* have group changed?
               let reloadGroup = true;
-              if(this.group != null){
-                reloadGroup = this.group.gid !== group.gid;
-              }
+              // if(this.group != null){
+              //   reloadGroup = this.group.gid !== group.gid;
+              // }
 
               this.group = group;
+              this.teamColor = this.group.data.team_color;
 
               console.log("언리드 모니터 시작");
               // 모든 채팅의 UNREAD COUNT 를 모니터
@@ -95,6 +100,12 @@ export class TabsPage implements OnInit {
       console.log("스쿼드 리스트 :",list);
       const newChat = list.map(l => {
         return new Chat(l.sid , l.data, this.bizFire.uid, l.ref);
+      }).filter(sChat => {
+        if(this.group.isPartner()) {
+          return sChat.data.agile;
+        } else {
+          return true;
+        }
       });
 
       this.squadService.onSquadListChanged.next(newChat);
@@ -190,6 +201,7 @@ export class TabsPage implements OnInit {
   }
 
   ngOnDestroy(): void {
+    console.log('tabs : ngOndestroy');
     this.clear();
     this._unsubscribeAll.next();
     this._unsubscribeAll.complete();
@@ -211,5 +223,6 @@ export class TabsPage implements OnInit {
       this.unreadCounter.clear();
       this.unreadCounter = null; // always create new one with new GID.
     }
+    this.squadService.onSquadListChanged.next(null);
   }
 }

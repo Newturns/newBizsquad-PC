@@ -397,7 +397,6 @@ export class NotificationService {
   * */
   acceptInvitation(notificationData: INotificationData): Promise<any> {
 
-
     return new Promise<any>( resolve => {
       // get type
       let path;

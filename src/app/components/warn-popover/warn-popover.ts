@@ -21,13 +21,12 @@ export class WarnPopoverComponent {
     this.description = this.navParams.get('description');
   }
 
+  ok() {
+    this.popoverCtrl.dismiss(true);
+  }
 
   cancel() {
     this.popoverCtrl.dismiss(false);
-  }
-
-  ok() {
-    this.popoverCtrl.dismiss(true);
   }
 
   closePopup(){

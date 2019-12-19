@@ -5,6 +5,7 @@ import {LoadingProvider} from '../providers/loading';
 import {Electron} from '../providers/electron';
 import {environment} from '../../environments/environment';
 import {INotification} from '../_models';
+import {ConfigService} from '../config.service';
 
 @Injectable()
 export class TokenProvider {
@@ -17,6 +18,7 @@ export class TokenProvider {
         private http: HttpClient,
         private electron : Electron,
         private loading: LoadingProvider,
+        private configService : ConfigService,
         private bizFire:BizFireService) {
     }
 
@@ -60,42 +62,40 @@ export class TokenProvider {
         })
     }
 
-    makeWebJump(type: string,sid?:string) {
-      this.getToken(this.bizFire.uid).then((token : string) => {
-        if(type === 'video_chat') {
-          this.ipc.send('loadGH',`${environment.webJumpBaseUrl}${token}&url=video`);
+    async makeWebJump(type: string,sid?:string) {
+      const loading = await this.loading.show();
+      this.getToken(this.bizFire.uid).then(async (token : string) => {
+        if(type === 'setting') {
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=selector/property/${this.bizFire.gid}`);
+        }
+        if(type === 'bbs') {
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/notice`);
+        }
+        if(type === 'squad') {
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/squad/${sid}`)
         }
         if(type == 'mypage') {
-          this.ipc.send('loadGH',`${environment.webJumpBaseUrl}${token}&url=myPage`);
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/myPage`)
         }
-        if(type == 'squad') {
-          this.ipc.send('loadGH',`${environment.webJumpBaseUrl}${token}&url=${this.bizFire.gid}/squad/${sid}`);
+        if(type === 'video_chat') {
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/video`);
         }
-        if(type == 'bbs') {
-          this.ipc.send('loadGH',`${environment.webJumpBaseUrl}${token}&url=${this.bizFire.gid}/notice`);
+        // 미구현 된 테스크 박스
+        if(type === 'taskbox') {
+          this.electron.goLink(environment.publicWeb);
         }
-        // 미구현된 기능들..
-        if(type === 'SFA'){
-          this.ipc.send('loadGH',`${environment.publicWeb}`);
-        }
-        if(type === 'workflow') {
-          this.ipc.send('loadGH',`${environment.publicWeb}`);
-        }
-        if(type === 'task') {
-          this.ipc.send('loadGH',`${environment.publicWeb}`);
-        }
+        await loading.dismiss();
       })
     }
 
     notifyWebJump(item: INotification,link?:string) {
       this.getToken(this.bizFire.uid).then((token : string) => {
         if(item.data.type === 'groupInvite') {
-          this.ipc.send('loadGH',`${environment.webJumpBaseUrl}${token}&url=${item.data.gid}/home`)
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${item.data.gid}/home`);
         } else {
-          let jumpUrl = `${environment.webJumpBaseUrl}${token}&url=${link}`;
-          this.ipc.send('loadGH',jumpUrl);
+          const jumbUrl = `${this.getWebUrl()}/auth?token=${token}&url=${link}`;
+          this.electron.goLink(jumbUrl);
         }
-
         //웹 점프시 알람 읽음 처리
         if(item.data.statusInfo.done !== true) {
           item.ref.update({
@@ -103,6 +103,19 @@ export class TokenProvider {
           });
         }
       })
+    }
+
+
+    getWebUrl() : string {
+      const firebaseName = this.configService.firebaseName;
+      if(firebaseName) {
+        if(firebaseName === 'bizsquad') {
+          return `http://localhost:4200/${firebaseName}`;
+          return `https://bizsquad.net/${firebaseName}`;
+        } else {
+          return `https://${firebaseName}.bizsquad.net/${firebaseName}`;
+        }
+      }
     }
 
 }

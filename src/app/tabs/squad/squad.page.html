@@ -10,7 +10,7 @@
     <div class="mb-3" *ngIf="bookmark.length > 0 && squadfilterValue === null || squadfilterValue === 'bookmark'">
       <div class="squad-list-title mb-2">{{langPack['bookmark']}}</div>
       <ng-container *ngFor="let squad of bookmark">
-        <div class="mb-1">
+        <div class="mb-1" (click)="tokenService.makeWebJump('squad',squad.cid)">
           <biz-squad-item class="w-100" [squad]="squad" [star]="true"></biz-squad-item>
         </div>
       </ng-container>
@@ -19,7 +19,7 @@
     <div class="mb-3" *ngIf="publicSquads.length > 0 && squadfilterValue === null || squadfilterValue === 'general'">
       <div class="squad-list-title mb-2">{{langPack['squad_count_label']}}</div>
       <ng-container *ngFor="let squad of publicSquads">
-        <div class="mb-1">
+        <div class="mb-1" (click)="tokenService.makeWebJump('squad',squad.cid)">
           <biz-squad-item class="w-100" [squad]="squad" [star]="false"></biz-squad-item>
         </div>
       </ng-container>
@@ -28,7 +28,7 @@
     <div *ngIf="privateSquads.length > 0 && squadfilterValue === null || squadfilterValue === 'agile'">
       <div class="squad-list-title mb-2">{{langPack['my_squad_count_label']}}</div>
       <ng-container *ngFor="let squad of privateSquads">
-        <div class="mb-1">
+        <div class="mb-1" (click)="tokenService.makeWebJump('squad',squad.cid)">
           <biz-squad-item class="w-100" [squad]="squad" [star]="false"></biz-squad-item>
         </div>
       </ng-container>

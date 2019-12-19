@@ -33,7 +33,11 @@
               <biz-chat-attach [files]="message.data.message.files" [isMyMessage]="isMyMessage"></biz-chat-attach>
             </ng-container>
             <ng-template #otherText>
-              <span class="font-14" [innerHTML]="text | sanitizingHtml"></span>
+              <div class="d-flex flex-column">
+                <div class="font-14" [innerHTML]="text | sanitizingHtml"></div>
+                <div class="font-14" *ngIf="userTranslationsFlg && translations && translations !== text" style="color:#EFEFEF" [innerHTML]="translations | sanitizingHtml"></div>
+                <div class="text-danger" *ngIf="userTranslationsFlg && translationError">{{translationError}}</div>
+              </div>
             </ng-template>
           </div>
 

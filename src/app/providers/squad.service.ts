@@ -59,7 +59,7 @@ export class SquadService extends TakeUntil{
 
   userCustomData: any;
 
-  constructor(public bizFire : BizFireService,) {
+  constructor(public bizFire : BizFireService) {
     super();
 
     this.bizFire.userData.pipe(this.takeUntil).subscribe(u => {
@@ -75,7 +75,7 @@ export class SquadService extends TakeUntil{
           return query;
       })
           .snapshotChanges()
-          .pipe(takeUntil(this.bizFire.onUserSignOut) ,
+          .pipe(takeUntil(this.bizFire.onUserSignOut),
               map(docs => docs
                   .filter(d=>{
                       // get all

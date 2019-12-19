@@ -1,15 +1,22 @@
 {
-  "name": "Bizsquad",
-  "version": "0.0.1",
-  "author": "Ionic Framework",
+  "name": "bizsquad",
+  "version": "1.0.2",
+  "author": {
+    "name": "kimtaehwan",
+    "email": "skyzard1@gmail.com",
+    "url": "https://www.bizsquad.net"
+  },
   "homepage": "https://ionicframework.com/",
   "scripts": {
-    "electron": "electron .",
-    "start": "ionic serve --no-open",
-    "build": "ionic build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e",
+    "dev": "nf start",
+    "start": "ionic-app-scripts serve",
+    "clean": "ionic-app-scripts clean",
+    "build": "ionic-app-scripts build",
+    "ionic:build": "ng build",
+    "ionic:serve": "ionic-app-scripts serve",
+    "publish": "electron-builder --mac --win --publish always",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
     "dist-all": "electron-builder -mw"
   },
   "private": true,
@@ -32,6 +39,8 @@
     "electron-context-menu": "^0.15.1",
     "electron-default-menu": "^1.0.1",
     "electron-json-storage": "^4.1.8",
+    "electron-log": "^4.0.0",
+    "electron-updater": "^4.2.0",
     "electron-window-state": "^5.0.3",
     "firebase": "^7.6.0",
     "rxjs": "~6.5.1",
@@ -53,7 +62,7 @@
     "@types/node": "~8.9.4",
     "codelyzer": "^5.0.0",
     "electron": "^7.1.5",
-    "electron-builder": "^21.2.0",
+    "electron-builder": "^22.2.0",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.1.0",
@@ -73,6 +82,13 @@
     "ionic_webpack": "./config/webpack.config.js"
   },
   "build": {
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Newturns",
+        "repo": "newBizsquad-PC"
+      }
+    ],
     "appId": "com.bizsquad.ionic",
     "mac": {
       "target": [

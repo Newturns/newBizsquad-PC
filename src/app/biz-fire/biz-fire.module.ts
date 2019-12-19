@@ -2,13 +2,25 @@ import {ModuleWithProviders, NgModule, NgZone, Optional, PLATFORM_ID, SkipSelf} 
 import { CommonModule } from '@angular/common';
 
 import {AngularFirestoreModule, FirestoreSettingsToken} from '@angular/fire/firestore';
-
-import {
-  BizAuth, BizAuthFactory, BizFirestore, BizFirestoreFactory, BizStorage, BizStorageFactory, TaxlineAuth, TaxlineAuthFactory,
-  TaxlineFirestore, TaxlineFirestoreFactory, TaxlineStorage, TaxlineStorageFactory,
-} from './factory.service';
 import {AngularFireAuthModule} from '@angular/fire/auth';
 import {AngularFireStorageModule} from '@angular/fire/storage';
+
+import {
+  BizAuth,
+  BizAuthFactory,
+  BizFirebase,
+  BizFirebaseFactory,
+  BizFirestore,
+  BizFirestoreFactory,
+  BizStorage,
+  BizStorageFactory,
+  TaxlineAuth,
+  TaxlineAuthFactory, TaxlineFirebase, TaxlineFirebaseFactory,
+  TaxlineFirestore,
+  TaxlineFirestoreFactory,
+  TaxlineStorage,
+  TaxlineStorageFactory,
+} from './factory.service';
 import {BizFireService} from './biz-fire';
 
 
@@ -46,6 +58,16 @@ const providers = [
     provide: TaxlineStorage,
     deps: [PLATFORM_ID, NgZone],
     useFactory: TaxlineStorageFactory
+  },
+  {
+    provide: BizFirebase,
+    deps: [PLATFORM_ID, NgZone],
+    useFactory: BizFirebaseFactory
+  },
+  {
+    provide: TaxlineFirebase,
+    deps: [PLATFORM_ID, NgZone],
+    useFactory: TaxlineFirebaseFactory
   },
 ];
 

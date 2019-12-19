@@ -54,10 +54,8 @@ export class HomePage implements OnInit {
   }
 
   ngOnInit() {
-
     this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => {
       this.langPack = l.pack();
-      console.log("언어팩구독.")
     });
 
     this.notificationService.onNotifications
@@ -154,6 +152,7 @@ export class HomePage implements OnInit {
 
 
   logout() {
+    this.showMore = false;
     this.electronService.resetValue();
     this.bizFire.signOut();
   }
@@ -166,6 +165,11 @@ export class HomePage implements OnInit {
     this.bizFire.signOut().then(() => {
       this.electronService.windowClose();
     });
+  }
+
+  goMypage() {
+    this.showMore = false;
+    this.tokenService.makeWebJump('mypage');
   }
 
   ngOnDestroy(): void {

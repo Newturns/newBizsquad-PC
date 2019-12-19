@@ -1,114 +1,73 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {filter} from 'rxjs/operators';
+import {filter, take} from 'rxjs/operators';
 
 import {language} from './lang';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class LangService {
 
-    language;
+    // database saved data
+    private originalLangData$ = new BehaviorSubject<any>(null);
     private countryCode = 'en';
 
-    private langPackCache = {};
-
-    private totalLangMap = {};
+    // 현재 선택된 언어만 저장 패키지.
+    private filteredLangMap = {};
 
     //v2
     private _langObserver = new BehaviorSubject<any>(null);
-
-    constructor() {
-
-        /*
-        this.db.object('language').valueChanges().subscribe(language =>{
-            console.log(language);
-            this.language = language;
-        });*/
-
-        new Observable<any>(observer => {
-
-            // todo: change to firebase
-            observer.next(language); // lang.ts file.
-        }).subscribe(language => {
-
-            this.langPackCache = {};
-            this.language = language; // just save lang.ts file of from firebase
-        });
-    }
-
     //v2 return just new map.
     get onLangMap(): Observable<any> {
-        // resolve only when totalLangMap had some value !
+        // resolve only when filteredLangMap had some value !
         return this._langObserver.asObservable().pipe(filter(f => f != null));
     }
 
-
-
-    /*
-    * Return object
-    * */
-    find(key: string): any | null{
-        const vals = key.split('.');
-        let path = this.language;
-        for(let val of vals){
-            path = path[val];
-            if(path == null)break;
-        }
-        return path;
+    get lang() {
+        return this.onLangMap;
     }
 
+    constructor(private http: HttpClient) {
 
-    //USAGE :
-    // pack()['close_button']
-    /*pack(key: string): any {
-        let ret = {};
-        const obj = this.find(key);
-        if(obj){
-            Object.keys(obj).forEach(stringKey => ret[stringKey] = obj[stringKey][this.countryCode]);
-        }
-        return ret;
-    }*/
+        this.http.get(`${environment.masterUrl}/lang.json`)
+            .subscribe((language: any) => {
+                this.originalLangData$.next(language); // just save lang.ts file of from firebase
+            });
+    }
+
 
     /*
     * v2
     * - load all keys from lang.ts
     * - override old key with new one.
     * */
-    loadLanguage(language = 'en'){
-
-        //console.log(`loadLanguage(${language}) called.`);
+    loadLanguage(langCode = 'en'){
 
         // remove old one.
-        this.totalLangMap = {};
-        this.countryCode = language;
+        this.filteredLangMap = {};
+        this.countryCode = langCode;
 
-        // start parse
-        Object.keys(this.language)
-            .filter(k => typeof this.language[k] === 'object')
-            .forEach(key => {
-
-                const pack = this.language[key];
-                if(pack.hasOwnProperty(language)){
-                    this.totalLangMap[key] = pack[language];
-                }
-                else {
-                    Object.keys(pack).forEach(subKey => {
-                        const subPack = pack[subKey];
-                        if(subPack.hasOwnProperty(language)){
-                            this.totalLangMap[subKey] = subPack[language];
+        this.originalLangData$
+            .pipe(take(1))
+            .subscribe((langFullData: any)=>{
+                // start parse
+                Object.keys(langFullData)
+                    .forEach(key => {
+                        const pack = langFullData[key];
+                        if(pack[langCode] != null){
+                            this.filteredLangMap[key] = pack[langCode];
                         }
                     });
-                }
+                // broadcast new map to all listeners.
+                this._langObserver.next(this.filteredLangMap);
             });
-
-        // broadcast new map to all listeners.
-        this._langObserver.next(this.totalLangMap);
     }
 
     get(key: string): string {
-        return this.totalLangMap[key] || key;
+        return this.filteredLangMap[key] || key;
     }
 
     /*
@@ -118,6 +77,7 @@ export class LangService {
     * */
     pack(firstObjectKey?: string): any {
         // just return map.
-        return this.totalLangMap;
+        return this.filteredLangMap;
     }
 }
+

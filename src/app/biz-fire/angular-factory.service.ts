@@ -1,9 +1,10 @@
 import {Injectable, NgZone} from '@angular/core';
 import {ConfigService} from '../config.service';
 import {AngularFirestore} from '@angular/fire/firestore';
-import {BizAuth, BizFirestore, BizStorage, TaxlineAuth, TaxlineFirestore, TaxlineStorage} from './factory.service';
+import {BizAuth, BizFirebase, BizFirestore, BizStorage, TaxlineAuth, TaxlineFirestore, TaxlineStorage} from './factory.service';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {AngularFireStorage} from '@angular/fire/storage';
+import {AngularFireDatabase} from '@angular/fire/database';
 
 @Injectable({
   providedIn: 'root'
@@ -17,9 +18,22 @@ export class AngularFactoryService {
     public _taxlineAuth: TaxlineAuth,
     public _bizStorage: BizStorage,
     public _taxlineStorage: TaxlineStorage,
+    public _bizFirebase : BizFirebase,
     private configService: ConfigService,
     ) {
     
+  }
+
+  getFirebase(): AngularFireDatabase {
+    if(this.configService.firebaseName == null){
+      throw new Error('this.configService.firebaseName is null.');
+    }
+    if(this.configService.firebaseName === 'bizsquad'){
+      return this._bizFirebase;
+    }
+    if(this.configService.firebaseName === 'taxline'){
+      return this._bizFirebase;
+    }
   }
   
   

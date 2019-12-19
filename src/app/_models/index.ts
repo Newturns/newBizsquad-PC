@@ -28,6 +28,8 @@ export interface IUser {
 export interface IUserData {
   email?: string,
   displayName?: string,
+  translateLang?: string,
+  autoTranslation?: boolean,
   status?: number,
   photoURL?: string,
   phoneNumber?: any,

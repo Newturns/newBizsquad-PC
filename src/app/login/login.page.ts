@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, NgZone, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, ValidatorFn, Validators} from '@angular/forms';
 import {LoadingProvider} from '../providers/loading';
 import {ConfigService} from '../config.service';
@@ -6,6 +6,7 @@ import {BizFireService} from '../biz-fire/biz-fire';
 import {Router} from '@angular/router';
 import {Electron} from '../providers/electron';
 import * as electron from "electron";
+import {UserStatusProvider} from '../core/user-status';
 // import * as electron from 'electron';
 
 @Component({
@@ -40,7 +41,8 @@ export class LoginPage implements OnInit {
       private configService: ConfigService,
       private bizFire : BizFireService,
       private router : Router,
-      private electronService : Electron
+      private electronService : Electron,
+      private ngZone : NgZone
   ) {
 
     this.loginForm = formBuilder.group({
@@ -57,13 +59,20 @@ export class LoginPage implements OnInit {
 
     this.electronService.ipcRenderer.send('getLocalUser', 'ping');
 
-    this.electronService.ipcRenderer.once('sendUserData',(e, data) => {
+    this.electronService.ipcRenderer.once('sendUserData',async (e, data) => {
       this.loginForm.get('email').setValue(data.id);
       this.autoLoign = data.auto;
       this.loginForm.get('company').setValue(data.company);
 
       //오토로그인 체크되어있을때 비밀번호 값 넣기
-      if(this.autoLoign) this.loginForm.get('password').setValue(data.pwd);
+      if(this.autoLoign && this.bizFire.firstLogin.getValue()) {
+        this.loginForm.get('password').setValue(data.pwd);
+
+        //자동로그인시 아이오닉 UI에러 해결 ngZone.
+        this.ngZone.run(() => {
+          this.onLogin();
+        });
+      }
     });
   }
 

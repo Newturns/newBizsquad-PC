@@ -1,8 +1,8 @@
 import {Injectable, Optional, SkipSelf} from '@angular/core';
 import * as firebase from 'firebase/app';
 import {AngularFireAuth} from '@angular/fire/auth';
-import {BehaviorSubject, Observable, Subscription, Subject, timer, concat} from 'rxjs';
-import {filter, takeUntil, take, concatMap} from 'rxjs/operators';
+import {BehaviorSubject, Observable, Subscription, Subject, timer, concat, forkJoin, of} from 'rxjs';
+import {filter, takeUntil, take, concatMap, endWith, concatAll} from 'rxjs/operators';
 import {Commons, STRINGS} from '../biz-common/commons';
 import {AngularFirestore} from '@angular/fire/firestore';
 import {InitProcess} from './init-process';
@@ -15,11 +15,15 @@ import {AngularFactoryService} from './angular-factory.service';
 import {ConfigService} from '../config.service';
 import {Router} from '@angular/router';
 import {Electron} from '../providers/electron';
+import {UserStatusProvider} from '../core/user-status';
+import {AngularFireDatabase} from '@angular/fire/database';
 
 @Injectable({
     providedIn: 'root'
 })
 export class BizFireService {
+
+    firstLogin = new BehaviorSubject<boolean>(true);
 
     userCustomLinks = new BehaviorSubject<userLinks[]>(null);
 
@@ -28,6 +32,7 @@ export class BizFireService {
     }
 
     onUserSignOut: Subject<boolean> = new Subject<boolean>();
+
 
     get takeUntilUserSignOut(){
         return takeUntil(this.onUserSignOut);
@@ -143,6 +148,9 @@ export class BizFireService {
     get afStorage(): AngularFireStorage {
         return this.angularFactoryService.getStorage();
     }
+    get afBase(): AngularFireDatabase {
+        return this.angularFactoryService.getFirebase();
+    }
 
     // authState 감시.
     private authStateSub: Subscription;
@@ -230,6 +238,12 @@ export class BizFireService {
             this._onLang.next(this._lang);
         });
 
+        //숙제.
+        // const testob = of(this.configService.firebaseName$,this.authState,this.currentUser);
+        // testob.pipe(concatAll()).subscribe((val) => {
+        //    console.log(val);
+        // });
+
         /*
         * 멀티 디비 추가.
         * */
@@ -302,15 +316,15 @@ export class BizFireService {
         //electron chat windows clear
         this.electronService.clearChatWindows();
 
+        this.currentBizGroup = null;
+        this._onBizGroupSelected.next(null);
+        this._currentUser.next(null);
+
         // unsubscribe old one for UserData
         if(this.currentUserSubscription != null){
             this.currentUserSubscription.unsubscribe();
             this.currentUserSubscription = null;
         }
-
-        this.currentBizGroup = null;
-        this._onBizGroupSelected.next(null);
-        this._currentUser.next(null);
 
         if(this.authStateSub){
             this.authStateSub.unsubscribe();
@@ -414,6 +428,7 @@ export class BizFireService {
         try {
             await this.afAuth.auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
             const user = await this.afAuth.auth.signInWithEmailAndPassword(email, password);
+            this.afBase.database.goOnline();
             return user.user;
         } catch (e) {
             console.error(e);
@@ -425,10 +440,14 @@ export class BizFireService {
 
         console.log('BizFireService.signOut()');
 
-        timer(0).subscribe(()=>this.onUserSignOut.next(true));
+        this.afBase.database.goOffline();
 
         // delete current info
         this.clear();
+
+        this.onUserSignOut.next(true);
+        this.firstLogin.next(false);
+
 
         // unsubscribe old one for UserData
         // * called ONLY user signed Out from signIn.

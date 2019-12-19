@@ -12,6 +12,7 @@ import {PopoverController} from '@ionic/angular';
 import {WarnPopoverComponent} from '../../components/warn-popover/warn-popover';
 import {filter, take, takeUntil} from 'rxjs/operators';
 import {CacheService} from '../../core/cache/cache';
+import {TokenProvider} from '../../biz-common/token';
 
 @Component({
   selector: 'app-notify',
@@ -48,6 +49,7 @@ export class NotifyPage implements OnInit {
               public electronService : Electron,
               private popoverCtrl : PopoverController,
               private cacheService : CacheService,
+              private tokenService : TokenProvider,
               private router : Router) {
     this._unsubscribeAll = new Subject<any>();
   }
@@ -124,7 +126,7 @@ export class NotifyPage implements OnInit {
     this.notificationService.acceptInvitation(msg.data).then(() => {
 
       //해당 디비와 관련된 웹으로 점프.
-      // this.notificationService.notifyWebJump(msg);
+      this.tokenService.notifyWebJump(msg);
 
       if(msg.ref) {
         msg.ref.delete()
@@ -175,7 +177,7 @@ export class NotifyPage implements OnInit {
     });
 
     popover.onDidDismiss().then(async (ok) => {
-      if(ok) {
+      if(ok === true) {
         const batch = this.bizFire.afStore.firestore.batch();
         this.messages.forEach(msg => {
           const ref = this.bizFire.afStore.firestore.collection(Commons.notificationPath(this.bizFire.currentUID)).doc(msg.mid);

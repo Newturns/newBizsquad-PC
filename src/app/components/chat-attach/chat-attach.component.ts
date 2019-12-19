@@ -7,6 +7,7 @@ import {Electron} from '../../providers/electron';
 @Component({
   selector: 'biz-chat-attach',
   templateUrl: './chat-attach.component.html',
+  styleUrls: ['./chat-attach.component.scss'],
 })
 export class ChatAttachComponent implements OnInit {
 

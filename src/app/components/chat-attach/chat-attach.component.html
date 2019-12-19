@@ -15,8 +15,8 @@
       <!-- 여기는 파일 확장자에 따른 이미지 -->
       <button class="custom-button" mat-icon-button (click)="goLink(file.url)">
         <!--  <mat-icon>insert_drive_file</mat-icon>-->
-        <img *ngIf="isMyMessage" src="imgs/renewal/Icon_Outline_file.svg">
-        <img *ngIf="!isMyMessage" src="imgs/renewal/Icon_Outline_file_white.svg">
+        <img *ngIf="isMyMessage" src="assets/imgs/renewal/Icon_Outline_file.svg">
+        <img *ngIf="!isMyMessage" src="assets/imgs/renewal/Icon_Outline_file_white.svg">
       </button>
     </ng-container>
 
@@ -24,7 +24,7 @@
     <div class="d-flex flex-column file-info"
          [ngStyle]="{'margin':isMyMessage? '0px 16px 0px 0px': '0px 0px 0px 16px'}">
       <div>
-        <a #aLink class="file-link" (click)="goLink(file.url)">{{file.name}}</a>
+        <a #aLink class="file-link pointer font-14" (click)="goLink(file.url)">{{file.name}}</a>
       </div>
       <div class="file-size">{{file.size / 1000000 |number:'1.0-2'}}Mb</div>
     </div>

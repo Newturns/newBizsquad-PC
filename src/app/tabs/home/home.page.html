@@ -17,7 +17,7 @@
     </div>
 
     <div class="badge-btn">
-      <ion-button class="mr-2 ion-no-padding" fill="clear" slot="ioon-only" [hidden]="!bizFire.currentBizGroup.isManager">
+      <ion-button (click)="tokenService.makeWebJump('setting')" class="mr-2 ion-no-padding" fill="clear" slot="ioon-only" [hidden]="!bizFire.currentBizGroup.isManager()">
         <ion-icon src="assets/imgs/renewal/Icon_Outline_settings.svg"></ion-icon>
       </ion-button>
       <ion-button class="mr-1 ion-no-padding" fill="clear" slot="ioon-only" (click)="showNotify()">
@@ -32,7 +32,7 @@
       </div>
       <div class="popup" *ngIf="showMore">
         <ul>
-          <li (click)="tokenService.makeWebJump('mypage')">{{ langPack['myaccount'] }}</li>
+          <li (click)="goMypage()">{{ langPack['myaccount'] }}</li>
           <li (click)="logout()">{{ langPack['logout'] }}</li>
           <li (click)="windowClose()">{{ langPack['shutdown'] }}</li>
         </ul>
@@ -48,7 +48,7 @@
           <ion-row>
             <ion-col class="col-3">
               <div class="d-flex flex-column align-items-center">
-                <div class="menu-box d-flex align-items-center justify-content-center">
+                <div class="menu-box d-flex align-items-center justify-content-center" (click)="tokenService.makeWebJump('video_chat')">
                   <img src="assets/imgs/renewal/Icon_video.svg">
                 </div>
                 <div class="menu-text mt-1">{{langPack['video_chat']}}</div>
@@ -56,7 +56,7 @@
             </ion-col>
             <ion-col class="col-3">
               <div class="d-flex flex-column align-items-center">
-                <div class="menu-box d-flex align-items-center justify-content-center">
+                <div class="menu-box d-flex align-items-center justify-content-center" (click)="tokenService.makeWebJump('taskbox')">
                   <img src="assets/imgs/renewal/Icon_sales.svg">
                 </div>
                 <div class="menu-text mt-1">{{ langPack['SFA'] }}</div>
@@ -64,7 +64,7 @@
             </ion-col>
             <ion-col class="col-3">
               <div class="d-flex flex-column align-items-center">
-                <div class="menu-box d-flex align-items-center justify-content-center">
+                <div class="menu-box d-flex align-items-center justify-content-center" (click)="tokenService.makeWebJump('taskbox')">
                   <img src="assets/imgs/renewal/Icon_workflow.svg">
                 </div>
                 <div class="menu-text mt-1">{{ langPack['workflow'] }}</div>
@@ -72,7 +72,7 @@
             </ion-col>
             <ion-col class="col-3">
               <div class="d-flex flex-column align-items-center">
-                <div class="menu-box d-flex align-items-center justify-content-center">
+                <div class="menu-box d-flex align-items-center justify-content-center" (click)="tokenService.makeWebJump('taskbox')">
                   <img src="assets/imgs/renewal/Icon_task.svg">
                 </div>
                 <div class="menu-text mt-1">{{ langPack['task'] }}</div>
@@ -132,17 +132,22 @@
         <div class="d-flex flex-column">
           <div class="px-3 py-2 menu-title d-flex justify-content-between align-items-center">
             <div>{{ langPack['BBS'] }}</div>
-            <div class="pointer p-1">
+            <div class="pointer p-1" (click)="tokenService.makeWebJump('bbs')">
               <ion-icon name="ios-arrow-forward" class="font-20 biz-color-default"></ion-icon>
             </div>
           </div>
-          <div class="px-4 notice-msg-con d-flex justify-content-between align-items-center pointer"
-               *ngFor="let notice of latelyNotice">
-            <div class="notice-title d-flex flex-grow-1 flex-shrink-1 align-items-center">
-              <span>{{notice.data.title}}</span>
+          <ng-container *ngIf="!bizFire.currentBizGroup.isPartner(); else partner">
+            <div class="px-4 notice-msg-con d-flex justify-content-between align-items-center"
+                 *ngFor="let notice of latelyNotice">
+              <div class="notice-title d-flex flex-grow-1 flex-shrink-1 align-items-center">
+                <span>{{notice.data.title}}</span>
+              </div>
+              <div class="notice-time d-flex flex-shrink-0 align-items-center">{{notice.data.created | timestampToDate | date:'yyyy-MM-dd hh:mm:ss a'}}</div>
             </div>
-            <div class="notice-time d-flex flex-shrink-0 align-items-center">{{notice.data.created | timestampToDate | date:'yyyy-MM-dd hh:mm:ss a'}}</div>
-          </div>
+          </ng-container>
+          <ng-template #partner>
+            <div class="notice-hide text-center">You do not have permission.</div>
+          </ng-template>
         </div>
       </div>
     </ng-container>

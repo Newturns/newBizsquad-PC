@@ -27,7 +27,7 @@
 
 
   <!--ITEM-->
-  <div class="pb-4 flex-grow-1 ">
+  <div class="pb-4 flex-grow-1 " style="min-width: 0">
     <div class="notice-item p-3 d-flex flex-column" [ngClass]="done == true ? 'read-notice-item' : 'notice-item'">
 
       <!--NAME-->
@@ -49,8 +49,8 @@
       </div>
 
       <!--TITLE ? -->
-      <div class="item-info word-break-all text-wrap text-ellipsis flex-grow-1 flex-shrink-1 d-flex align-items-center">
-        {{item.data.info?.title || langPack['deleted_group']}}
+      <div class="item-info d-flex flex-grow-1 flex-shrink-1 align-items-center">
+        <span>{{item.data.info?.title || langPack['deleted_group']}}</span>
       </div>
 
       <div class="flex-shrink-0 d-flex align-items-center">

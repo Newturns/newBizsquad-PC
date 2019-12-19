@@ -5,10 +5,9 @@ import {IBizGroup, IFolderItem, IUserData} from '../../_models';
 import {IChat} from '../../_models/message';
 import {BehaviorSubject, combineLatest, Subject} from 'rxjs';
 import {SquadService} from '../../providers/squad.service';
-import {Router} from '@angular/router';
-import {ConfigService} from '../../config.service';
 import {Commons} from '../../biz-common/commons';
 import {takeUntil} from 'rxjs/operators';
+import {TokenProvider} from '../../biz-common/token';
 
 @Component({
   selector: 'app-squad',
@@ -28,14 +27,11 @@ export class SquadPage implements OnInit {
 
   sortSquadBy$ = new BehaviorSubject<'name'|'created'|any>('created');
 
-  private userDataChanged = new Subject<IUserData>(); // userData monitor.
-
   private _unsubscribeAll;
 
   constructor(private bizFire : BizFireService,
               private squadService : SquadService,
-              private configService : ConfigService,
-              private router : Router) {
+              private tokenService : TokenProvider) {
     this._unsubscribeAll = new Subject<any>();
   }
 
@@ -67,7 +63,7 @@ export class SquadPage implements OnInit {
     const {folders,privateFolders,privateSquads,publicSquads,bookmark} = this.squadService.makeSquadMenuWith(userData, squadList);
 
     let sorter = sortSquadBy === 'name' ? Commons.squadSortByName : Commons.sortDataByCreated();
-    if(publicSquads) {
+    if(publicSquads.length > 0) {
       this.publicSquads = publicSquads.sort(sorter);
       const defaultSquadIndex = this.publicSquads.findIndex(s => s.data.default === true);
       if(defaultSquadIndex !== -1) {
@@ -77,10 +73,10 @@ export class SquadPage implements OnInit {
         this.publicSquads = alter.concat(this.publicSquads);
       }
     }
-    if(privateSquads) {
+    if(privateSquads.length > 0) {
       this.privateSquads = privateSquads.sort(sorter);
     }
-    if(bookmark) {
+    if(bookmark.length > 0) {
       this.bookmark = bookmark.sort(sorter);
       const defaultSquadIndex = this.publicSquads.findIndex(s => s.data.default === true);
       if(defaultSquadIndex !== -1){

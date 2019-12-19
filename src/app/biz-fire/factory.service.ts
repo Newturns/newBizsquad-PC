@@ -4,6 +4,7 @@ import {environment} from '../../environments/environment';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {AngularFireStorage} from '@angular/fire/storage';
 import {AngularFireMessaging} from '@angular/fire/messaging';
+import {AngularFireDatabase} from '@angular/fire/database';
 
 /*@Injectable({
   providedIn: 'root'
@@ -25,6 +26,10 @@ export class TaxlineStorage extends AngularFireStorage {}
 export class BizMessaging extends AngularFireMessaging {}
 @Injectable()
 export class TaxlineMessaging extends AngularFireMessaging {}
+@Injectable()
+export class BizFirebase extends AngularFireDatabase {}
+@Injectable()
+export class TaxlineFirebase extends AngularFireDatabase {}
 
 export function BizFirestoreFactory(platformId: Object, zone: NgZone) {
   return new AngularFirestore(environment.bizsquad, 'bizsquad', false, null, platformId, zone, null);
@@ -50,4 +55,11 @@ export function BizMessagingFactory(platformId: Object, zone: NgZone) {
 }
 export function TaxlineMessagingFactory(platformId: Object, zone: NgZone) {
   return new AngularFireMessaging(environment.taxline, 'taxline',  platformId, zone);
+}
+
+export function BizFirebaseFactory(platformId: Object, zone: NgZone) {
+  return new AngularFireDatabase(environment.bizsquad,'bizsquad',null,platformId,zone)
+}
+export function TaxlineFirebaseFactory(platformId: Object, zone: NgZone) {
+  return new AngularFireDatabase(environment.bizsquad,'taxline',null,platformId,zone)
 }

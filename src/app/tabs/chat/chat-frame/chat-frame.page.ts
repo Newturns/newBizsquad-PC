@@ -78,6 +78,9 @@ export class ChatFramePage implements OnInit {
 
   private startToast = false;
 
+  //프로그래스바
+  loadProgress : number = 0;
+
   constructor(private configService : ConfigService,
               private activatedRoute: ActivatedRoute,
               private electronService: Electron,
@@ -116,6 +119,25 @@ export class ChatFramePage implements OnInit {
     this.cid = this.activatedRoute.snapshot.queryParamMap.get('cid');
     this.type = this.activatedRoute.snapshot.queryParamMap.get('type');
     console.log("gid ::",this.gid,"cid ::",this.cid, "type ::",this.type);
+
+    //파일 업로드 프로그레스바
+    this.chatService.fileUploadProgress.subscribe(per => {
+      if(per === 100) {
+
+        // 용량이 작을때 프로그레스 바가 안나오므로..
+        this.loadProgress = per;
+
+        // 1.5초 뒤 값을 초기화한다.
+        timer(1500).subscribe(() => {
+          this.chatService.fileUploadProgress.next(null);
+          this.loadProgress = 0;
+          this.contentArea.scrollToBottom(0);
+        })
+      } else {
+        this.loadProgress = per;
+      }
+      console.log(per);
+    });
 
     this.bizFire.currentUser.subscribe((user: IUserData) => {
       if(user) {
@@ -428,5 +450,13 @@ export class ChatFramePage implements OnInit {
       return wholeDate;
     }
 
+  }
+
+  translationResult(result) {
+    if(result && this.bottomCheck) {
+      setTimeout(() => {
+        this.contentArea.scrollToBottom(0);
+      }, 100);
+    }
   }
 }

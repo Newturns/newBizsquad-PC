@@ -9,6 +9,8 @@ import {BehaviorSubject} from 'rxjs';
 })
 export class ConfigService implements CanLoad {
 
+  metaData: any;
+
   // null로 설정시, BizFire생성자에서 authState가 에러.
   private _firebaseName: string = null;
   get firebaseName(): string {
@@ -33,9 +35,7 @@ export class ConfigService implements CanLoad {
   
   constructor(@Optional() @SkipSelf() private mySelf: ConfigService,
               private http: HttpClient,
-              private router: Router
-              
-              ) {
+              private router: Router) {
     if(mySelf){
       throw new Error('ConfigService already loaded.');
     }
@@ -101,6 +101,7 @@ export class ConfigService implements CanLoad {
             if(found){
               // save
               this.firebaseName = company;
+              this.metaData = data[found];
               resolve(true);
             } else {
               reject({message: `Sorry, Invalid company name [${company}]`, code: 'companyNotFound'});

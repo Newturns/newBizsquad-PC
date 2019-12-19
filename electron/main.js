@@ -14,6 +14,18 @@ const defaultMenu = require('electron-default-menu');
 //메뉴
 const _menu = require('./menu');
 
+// auto update //
+const { autoUpdater } = require("electron-updater");
+const logger = require('electron-log');
+
+app.setAppUserModelId("com.bizsquad.ionic");
+app.setAsDefaultProtocolClient('bizsquad');
+
+autoUpdater.logger = logger;
+autoUpdater.logger["transports"].file.level = "info";
+
+logger.info('App starting...');
+
 //메인 윈도우.
 let mainWindow;
 
@@ -102,7 +114,7 @@ function createWindow () {
     });
 
     // x버튼 클릭시 작은 아이콘으로 표시.
-    tray = new Tray(path.join(__dirname,'../build/logo16.png'));
+    tray = new Tray(path.join(__dirname,'logo16.png'));
     tray.on('double-click',() => {
         mainWindow.show();
     });
@@ -284,3 +296,74 @@ ipcMain.on('windowsFlashFrame',(event, count) => {
         win.flashFrame(false);
     }
 });
+
+
+autoUpdater.on('checking-for-update', function () {
+    sendStatusToWindow('Checking for update...');
+});
+
+autoUpdater.on('update-available', function (info) {
+    // const dialogOpts = {
+    //     type: 'info',
+    //     buttons: ['OK'],
+    //     title: 'Application Update',
+    //     message: releaseNameG,
+    //     detail: 'There is a new update.\nThe installation file is being downloaded.\n',
+    //     icon: path.join(__dirname, 'logo512.png'),
+    //     noLink : true
+    // }
+    // dialog.showMessageBox(dialogOpts, (response) => {
+    //     if (response === 0) autoUpdater.quitAndInstall();
+    //     })
+    sendStatusToWindow('Update available.');
+});
+
+autoUpdater.on('update-not-available', function (info) {
+    sendStatusToWindow('Update not available.');
+});
+autoUpdater.on('error', function (err) {
+    sendStatusToWindow('Error in auto-updater.');
+});
+
+autoUpdater.on('download-progress', function (progressObj) {
+    let log_message = "Download speed: " + progressObj.bytesPerSecond;
+    log_message = log_message + ' - Downloaded ' + parseInt(progressObj.percent) + '%';
+    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+    sendStatusToWindow(log_message);
+});
+
+autoUpdater.on('update-downloaded', (event,releaseName) => {
+
+    // git의 버전을 담습니다.
+    let releaseNameG = "";
+    if(releaseName){
+        releaseNameG = 'The new version is installed. '+releaseName+'.';
+    } else {
+        releaseNameG = 'The new version is installed.';
+    }
+
+    const dialogOpts = {
+        type: 'question',
+        buttons: ['Restart now', 'Later'],
+        title: 'Application Update',
+        message: releaseNameG,
+        detail: 'Do you want to restart now?',
+        icon: path.join(__dirname, 'logo512.png'),
+        noLink : true
+    };
+    dialog.showMessageBox(dialogOpts, (response) => {
+        if (response === 0) autoUpdater.quitAndInstall();
+    })
+});
+
+autoUpdater.checkForUpdatesAndNotify();
+
+// 10분마다 버전 체크 후 업데이트
+setInterval(function() {
+    autoUpdater.checkForUpdatesAndNotify();
+}, 600000);
+
+function sendStatusToWindow(message) {
+    logger.info(message);
+}
+

@@ -15,7 +15,7 @@
         <div class="d-flex align-items-center avatar-con">
           <app-avatar-button class="mr-3" [uid]="targetValue.uid" [size]="60"></app-avatar-button>
           <img *ngIf="me" class="profile_change_icon pointer" src="assets/imgs/icon_camera.svg" (click)="fileAttach.click()">
-          <input type="file" style="display: none;" #fileAttach (change)="editPhoto($event)">
+          <input type="file" style="display: none;" #fileAttach (change)="editPhoto($event)" accept="image/*">
         </div>
         <div class="d-flex flex-column flex-grow-1">
           <div class="inputTitle">{{langPack['displayName']}}</div>

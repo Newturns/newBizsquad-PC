@@ -4,7 +4,8 @@ import {TakeUntil} from "../../biz-common/take-until";
 
 @Component({
   selector: 'progress-bar',
-  templateUrl: 'progress-bar.html'
+  templateUrl: './progress-bar.html',
+  styleUrls: ['./progress-bar.scss'],
 })
 export class ProgressBarComponent extends TakeUntil implements OnInit{
 

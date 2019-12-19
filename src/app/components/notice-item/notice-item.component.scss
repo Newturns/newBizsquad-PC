@@ -67,6 +67,12 @@
       font-size: 13px;
       color: #707c97;
       line-height: 1.38;
+      min-width: 0;
+      span {
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+      }
 
     }
 

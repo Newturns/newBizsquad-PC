@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {BizFireService} from '../biz-fire/biz-fire';
-import * as firebase from 'firebase';
+import {ConfigService} from '../config.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,19 +9,26 @@ import * as firebase from 'firebase';
 
 export class UserStatusProvider {
 
+  firebaseName : string;
+
   constructor(private http: HttpClient,
+              private configService : ConfigService,
               private bizFire : BizFireService)
-  {}
+  {
+    this.firebaseName = configService.firebaseName;
+  }
 
   onUserStatusChange() {
 
-    const userStatusDatabaseRef = firebase.database().ref(`/status/${this.bizFire.uid}`);
+    const firebase = this.bizFire.afBase;
+
+    const userStatusDatabaseRef = firebase.database.ref(`/status/${this.bizFire.uid}`);
     const userStatusFirestoreRef = this.bizFire.afStore.doc(`users/${this.bizFire.uid}`);
 
     const isOnlineForFirestore = { onlineStatus : 'online' };
     const isOfflineForFirestore = { onlineStatus : 'offline' };
 
-    const connectedRef = firebase.database().ref('.info/connected');
+    const connectedRef = firebase.database.ref('.info/connected');
 
     connectedRef.on('value', (snapshot) => {
 

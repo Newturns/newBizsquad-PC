@@ -122,7 +122,7 @@ export class NoticeItemComponent extends BizComponent implements OnInit {
       link = `video`;
       this.linkUrl = [];
       this.linkUrl.push('video');
-      this.pcLinkUrl += '/notice';
+      this.pcLinkUrl += '/video';
 
       if(item.data.info.vid){
         link += `/${item.data.info.vid}`;

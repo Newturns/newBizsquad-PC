@@ -1,7 +1,7 @@
 import {Component, Input} from '@angular/core';
 import {IChat} from "../../_models/message";
 import {Commons} from "../../biz-common/commons";
-import {IUser} from "../../_models";
+import {IUser, IUserData} from '../../_models';
 import {TakeUntil} from "../../biz-common/take-until";
 
 
@@ -35,6 +35,8 @@ export class ChatHeaderComponent extends TakeUntil {
   senderUid : string;
 
   langPack = {};
+
+  autoTranslation: boolean = true;
 
   @Input()
   set chat(room: IChat) {
@@ -75,13 +77,26 @@ export class ChatHeaderComponent extends TakeUntil {
   constructor(
     public electron : Electron,
     private popoverCtrl :PopoverController,
-    private bizFire : BizFireService,
+    public bizFire : BizFireService,
     private cacheService : CacheService,
     private alertCtrl : AlertController,
     private chatService : ChatService
   ) {
     super();
     this.bizFire.onLang.pipe(this.takeUntil).subscribe((l: any) => this.langPack = l.pack());
+
+  }
+
+  ngOnInit() {
+    this.bizFire.currentUser
+    .pipe(this.takeUntil)
+    .subscribe((uData : IUserData) => {
+      if(uData.autoTranslation) {
+        this.autoTranslation = uData.autoTranslation;
+      } else {
+        this.autoTranslation = false;
+      }
+    });
   }
 
   getUserData() {
@@ -89,6 +104,7 @@ export class ChatHeaderComponent extends TakeUntil {
     .pipe(this.takeUntil)
     .subscribe(data => {
       this.userCustomData = data;
+      // this.autoTranslation = this.userCustomData.autoTranslation;
       console.log("userCustomData::",this.userCustomData);
       console.log(this.room);
       if(this.userCustomData[this.room.cid] == null ||
@@ -153,7 +169,13 @@ export class ChatHeaderComponent extends TakeUntil {
     }
   }
 
-
+  changeTranslation(){
+    this.autoTranslation = !this.autoTranslation;
+    //자동번역설정값을 유저 DB에 격납하도록하자
+    return this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid)).update({
+      autoTranslation: this.autoTranslation
+    });
+  }
 
   //Chat invite Popover
   async presentPopover() {

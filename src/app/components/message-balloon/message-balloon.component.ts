@@ -1,10 +1,13 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {TakeUntil} from "../../biz-common/take-until";
 import {IMessage} from "../../_models/message";
 import {IBizGroup, IUser} from "../../_models";
 import {Commons} from "../../biz-common/commons";
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {CacheService} from '../../core/cache/cache';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {ITranslations, TranslateService} from '../../providers/translate.service';
 
 
 @Component({
@@ -12,7 +15,7 @@ import {CacheService} from '../../core/cache/cache';
   templateUrl: './message-balloon.component.html',
   styleUrls: ['./message-balloon.component.scss'],
 })
-export class MessageBalloonComponent extends TakeUntil implements OnInit {
+export class MessageBalloonComponent implements OnInit {
 
   @Input()
   set message(msg: IMessage){
@@ -25,6 +28,9 @@ export class MessageBalloonComponent extends TakeUntil implements OnInit {
   get message(){
     return this._message;
   }
+
+  @Output()
+  initScrollBottomForTranslation = new EventEmitter<boolean>();
 
   private _message: IMessage;
   public displayName;
@@ -40,13 +46,25 @@ export class MessageBalloonComponent extends TakeUntil implements OnInit {
 
   private group : IBizGroup;
 
+  //유저 정보에서 가져와야함.
+  private autoTrans : boolean = true;
+  translations: string;
+  translationError: string;
+  userTranslationsFlg: boolean = false;
+
+  private _unsubscribeAll;
+
   constructor(
+    private translateService: TranslateService,
     private bizFire : BizFireService,
     private cacheService : CacheService) {
-    super();
+    this._unsubscribeAll = new Subject<any>();
   }
 
   ngOnInit() {
+    this.bizFire.currentUser.pipe(takeUntil(this._unsubscribeAll)).subscribe((user) => {
+      this.userTranslationsFlg = user.autoTranslation;
+    });
   }
 
   private loadMessage(message: IMessage) {
@@ -67,7 +85,7 @@ export class MessageBalloonComponent extends TakeUntil implements OnInit {
       this.isMyMessage = uid === this.bizFire.currentUID;
 
       this.cacheService.userGetObserver(uid)
-        .pipe(this.takeUntil)
+        .pipe(takeUntil(this._unsubscribeAll))
         .subscribe( (user:IUser) =>{
           if(user){
             this.setUserInfo(user);
@@ -79,11 +97,32 @@ export class MessageBalloonComponent extends TakeUntil implements OnInit {
           }
         });
     }
+
+    // autoTrans = true; 임시. 유저정보에서 가져와야하는값.
+    if(this.isMyMessage === false && this.autoTrans) {
+      this.onTranslate(this.text,this.bizFire.currentUserValue.translateLang);
+    } else {
+      this.finishTranslation(false);
+    }
+
     /*
     * Get Unread Count.
     * 현재는 라인식 읽은이들 수
     * */
     this.calcUnreadCount();
+  }
+
+  onTranslate(text: string, translateLang: string) {
+
+    this.translateService.translateText(text, translateLang)
+        .then((translations: ITranslations[]) => {
+          this.translations = translations[0].translatedText;
+          this.finishTranslation(true);
+        }).catch( (reason: any) => {
+      if(reason && reason.message){
+        this.translationError = reason.message;
+      }
+    });
   }
 
 
@@ -128,6 +167,11 @@ export class MessageBalloonComponent extends TakeUntil implements OnInit {
     } else {
       return 'balloon-style-duskblue';
     }
+  }
+
+  //번역이 되면 부모컴포넌트에 알려준다 -> 스크롤초기화를 위해서.
+  finishTranslation(result){
+    this.initScrollBottomForTranslation.emit(result);
   }
 
 }
