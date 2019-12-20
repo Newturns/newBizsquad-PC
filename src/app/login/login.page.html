@@ -25,7 +25,7 @@
           <div class="inputTitle mb-2">Email</div>
           <input type="email" class="form-control input-text mb-3" formControlName="email">
           <div class="inputTitle mb-2">Password</div>
-          <input type="password" class="form-control input-text mb-4" formControlName="password">
+          <input type="password" class="form-control input-text mb-4" formControlName="password" (keyup.enter)="this.onLogin()">
           <ion-button (click)="onLogin()" expand="full" class="login-btn mb-3">Sign In</ion-button>
         </div>
       </form>

@@ -50,6 +50,10 @@ export class LoginPage implements OnInit {
       email: ['', this.emailValidator],
       password: ['', this.passwordValidator]
     });
+
+    this.electronService.ipcRenderer.on('autoUpdate',(e,data) => {
+      console.log(data);
+    });
   }
 
   ngOnInit() {
@@ -95,7 +99,7 @@ export class LoginPage implements OnInit {
         this.electronService.saveLocalUser(email,password,this.autoLoign,company);
 
         // go to main/tabs
-        await this.router.navigate([`/${this.configService.firebaseName}`], {replaceUrl: true});
+        await this.router.navigate([`/${this.configService.firebaseName}`]);
 
         await loading.dismiss();
       } catch (e) {

@@ -1,12 +1,12 @@
 
 import { Injectable } from '@angular/core';
 
-import {SquadService, ISquad} from './squad.service';
+import {SquadService, ISquad, ISquadData} from './squad.service';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import * as firebase from 'firebase';
 import {Commons, STRINGS} from '../biz-common/commons';
 
-import {takeUntil} from 'rxjs/operators';
+import {debounceTime, filter, takeUntil} from 'rxjs/operators';
 import {IChat, IChatData, IFiles, IMessage, IMessageData} from "../_models/message";
 import {IBizGroup, IUser} from '../_models';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
@@ -17,24 +17,65 @@ import {CacheService} from '../core/cache/cache';
 import {environment} from '../../environments/environment';
 import {ConfigService} from '../config.service';
 import {IonContent} from '@ionic/angular';
+import {IUnreadMap, UnreadCounter} from '../components/classes/unread-counter';
+import {TakeUntil} from '../biz-common/take-until';
+import {Chat} from '../biz-common/chat';
+import {DocumentChangeAction} from '@angular/fire/firestore';
 
 @Injectable({
     providedIn: 'root'
 })
 
-export class ChatService {
+export class ChatService extends TakeUntil{
 
   var_chatRooms: any;
 
-  onChatRoomListChanged = new BehaviorSubject<IChat[]>([]);
+  // onChatRoomListChanged = new BehaviorSubject<IChat[]>(null);
 
   onSelectChatRoom = new BehaviorSubject<IChat>(null);
 
   fileUploadProgress = new BehaviorSubject<number>(null);
 
-  unreadCountMap$ = new BehaviorSubject<any[]>(null);
-
   langPack: any = {};
+
+  private _chatList : IChat[];
+
+
+  private chatDataMap: any = {
+    chatListSub: null,
+    chatListSubject: new BehaviorSubject<IChat[]>(null),
+    chatList: null,
+
+    squadChatListSub: null,
+    squadChatSubject: new BehaviorSubject<IChat[]>(null),
+    squadChatList: null
+  };
+
+  //CHAT CONTENT CACHE
+  private chatContentMap = {};
+
+  private currentGroupId: string;
+
+  get unreadCountMap$(): Observable<IUnreadMap> {
+    return this.unreadCounter.unreadChanged$.asObservable()
+        .pipe(
+            filter(d=>d!=null)// 0.5 sec
+        );
+  }
+
+  get chatList$(): Observable<IChat[]>{
+    if(this.chatDataMap == null){
+      throw new Error('ChatService has not being initialized.');
+    }
+    return this.chatDataMap.chatListSubject.asObservable().pipe(filter(d=> d!= null));
+  }
+
+  get squadChatList$(): Observable<IChat[]>{
+    if(this.chatDataMap == null){
+      throw new Error('ChatService has not being initialized.');
+    }
+    return this.chatDataMap.squadChatSubject.asObservable().pipe(filter(d=> d!= null));
+  }
 
   constructor(
       public bizFire : BizFireService,
@@ -43,19 +84,200 @@ export class ChatService {
       private http: HttpClient,
       private cacheService : CacheService,
       private configService: ConfigService,
-      private squadService: SquadService) {
+      private unreadCounter: UnreadCounter) {
+    super();
 
     this.langService.onLangMap
         .pipe(takeUntil(this.bizFire.onUserSignOut))
         .subscribe((l: any) => {
           this.langPack = l;
         });
+
+    this.bizFire.onUserSignOut.subscribe(()=>{
+      this.clear();
+    });
+    this.bizFire.onBizGroupChanged$.subscribe(()=> this.clear());
+
+    this.bizFire.onBizGroupSelected
+    .subscribe((g: IBizGroup)=>{
+
+      let load = true;
+      if(this.currentGroupId){
+        load = this.currentGroupId !== g.gid;
+      }
+
+      if(load){
+
+        const gid = g.gid;
+
+        console.log(`onBizGroupSelected: [${g.gid}],`);
+
+        // delete old other gid's data.
+        this.clear();
+
+        // start monitor group chat
+        this.loadChat(gid);
+        // start monitor each squad's chat.
+        this.loadSquadChat(gid);
+
+        this.currentGroupId = gid;
+      }
+
+
+    });
   }
+
+  loadChat(gid : string) {
+    let startNewLoad = true;
+
+    // clear old one if gid id differ
+    if(this.currentGroupId != null){
+      if(this.currentGroupId !== gid){
+        // new group have selected.
+        // delete old datas.
+        this.clear();
+        // load new sub
+      } else {
+        console.log('이전 채팅리스트를 재활용');
+        // old one still usable
+        startNewLoad = false;
+      }
+    }
+
+    if(startNewLoad){
+
+      // start load chatList
+      const path = Commons.chatPath(gid);
+      this.chatDataMap.chatList = [];
+
+      this.chatDataMap.chatListSub = this.bizFire.afStore.collection(path, (ref:any)=> {
+        let q: any = ref;
+        q = q.where('status', '==', true);
+        q = q.where(new firebase.firestore.FieldPath(STRINGS.FIELD.MEMBER, this.bizFire.uid), '==', true);
+        return q;
+      }).stateChanges()
+          .pipe(
+              this.takeUntil,
+              takeUntil(this.bizFire.onUserSignOut),
+          ).subscribe( (changes: any[]) => {
+            changes.forEach((change: DocumentChangeAction<any>) => {
+
+              this.processChange(change, this.chatDataMap.chatList, 'groupChat');
+
+            }); // end of for
+
+            this.chatDataMap.chatList.sort(Commons.sortDataByLastMessage(false));
+
+            this.chatDataMap.chatListSubject.next(this.chatDataMap.chatList);
+            this._chatList = this.chatDataMap.chatList;
+          });
+
+    }
+  }
+
+  loadSquadChat(gid : string) {
+    let startNewLoad = true;
+
+    // clear old one if gid id differ
+    if(this.currentGroupId != null){
+      if(this.currentGroupId !== gid){
+        // new group have selected.
+        // delete old datas.
+        this.clear();
+        // load new sub
+      } else {
+        console.log('이전 채팅리스트를 재활용');
+        // old one still usable
+        startNewLoad = false;
+      }
+    }
+    if(startNewLoad === false){
+
+      // do nothing.
+      return;
+    }
+    const path = Commons.squadPath(gid);
+
+    // save squad chat list here
+    this.chatDataMap.squadChatList = [];
+
+    // save unsubscribe
+    this.chatDataMap.squadChatListSub =
+    this.bizFire.afStore.collection(path, (ref:any) => {
+      ref = ref.where('status', '==', true);
+      return ref;
+    })
+        .stateChanges()
+        .pipe(this.takeUntil, takeUntil(this.bizFire.onUserSignOut))
+        .subscribe( (changes: any[]) => {
+          // save new value
+          changes.filter(change => {
+
+            const data: ISquadData = change.payload.doc.data();
+            // type 이 public 인건 제네럴스쿼드의 public스쿼드 밖에 없다.
+            // type 이 private 이면, 제네럴/ 애자일 관계없이 내가 속한 스쿼드만 보면된다.
+            // agile squad must include me.
+            return data.members[this.bizFire.uid] === true;
+          })
+              .forEach(async (change, index) => {
+
+                this.processChange(change, this.chatDataMap.squadChatList);
+              });
+
+          // sort by latest.
+          this.chatDataMap.squadChatList.sort(Commons.sortDataByLastMessage(false));
+
+          this.chatDataMap.squadChatSubject.next(this.chatDataMap.squadChatList);
+
+        });
+  }
+
+  private processChange(change: any, chatList, chatType?: string){
+
+    const data = change.payload.doc.data();
+    const mid = change.payload.doc.id;
+
+    if(change.type === 'added'){
+
+      // add new message to top
+      const item = new Chat(mid, data, this.bizFire.uid, change.payload.doc.ref);
+      chatList.push(item);
+      this.unreadCounter.register(mid, item);
+
+    } else if (change.type === 'modified') {
+
+      // replace old one
+      for(let index = 0 ; index < chatList.length; index ++){
+        if(chatList[index].cid === mid ){
+          // find replacement
+
+          //---------- 껌벅임 테스트 -------------//
+          //chatList[index].data = data; // data 만 경신 한다.
+          //-----------------------------------//
+          const item = new Chat(mid, data, this.bizFire.uid, change.payload.doc.ref);
+          chatList[index] = item;
+
+          break;
+        }
+      }
+    } else if (change.type === 'removed') {
+      for (let index = 0; index < chatList.length; index++) {
+        if (chatList[index].cid === mid) {
+          // remove from array
+          chatList.splice(index, 1);
+          this.unreadCounter.unRegister(mid);
+          break;
+        }
+      }
+    }
+  }
+
   getChatRooms(){
-    let chatRooms = this.onChatRoomListChanged.getValue();
+
+    let chatRooms = this._chatList;
     chatRooms.forEach(room =>{
       const newData = room;
-      newData['uid'] = this.bizFire.currentUID;
+      newData['uid'] = this.bizFire.uid;
     });
     return chatRooms;
   }
@@ -339,13 +561,13 @@ export class ChatService {
     return ret;
   }
 
-  findChat(cid: string): IChat| null {
-    let currentChat = this.onChatRoomListChanged.getValue().find(c => c.cid === cid);
-    if(currentChat == null){
-      currentChat = this.squadService.onSquadListChanged.getValue().find(c => c.cid === cid);
-    }
-    return currentChat;
-  }
+  // findChat(cid: string): IChat| null {
+  //   let currentChat = this.onChatRoomListChanged.getValue().find(c => c.cid === cid);
+  //   if(currentChat == null){
+  //     currentChat = this.squadService.squadChatList$.getValue().find(c => c.cid === cid);
+  //   }
+  //   return currentChat;
+  // }
 
   TimestampToDate(value) {
     //console.log(value, typeof value);
@@ -370,6 +592,30 @@ export class ChatService {
         'body': msg,
       });
     })
+  }
+
+
+  private clear(){
+
+    //console.log('chat clear called !!!');
+
+    //just unsubscribe old one.
+    if(this.chatDataMap.chatListSub){
+      this.chatDataMap.chatListSub.unsubscribe();
+      this.chatDataMap.chatListSub = null;
+      // left subject for next subscription.
+    }
+
+    if(this.chatDataMap.squadChatListSub){
+      this.chatDataMap.squadChatListSub.unsubscribe();
+      this.chatDataMap.squadChatListSub = null;
+    }
+
+    this.currentGroupId = null;
+
+    if(this.unreadCounter){
+      this.unreadCounter.clear();
+    }
   }
 
 }

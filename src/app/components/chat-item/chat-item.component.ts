@@ -7,6 +7,7 @@ import {Commons} from "../../biz-common/commons";
 import {IUnreadItem, IUser} from '../../_models';
 import {CacheService} from '../../core/cache/cache';
 import {BizFireService} from '../../biz-fire/biz-fire';
+import {IUnreadMap} from '../classes/unread-counter';
 
 @Component({
   selector: 'biz-chat-item',
@@ -60,18 +61,15 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
   ngOnInit() {
 
     this.chatService.unreadCountMap$
-      .pipe(
-        this.takeUntil,
-        filter(d=>d!=null)
-      )
-      .subscribe((list: IUnreadItem[]) => {
-
-        // see only my unread
-        list = list.filter(i=> i.cid === this.chatBox.cid);
-
-        //console.log('unread datas:', this.room.cid,  list.length);
-        this.unreadCount = list.length;
-      });
+        .pipe(
+            this.takeUntil,
+            filter(d=>d!=null)
+        )
+        .subscribe((list: IUnreadMap) => {
+          if(list.get(this.chatBox.cid) != null){
+            this.unreadCount = list.get(this.chatBox.cid).unreadList.length;
+          }
+        });
 
   }
 

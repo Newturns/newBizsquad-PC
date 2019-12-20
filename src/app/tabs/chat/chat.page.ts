@@ -15,6 +15,7 @@ import {GroupColorProvider} from '../../biz-common/group-color';
 import {PopoverController} from '@ionic/angular';
 
 import {CreateChatPopoverComponent} from '../../components/create-chat-popover/create-chat-popover.component';
+import {IUnreadMap, MapItem} from '../../components/classes/unread-counter';
 
 @Component({
   selector: 'app-chat',
@@ -63,31 +64,8 @@ export class ChatPage implements OnInit {
       this.group = group;
     });
 
-    this.chatService.unreadCountMap$
-    .pipe(takeUntil(this._unsubscribeAll))
-    .subscribe((list : IUnreadItem[]) => {
-      // temp array for counting.
-      const typeMember = [];
-      const typeSquad = [];
-
-      // get chat data
-      list.filter(i => {
-        const chat = this.chatService.findChat(i.cid);
-        if(chat){
-          if(chat.data.type === 'member'){
-            typeMember.push(chat);
-          } else {
-            typeSquad.push(chat);
-          }
-        }
-      });
-      this.memberUnreadTotalCount = typeMember.length;
-      this.squadUnreadTotalCount = typeSquad.length;
-
-    });
-
     // 멤버 채팅방
-    this.chatService.onChatRoomListChanged
+    this.chatService.chatList$
         .pipe(filter(d=>d!=null),takeUntil(this._unsubscribeAll),map((chats : IChat[]) => {
               return chats.map((chat : IChat) => {
                 if(chat.data.title == null) {
@@ -111,16 +89,31 @@ export class ChatPage implements OnInit {
             })
         ).subscribe((rooms : IChat[]) => {
       // this.chatRooms = rooms.sort(Commons.sortDataByCreated());
-      this.chatRooms = rooms.sort(Commons.sortDataByLastMessage(false));
+      this.chatRooms = rooms;
     });
 
     // 스쿼드 채팅방
-    this.squadService.onSquadListChanged
+    this.chatService.squadChatList$
     .pipe(filter(d=>d != null),takeUntil(this._unsubscribeAll))
     .subscribe((squad : IChat[]) => {
-      const onlyPrivateSquad = squad.filter(s => s.data.type !== 'public');
-      // this.squadChatRooms = squad.sort(Commons.sortDataByCreated());
-      this.squadChatRooms = onlyPrivateSquad.sort(Commons.sortDataByLastMessage(false));
+      const onlyPrivateSquad = squad.filter(s => s.data.type === 'private');
+      this.squadChatRooms = onlyPrivateSquad.sort(Commons.sortDataByCreated());
+    });
+
+    // unread count map
+    this.chatService.unreadCountMap$
+    .pipe(takeUntil(this._unsubscribeAll))
+    .subscribe((list: IUnreadMap) => {
+      // temp array for counting.
+      this.memberUnreadTotalCount = 0;
+      this.squadUnreadTotalCount = 0;
+      list.getValues().forEach( (item: MapItem) => {
+        if(item.chat.data.type === 'member'){
+          this.memberUnreadTotalCount += item.unreadList.length;
+        } else {
+          this.squadUnreadTotalCount += item.unreadList.length;
+        }
+      });
     });
 
 

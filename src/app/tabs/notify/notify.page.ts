@@ -211,7 +211,7 @@ export class NotifyPage implements OnInit {
   }
 
   back() {
-    this.router.navigate([`/${this.configService.firebaseName}/tabs/home`], {replaceUrl: true});
+    this.router.navigate([`/${this.configService.firebaseName}/tabs/home`]);
   }
 
   ngOnDestroy(): void {

@@ -330,9 +330,12 @@ autoUpdater.on('download-progress', function (progressObj) {
     log_message = log_message + ' - Downloaded ' + parseInt(progressObj.percent) + '%';
     log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
     sendStatusToWindow(log_message);
+    mainWindow.webContents.send('progress',log_message);
 });
 
 autoUpdater.on('update-downloaded', (event,releaseName) => {
+
+    sendStatusToWindow('update-downloaded');
 
     // git의 버전을 담습니다.
     let releaseNameG = "";
@@ -358,10 +361,10 @@ autoUpdater.on('update-downloaded', (event,releaseName) => {
 
 autoUpdater.checkForUpdatesAndNotify();
 
-// 10분마다 버전 체크 후 업데이트
+// 15분마다 버전 체크 후 업데이트
 setInterval(function() {
     autoUpdater.checkForUpdatesAndNotify();
-}, 600000);
+}, 900000);
 
 function sendStatusToWindow(message) {
     logger.info(message);

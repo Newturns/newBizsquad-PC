@@ -8,6 +8,7 @@ import {SquadService} from '../../providers/squad.service';
 import {Commons} from '../../biz-common/commons';
 import {takeUntil} from 'rxjs/operators';
 import {TokenProvider} from '../../biz-common/token';
+import {ChatService} from '../../providers/chat.service';
 
 @Component({
   selector: 'app-squad',
@@ -31,6 +32,7 @@ export class SquadPage implements OnInit {
 
   constructor(private bizFire : BizFireService,
               private squadService : SquadService,
+              private chatService : ChatService,
               private tokenService : TokenProvider) {
     this._unsubscribeAll = new Subject<any>();
   }
@@ -43,7 +45,7 @@ export class SquadPage implements OnInit {
     .pipe(takeUntil(this._unsubscribeAll))
     .subscribe((g:IBizGroup) => this.currentBizGroup = g);
 
-    combineLatest(this.bizFire.userData, this.squadService.onSquadListChanged,this.sortSquadBy$)
+    combineLatest(this.bizFire.userData,this.chatService.squadChatList$,this.sortSquadBy$)
     .pipe(takeUntil(this._unsubscribeAll))
     .subscribe(([userData, squadList, sortSquadBy]) => {
       console.log("filterBroadCast() combineLatest start");

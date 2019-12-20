@@ -11,6 +11,10 @@ export class SquadFilterComponent implements OnInit {
   @Input()
   size : 'sm' | 'md' | 'lg' = 'sm';
 
+  @Input()
+  set color(c : string) {
+    this.subcolor = c;
+  }
   @Output()
   onFilter = new EventEmitter<string>();
 
@@ -19,15 +23,14 @@ export class SquadFilterComponent implements OnInit {
 
   filterButtonText : string = null;
 
-  subcolor:string = '';
-
   currentSort = 'created';
 
-  constructor(public bizFire : BizFireService) {
-    this.subcolor = this.bizFire.currentBizGroup.data.team_subColor;
+  subcolor: string;
+
+  constructor() {
   }
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   onClickFilter(value : string) {
     this.filterButtonText = value;

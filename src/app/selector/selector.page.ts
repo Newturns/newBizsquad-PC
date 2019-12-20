@@ -32,7 +32,6 @@ export class SelectorPage implements OnInit {
   ngOnInit() {
 
     this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
-
     this.loadGroups();
   }
 
@@ -68,12 +67,12 @@ export class SelectorPage implements OnInit {
         console.log("select Group :",group);
         //start load group
         await this.bizFire.loadBizGroup(group.gid);
-        await this.router.navigate([`/${this.bizFire.configService.firebaseName}/tabs`], {replaceUrl: true});
+        await this.router.navigate([`/${this.bizFire.configService.firebaseName}/tabs`]);
       } catch (e) {
         console.error(`this.bizFire.loadBizGroup(${group.gid}) error.`);
         console.error(e);
         await this.bizFire.signOut();
-        await this.router.navigate(['/login'], {replaceUrl: true});
+        await this.router.navigate(['/login']);
       }
     }
   }

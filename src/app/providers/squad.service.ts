@@ -51,12 +51,6 @@ export interface IUserDataDoc {
 
 export class SquadService extends TakeUntil{
 
-    /*
-    * Current BizGroups' squad list:
-    * public or mine.
-    * */
-  onSquadListChanged = new BehaviorSubject<IChat[]>(null);
-
   userCustomData: any;
 
   constructor(public bizFire : BizFireService) {

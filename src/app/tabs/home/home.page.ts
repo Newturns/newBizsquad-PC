@@ -143,7 +143,7 @@ export class HomePage implements OnInit {
   }
 
   showNotify() {
-    this.router.navigate([`/${this.configService.firebaseName}/tabs/notify`], {replaceUrl: true});
+    this.router.navigate([`/${this.configService.firebaseName}/tabs/notify`]);
   }
 
   showMenu() {
