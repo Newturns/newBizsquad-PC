@@ -59,7 +59,8 @@ export class ChatService extends TakeUntil{
   get unreadCountMap$(): Observable<IUnreadMap> {
     return this.unreadCounter.unreadChanged$.asObservable()
         .pipe(
-            filter(d=>d!=null)// 0.5 sec
+            filter(d=>d!=null),
+            debounceTime(800), // 0.8 sec
         );
   }
 
@@ -96,7 +97,11 @@ export class ChatService extends TakeUntil{
     this.bizFire.onUserSignOut.subscribe(()=>{
       this.clear();
     });
-    this.bizFire.onBizGroupChanged$.subscribe(()=> this.clear());
+    this.bizFire.onBizGroupChanged$.subscribe(()=> {
+      console.log("onBizGroupChanged$.subscribe = clear unread count");
+      console.log(this.unreadCounter);
+      this.clear();
+    });
 
     this.bizFire.onBizGroupSelected
     .subscribe((g: IBizGroup)=>{
@@ -211,18 +216,9 @@ export class ChatService extends TakeUntil{
         .pipe(this.takeUntil, takeUntil(this.bizFire.onUserSignOut))
         .subscribe( (changes: any[]) => {
           // save new value
-          changes.filter(change => {
-
-            const data: ISquadData = change.payload.doc.data();
-            // type 이 public 인건 제네럴스쿼드의 public스쿼드 밖에 없다.
-            // type 이 private 이면, 제네럴/ 애자일 관계없이 내가 속한 스쿼드만 보면된다.
-            // agile squad must include me.
-            return data.members[this.bizFire.uid] === true;
-          })
-              .forEach(async (change, index) => {
-
-                this.processChange(change, this.chatDataMap.squadChatList);
-              });
+          changes.forEach(async (change, index) => {
+            this.processChange(change, this.chatDataMap.squadChatList);
+          });
 
           // sort by latest.
           this.chatDataMap.squadChatList.sort(Commons.sortDataByLastMessage(false));
@@ -612,6 +608,7 @@ export class ChatService extends TakeUntil{
     }
 
     this.currentGroupId = null;
+
 
     if(this.unreadCounter){
       this.unreadCounter.clear();

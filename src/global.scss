@@ -28,12 +28,17 @@
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
 
-$font-family-md-base: “Roboto”;
-$font-family-ios-base: “Roboto”;
+//$font-family-md-base: “Roboto”;
+//$font-family-ios-base: “Roboto”;
 
 body{
   font-family: Roboto-Regular, "Noto Sans JP", "Noto Sans KR", "Apple SD Gothic Neo", "Nanum Gothic", Dotum, Helvetica, sans-serif;
 }
+
+.md,.ios{
+  font-family: Roboto-Regular, "Noto Sans JP", "Noto Sans KR", "Apple SD Gothic Neo", "Nanum Gothic", Dotum, Helvetica, sans-serif;
+}
+
 
 
 .btn:focus,.btn:active:focus,.btn.active:focus,

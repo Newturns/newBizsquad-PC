@@ -117,9 +117,11 @@
             </div>
           </ng-template>
         </ion-grid>
-        <div class="d-flex justify-content-center pointer mt-2" *ngIf="userCustomLinks && userCustomLinks.length > 8" (click)="clickMore()">
-          <span class="more-apps-text" *ngIf="!moreAppsMode">{{langPack['more_apps']}}</span>
-          <span class="more-apps-text" *ngIf="moreAppsMode">{{langPack['end_more']}}</span>
+        <div class="d-flex justify-content-center mt-2">
+          <ng-container *ngIf="userCustomLinks && userCustomLinks.length > 8">
+            <span (click)="clickMore()" class="pointer more-apps-text" *ngIf="!moreAppsMode">{{langPack['more_apps']}}</span>
+            <span (click)="clickMore()" class="pointer more-apps-text" *ngIf="moreAppsMode">{{langPack['end_more']}}</span>
+          </ng-container>
         </div>
       </div>
     </div>

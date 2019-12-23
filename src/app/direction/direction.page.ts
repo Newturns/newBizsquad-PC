@@ -33,7 +33,7 @@ export class DirectionPage implements OnInit {
           await this.goChatFrame(data,result);
         });
       } else {
-        this.router.navigate(['/login']);
+        this.router.navigate(['/login'],{replaceUrl: true});
       }
     });
 

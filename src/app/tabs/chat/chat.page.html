@@ -5,14 +5,14 @@
   <div class="msg-badge d-flex text-white ml-1 align-items-center justify-content-center" *ngIf="memberUnreadTotalCount">
    {{ memberUnreadTotalCount | badgeLimit: 99 }}
   </div>
-  <div class="segment-line w-100" *ngIf="segmentName === 'chatRoom'" [ngStyle]="{'background-color': group.data.team_color}"></div>
+  <div class="segment-line w-100" *ngIf="segmentName === 'chatRoom'" [ngStyle]="{'background-color': group?.data.team_color}"></div>
  </ion-segment-button>
  <ion-segment-button value="squadChatRoom" class="w-50">
   <ion-label>{{ langPack['squad_chatroom'] }}</ion-label>
   <div class="msg-badge d-flex text-white ml-1 align-items-center justify-content-center" *ngIf="squadUnreadTotalCount">
    {{ squadUnreadTotalCount | badgeLimit: 99 }}
   </div>
-  <div class="segment-line w-100" *ngIf="segmentName === 'squadChatRoom'" [ngStyle]="{'background-color': group.data.team_color}"></div>
+  <div class="segment-line w-100" *ngIf="segmentName === 'squadChatRoom'" [ngStyle]="{'background-color': group?.data.team_color}"></div>
  </ion-segment-button>
 </ion-segment>
 
@@ -44,7 +44,7 @@
  </div>
 
  <div class="custom-fab d-flex align-items-center justify-content-center pointer"
-      [style.background-color]="group.data.team_color"
+      [style.background-color]="group?.data.team_color"
       *ngIf="segmentName === 'chatRoom'"
       (click)="createChatPopover()">
   <ion-icon name="add"></ion-icon>

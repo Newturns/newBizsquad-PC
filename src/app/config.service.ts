@@ -64,7 +64,7 @@ export class ConfigService implements CanLoad {
             console.error('ConfigService::canLoad firebaseNameOfUrl error.');
             console.error(e);
             // route to login
-            this.router.navigate(['/login']);
+            this.router.navigate(['/login'],{replaceUrl: true});
             resolve(false);
           });
         } else {
@@ -73,7 +73,7 @@ export class ConfigService implements CanLoad {
           // login 화면으로 보낸다.
           console.error('ConfigService::canLoad', 'firebase name not found.');
           console.error('redirect to /login');
-          this.router.navigate(['/login']);
+          this.router.navigate(['/login'],{replaceUrl: true});
           resolve(false);
         }
       } else {

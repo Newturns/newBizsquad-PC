@@ -49,7 +49,15 @@ export class SquadPage implements OnInit {
     .pipe(takeUntil(this._unsubscribeAll))
     .subscribe(([userData, squadList, sortSquadBy]) => {
       console.log("filterBroadCast() combineLatest start");
-      this.filterBroadCast(userData, squadList,sortSquadBy);
+      console.log("squadList",squadList);
+      const mySquadsFilter = squadList.filter(s => {
+        if(s.data.type === 'private') {
+          return s.data.members[this.bizFire.uid] === true;
+        } else {
+          return !this.bizFire.currentBizGroup.isPartner();
+        }
+      });
+      this.filterBroadCast(userData, mySquadsFilter,sortSquadBy);
     });
   }
 

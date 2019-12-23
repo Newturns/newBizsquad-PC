@@ -1,15 +1,15 @@
-<ion-header class="px-2">
+<ion-header class="drag">
   <ion-toolbar>
     <ion-buttons slot="start" class="login-top-menu">
       <ion-button fill="clear" size="small" class="titleButton">
         Bizgroup List
       </ion-button>
     </ion-buttons>
-    <ion-buttons slot="end" class="login-top-menu ion-no-padding">
+    <ion-buttons slot="end" class="login-top-menu ion-no-padding no-drag">
       <ion-button class="ion-no-padding" fill="clear" size="small" slot="icon-only" color="light" (click)="windowMimimize()">
         <img src="assets/imgs/renewal/Icon_Outline_minimize.svg">
       </ion-button>
-      <ion-button class="ion-no-padding" fill="clear" size="small" slot="icon-only" color="light" (click)="windowHide()">
+      <ion-button class="ion-no-padding no-drag" fill="clear" size="small" slot="icon-only" color="light" (click)="windowHide()">
         <img src="assets/imgs/renewal/Icon_Outline_close.svg">
       </ion-button>
     </ion-buttons>
@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="group-detail d-flex flex-column justify-content-center flex-grow-1 flex-shrink-1 mr-3">
-        <div class="d-flex group-name py-2">
+        <div class="d-flex group-name pb-1">
           <div>{{ group.data.team_name }}</div>
         </div>
         <div class="d-flex group-description">

@@ -31,6 +31,14 @@ select {
   appearance: none;
   background: url("../../../assets/imgs/renewal/Icon_Outline_down.svg") no-repeat 95% 50%; /* 화살표 모양의 이미지 */
   outline: none;
+
+  .select-items div,.select-selected {
+    padding: 8px 16px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 14px;
+  }
+
 }
 select::-ms-expand { display: none; }
 

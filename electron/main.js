@@ -354,9 +354,14 @@ autoUpdater.on('update-downloaded', (event,releaseName) => {
         icon: path.join(__dirname, 'logo512.png'),
         noLink : true
     };
-    dialog.showMessageBox(dialogOpts, (response) => {
-        if (response === 0) autoUpdater.quitAndInstall();
-    })
+    dialog.showMessageBox(dialogOpts).then(result => {
+        if(result.response === 0) {
+            sendStatusToWindow('---- start install now quitAndInstall() ----');
+            autoUpdater.quitAndInstall();
+        } else {
+            sendStatusToWindow('---- Later install ----');
+        }
+    });
 });
 
 autoUpdater.checkForUpdatesAndNotify();

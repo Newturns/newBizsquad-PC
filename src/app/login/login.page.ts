@@ -51,12 +51,14 @@ export class LoginPage implements OnInit {
       password: ['', this.passwordValidator]
     });
 
-    this.electronService.ipcRenderer.on('autoUpdate',(e,data) => {
-      console.log(data);
-    });
+    // this.electronService.ipcRenderer.on('autoUpdate',(e,data) => {
+    //   console.log(data);
+    // });
   }
 
   ngOnInit() {
+
+    console.log("login page ngOninit");
 
     // 버전 가져오기
     this.version = this.electronService.remote.app.getVersion();

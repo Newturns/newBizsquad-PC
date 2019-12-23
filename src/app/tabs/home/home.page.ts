@@ -50,10 +50,11 @@ export class HomePage implements OnInit {
               private router : Router,
               private configService : ConfigService
   ) {
-    this._unsubscribeAll = new Subject<any>();
   }
 
-  ngOnInit() {
+  ionViewWillEnter() {
+    this._unsubscribeAll = new Subject<any>();
+
     this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => {
       this.langPack = l.pack();
     });
@@ -96,18 +97,20 @@ export class HomePage implements OnInit {
     //공지사항 불러오기.
     const path = Commons.bbsPath(this.bizFire.gid);
     this.bizFire.afStore.collection(path,ref => ref.orderBy('created','desc')
-        .limit(4))
-        .snapshotChanges()
-        .pipe(takeUntil(this._unsubscribeAll),
+    .limit(4))
+    .snapshotChanges()
+    .pipe(takeUntil(this._unsubscribeAll),
         map((docs: any[]) => {
           return docs.map(s => new Message(s.payload.doc.id, s.payload.doc.data(), s.payload.doc.ref));
         }))
-        .subscribe((noticeList: IMessage[]) => {
-          this.latelyNotice = noticeList;
-        });
+    .subscribe((noticeList: IMessage[]) => {
+      this.latelyNotice = noticeList;
+    });
 
   }
 
+  ngOnInit() {
+  }
 
    async presentPopover(ev) {
       const popover = await this.popoverCtrl.create({
@@ -143,7 +146,7 @@ export class HomePage implements OnInit {
   }
 
   showNotify() {
-    this.router.navigate([`/${this.configService.firebaseName}/tabs/notify`]);
+    this.router.navigate([`/${this.configService.firebaseName}/tabs/notify`],{replaceUrl: true});
   }
 
   showMenu() {
@@ -172,7 +175,7 @@ export class HomePage implements OnInit {
     this.tokenService.makeWebJump('mypage');
   }
 
-  ngOnDestroy(): void {
+  ionViewDidLeave() {
     this._unsubscribeAll.next();
     this._unsubscribeAll.complete();
   }

@@ -23,17 +23,18 @@
 <ion-footer no-border>
   <form [formGroup]="chatForm">
     <div class="chat-input-frame p-2 d-flex align-items-end">
-      <div class="file-attach-div d-flex align-items-center justify-content-center pointer mb-1" (click)="fileAttach.click()">
+      <div class="file-attach-div d-flex align-items-center justify-content-center pointer" (click)="fileAttach.click()"
+      style="margin-bottom: 2px">
         <img src="assets/imgs/renewal/Icon_circle_attach.svg">
         <input type="file" style="display: none;" accept="*" #fileAttach (change)="file($event)">
       </div>
 
-      <div class="flex-grow-1 mx-3">
+      <div class="flex-grow-1 mx-2">
         <ion-textarea #msgInput rows="1" formControlName="chat" placeholder="Type a message here"
-                      (keydown)="keydown($event)" autosize="100">
+                      (keydown)="keydown($event)" autosize="100" class="mt-0" align-items-start>
         </ion-textarea>
       </div>
-      <div class="mb-1">
+      <div style="margin-bottom: 2px">
         <div class="circle_send d-flex align-items-center justify-content-center pointer" (click)="sendMsg(chatForm.value.chat)"
              [ngStyle]="{'background-color': selectBizGroup != null ? selectBizGroup.data.team_color : 'silver'}">
           <img src="assets/imgs/renewal/Icon_Fill_navigation.svg">

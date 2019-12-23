@@ -19,14 +19,14 @@ export class InitProcess {
         return new Promise<any>( resolve => {
             this.afStore.collection('users').doc(`${user.uid}`).get()
               .subscribe(snap => {
-                  if(snap.exists){
-                      // update this user's data
-                      // DB에 displayName 등이 없으면, SNS계정 값을 DB에 저장
-                      const data = this.makeUpdateData(user, snap.data());
-                      resolve(data);
-                  } else {
-                      const data = this.makeNewUserData(user);
-                      snap.ref.set(data, {merge: true}).then(()=>{
+                          if(snap.exists){
+                              // update this user's data
+                              // DB에 displayName 등이 없으면, SNS계정 값을 DB에 저장
+                              const data = this.makeUpdateData(user, snap.data());
+                              resolve(data);
+                          } else {
+                              const data = this.makeNewUserData(user);
+                              snap.ref.set(data, {merge: true}).then(()=>{
                       
                           resolve(data);
                       });

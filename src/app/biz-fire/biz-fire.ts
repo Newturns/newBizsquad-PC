@@ -268,12 +268,6 @@ export class BizFireService {
                                 this.getCustomLinks(user.uid);
                             }
 
-                            // ------------------------------------------------------------------
-                            // * update user info.
-                            // ------------------------------------------------------------------
-                            const initProcess = new InitProcess(this.afStore);
-                            await initProcess.start(user);
-
                             // start trigger after update login date.
                             this.currentUserSubscription = this.afStore.doc(Commons.userPath(user.uid))
                                 .valueChanges()
@@ -292,6 +286,12 @@ export class BizFireService {
                                     // multicast current user.
                                     this._currentUser.next(userData as IUserData);
                                 });
+
+                            // ------------------------------------------------------------------
+                            // * update user info.
+                            // ------------------------------------------------------------------
+                            const initProcess = new InitProcess(this.afStore);
+                            await initProcess.start(user);
 
                         } else {
 

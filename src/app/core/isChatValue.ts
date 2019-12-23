@@ -21,7 +21,7 @@ export class isChatValue implements CanLoad, CanActivate {
       this.electronService.ipcRenderer.invoke('test-channel','getChatData').then((result) => {
         console.log("get chat Data :::",result);
         if (result.chat) {
-          this.router.navigate([`${this.configService.firebaseName}/chat-frame`]);
+          this.router.navigate([`${this.configService.firebaseName}/chat-frame`],{replaceUrl: true});
           resolve(true);
         } else {
           resolve(true);

@@ -51,17 +51,16 @@ export class GidLoadService implements CanActivate, CanLoad, CanActivateChild {
             }).catch(()=>{
               // lastMobileGid's gid not found form db.
 
-              this.router.navigate([`${this.bizFire.configService.firebaseName}/selector`]);
+              this.router.navigate([`${this.bizFire.configService.firebaseName}/selector`],{replaceUrl: true});
               resolve(true);
             });
-
           } else {
             // nothing to load.
             // go back to selector
             console.error('lastPcGid not found. Select first group.', userData);
             console.log("firebaseName ::",this.bizFire.configService.firebaseName);
 
-            this.router.navigate([`${this.bizFire.configService.firebaseName}/selector`]);
+            this.router.navigate([`${this.bizFire.configService.firebaseName}/selector`],{replaceUrl: true});
             resolve(true);
           }
         });

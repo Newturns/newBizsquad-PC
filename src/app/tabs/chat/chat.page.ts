@@ -51,18 +51,19 @@ export class ChatPage implements OnInit {
               private groupColorProvider: GroupColorProvider,
               private popoverCtrl : PopoverController,
               private bizFire : BizFireService) {
-    this._unsubscribeAll = new Subject<any>();
   }
 
-  ngOnInit() {
+  ionViewWillEnter() {
+    this._unsubscribeAll = new Subject<any>();
 
+    console.log("-------- ngOnInit chat -----------");
     this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
 
     this.bizFire.onBizGroupSelected
-    .pipe(takeUntil(this._unsubscribeAll))
-    .subscribe((group : IBizGroup) => {
-      this.group = group;
-    });
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((group : IBizGroup) => {
+          this.group = group;
+        });
 
     // 멤버 채팅방
     this.chatService.chatList$
@@ -94,33 +95,35 @@ export class ChatPage implements OnInit {
 
     // 스쿼드 채팅방
     this.chatService.squadChatList$
-    .pipe(filter(d=>d != null),takeUntil(this._unsubscribeAll))
-    .subscribe((squad : IChat[]) => {
-      const onlyPrivateSquad = squad.filter(s => s.data.type === 'private');
-      this.squadChatRooms = onlyPrivateSquad.sort(Commons.sortDataByCreated());
-    });
+        .pipe(filter(d=>d != null),takeUntil(this._unsubscribeAll))
+        .subscribe((squad : IChat[]) => {
+          const onlyPrivateSquad = squad.filter(s => {
+            return s.data.type === 'private' && s.data.members[this.bizFire.uid] === true;
+          });
+          this.squadChatRooms = onlyPrivateSquad.sort(Commons.sortDataByCreated());
+        });
 
     // unread count map
     this.chatService.unreadCountMap$
-    .pipe(takeUntil(this._unsubscribeAll))
-    .subscribe((list: IUnreadMap) => {
-      // temp array for counting.
-      this.memberUnreadTotalCount = 0;
-      this.squadUnreadTotalCount = 0;
-      list.getValues().forEach( (item: MapItem) => {
-        if(item.chat.data.type === 'member'){
-          this.memberUnreadTotalCount += item.unreadList.length;
-        } else {
-          this.squadUnreadTotalCount += item.unreadList.length;
-        }
-      });
-    });
+        .pipe(takeUntil(this._unsubscribeAll))
+        .subscribe((list: IUnreadMap) => {
+          // temp array for counting.
+          this.memberUnreadTotalCount = 0;
+          this.squadUnreadTotalCount = 0;
+          list.getValues().forEach( (item: MapItem) => {
+            if(item.chat.data.type === 'member'){
+              this.memberUnreadTotalCount += item.unreadList.length;
+            } else {
+              this.squadUnreadTotalCount += item.unreadList.length;
+            }
+          });
+        });
 
 
     /*
-* sort 채팅방
-* 마지막 메시지가 도착한 순으로 소팅
-* */
+    * sort 채팅방
+    * 마지막 메시지가 도착한 순으로 소팅
+    * */
     this.sortChatRooms$
         .pipe(takeUntil(this._unsubscribeAll),
             distinctUntilChanged() // 같은 채팅창이면 이미 소팅되어있으므로 무시
@@ -151,6 +154,20 @@ export class ChatPage implements OnInit {
             });
           }
         });
+  }
+
+  ionViewDidLeave() {
+
+    console.log("-------- ngOnDestroy chat -----------");
+    this.memberUnreadTotalCount = 0;
+    this.squadUnreadTotalCount = 0;
+    this._unsubscribeAll.next();
+    this._unsubscribeAll.complete();
+  }
+
+  ngOnInit() {
+  }
+  ngOnDestroy(): void {
   }
 
 
@@ -187,8 +204,4 @@ export class ChatPage implements OnInit {
     await popover.present();
   }
 
-  ngOnDestroy(): void {
-    this._unsubscribeAll.next();
-    this._unsubscribeAll.complete();
-  }
 }

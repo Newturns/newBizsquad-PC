@@ -24,7 +24,7 @@ export class HomeGuard implements CanLoad, CanActivate {
             if(this.configService.firebaseName == null){
                 console.error('HomeGuard:, ConfigService.firebaseName is null.');
                 console.error('redirect to /login');
-                this.router.navigate(['/login']);
+                this.router.navigate(['/login'],{replaceUrl: true});
                 resolve(false);
                 return;
             }
@@ -36,7 +36,7 @@ export class HomeGuard implements CanLoad, CanActivate {
                       authSub.unsubscribe();
                       console.error('HomeGuard login check failed. User not signed in.');
                       console.error('redirect to /login');
-                      this.router.navigate(['/login']);
+                      this.router.navigate(['/login'],{replaceUrl: true});
                       resolve(false);
                   } else {
                       resolve(true);

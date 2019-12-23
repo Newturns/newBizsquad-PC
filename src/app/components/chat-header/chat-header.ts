@@ -196,7 +196,7 @@ export class ChatHeaderComponent extends TakeUntil {
       } else if (eventText === 'invite') {
         this.inviteChatRoom();
       } else {
-        console.error("not event");
+        console.log("not event : close popover");
       }
     });
   }

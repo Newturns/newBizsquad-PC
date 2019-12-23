@@ -9,7 +9,8 @@ import {IUnreadMap} from '../components/classes/unread-counter';
 import {ChatService} from '../providers/chat.service';
 
 import {UserStatusProvider} from '../core/user-status';
-import {filter} from 'rxjs/operators';
+import {filter, takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
 
 @Component({
   selector: 'app-tabs',
@@ -17,7 +18,7 @@ import {filter} from 'rxjs/operators';
   styleUrls: ['./tabs.page.scss'],
 })
 
-export class TabsPage extends TakeUntil implements OnInit {
+export class TabsPage {
 
   langPack = {};
 
@@ -31,31 +32,34 @@ export class TabsPage extends TakeUntil implements OnInit {
 
   chatRooms = [];
 
+  private _unsubscribeAll;
+
   constructor(
       private bizFire : BizFireService,
       private router : Router,
       private electronService : Electron,
       private chatService : ChatService,
       private userStatusService: UserStatusProvider) {
-    super();
 
-    this.userStatusService.onUserStatusChange();
+    // this.electronService.ipcRenderer.on('progress',(e,m) => {
+    //   console.log(m);
+    // });
+  }
 
+  ionViewWillEnter() {
     // 채팅이 아닌 메인 윈도우를 우클릭으로 완전 종료시 유저상태변경하는 리스너.(파이어베이스의 유저상태);
     window.addEventListener('unload', () => {
       this.bizFire.signOut();
     });
 
-    this.bizFire.onLang.pipe(this.takeUntil).subscribe((l: any) => this.langPack = l.pack());
+    this.userStatusService.onUserStatusChange();
 
-    this.electronService.ipcRenderer.on('progress',(e,m) => {
-      console.log(m);
-    });
-  }
+    this._unsubscribeAll = new Subject<any>();
 
-  ngOnInit() {
+    this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
+
     this.bizFire.onBizGroupSelected
-    .pipe(filter(d=>d!=null),this.takeUntil)
+    .pipe(filter(d=>d!=null),takeUntil(this._unsubscribeAll))
     .subscribe((group : IBizGroup) => {
       console.log("onBizGroupSelected !",group);
       this.group = group;
@@ -63,11 +67,12 @@ export class TabsPage extends TakeUntil implements OnInit {
     });
 
     this.chatService.unreadCountMap$
-        .pipe(this.takeUntil)
-        .subscribe((map: IUnreadMap)=> {
-          this.chatUnreadCount = map.totalUnreadCount();
-          console.log("chatUnreadCount ::",this.chatUnreadCount);
-        });
+    .pipe(takeUntil(this._unsubscribeAll))
+    .subscribe((map: IUnreadMap)=> {
+      this.chatUnreadCount = map.totalUnreadCount();
+      console.log("chatUnreadCount ::",this.chatUnreadCount);
+      console.log("chat list item",map.getValues());
+    });
   }
 
   changeTabs(e) {
@@ -78,7 +83,7 @@ export class TabsPage extends TakeUntil implements OnInit {
   }
 
   groupSelectPage() {
-    this.router.navigate([`/${this.bizFire.configService.firebaseName}/selector`]);
+    this.router.navigate([`/${this.bizFire.configService.firebaseName}/selector`],{replaceUrl: true});
   }
 
   windowMimimize() {
@@ -89,7 +94,9 @@ export class TabsPage extends TakeUntil implements OnInit {
     this.electronService.windowHide();
   }
 
-  ngOnDestroy() {
-    // this.electronService.setAppBadge(0);
+  ionViewDidLeave() {
+    this.chatUnreadCount = 0;
+    this._unsubscribeAll.next();
+    this._unsubscribeAll.complete();
   }
 }

@@ -26,15 +26,16 @@ export class SelectorPage implements OnInit {
       private router : Router,
       private electronService : Electron,
   ) {
-    this._unsubscribeAll = new Subject<any>();
   }
 
   ngOnInit() {
+  }
 
+  ionViewWillEnter() {
+    this._unsubscribeAll = new Subject<any>();
     this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
     this.loadGroups();
   }
-
 
   private async loadGroups() {
 
@@ -67,12 +68,12 @@ export class SelectorPage implements OnInit {
         console.log("select Group :",group);
         //start load group
         await this.bizFire.loadBizGroup(group.gid);
-        await this.router.navigate([`/${this.bizFire.configService.firebaseName}/tabs`]);
+        await this.router.navigate([`/${this.bizFire.configService.firebaseName}/tabs`],{replaceUrl: true});
       } catch (e) {
         console.error(`this.bizFire.loadBizGroup(${group.gid}) error.`);
         console.error(e);
         await this.bizFire.signOut();
-        await this.router.navigate(['/login']);
+        await this.router.navigate(['/login'],{replaceUrl: true});
       }
     }
   }
@@ -87,7 +88,7 @@ export class SelectorPage implements OnInit {
     this.electronService.windowHide();
   }
 
-  ngOnDestroy(): void {
+  ionViewDidLeave() {
     this._unsubscribeAll.next();
     this._unsubscribeAll.complete();
   }
