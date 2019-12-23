@@ -56,7 +56,10 @@ export class TabsPage {
 
     this._unsubscribeAll = new Subject<any>();
 
-    this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
+    this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => {
+          this.langPack = l.pack();
+          console.log("langPack ::",this.langPack);
+        });
 
     this.bizFire.onBizGroupSelected
     .pipe(filter(d=>d!=null),takeUntil(this._unsubscribeAll))
