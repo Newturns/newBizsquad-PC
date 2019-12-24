@@ -3,15 +3,17 @@
 </ion-list>
 
 <ion-content>
-  <ng-container *ngFor="let uid of filteredUserList">
-    <ng-container *ngIf="getUserObserver(uid) | async as user">
-      <div *ngIf="!searchKeyword || user.data.displayName.indexOf(searchKeyword.trim())>-1;"
-           class="biz-border-bottom d-flex flex-column justify-content-center px-4 py-2"
-           bizGroupColor [hover]="true" [selected]="false">
-        <app-avatar-button [user]="user" [displayNameOn]="true" (onClick)="presentPopover(user)" [statusOn]="true"></app-avatar-button>
-      </div>
+  <div class="overflow-auto w-100 h-100">
+    <ng-container *ngFor="let uid of filteredUserList">
+      <ng-container *ngIf="getUserObserver(uid) | async as user">
+        <div *ngIf="!searchKeyword || user.data.displayName.indexOf(searchKeyword.trim())>-1;"
+             class="biz-border-bottom d-flex flex-column justify-content-center px-4 py-2"
+             bizGroupColor [hover]="true" [selected]="false">
+          <app-avatar-button [user]="user" [displayNameOn]="true" (onClick)="presentPopover(user)" [statusOn]="true"></app-avatar-button>
+        </div>
+      </ng-container>
     </ng-container>
-  </ng-container>
+  </div>
 </ion-content>
 
 <div class="biz-footer d-flex justify-content-center align-items-center">

@@ -3,13 +3,14 @@ import {CanLoad, Route, Router, UrlSegment} from '@angular/router';
 import {environment} from '../environments/environment';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject} from 'rxjs';
+import {IMetaData} from './_models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConfigService implements CanLoad {
 
-  metaData: any;
+  metaData: IMetaData;
 
   // null로 설정시, BizFire생성자에서 authState가 에러.
   private _firebaseName: string = null;
@@ -54,7 +55,7 @@ export class ConfigService implements CanLoad {
       
       // refresh 대응.
       // URL 에서 'taxline' 을 찾아 서버에 확인한 후, 다음 라우트로 허가
-      if(this.firebaseName == null || this.firebaseName !== firebaseNameOfUrl){
+      if(this.firebaseName !== firebaseNameOfUrl){
         
         if(firebaseNameOfUrl){
           

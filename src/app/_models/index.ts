@@ -15,9 +15,9 @@ export interface userLinks {
 }
 
 export interface IMetaData {
-  serverUrl?: string,
-  databaseUrl?: string,
-  loginTitle?: string
+  fireFunc: string,
+  loginTitle?: string,
+  fileUrl?: string
 }
 
 export interface IUser {

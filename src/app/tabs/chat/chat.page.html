@@ -22,32 +22,34 @@
 
 <ion-content class="content-color ion-no-padding">
 
- <!-- segment con -->
- <div *ngIf="segmentName === 'chatRoom'">
-  <ng-container *ngFor="let room of chatRooms">
-   <ng-container *ngIf="!searchKeyword || room.data.title.indexOf(searchKeyword.trim())>-1;">
-    <div class="px-3 chat-item-frame" bizGroupColor [hover]="true" [selected]="false">
-     <biz-chat-item  (clickedFunc)="gotoRoom($event)" [chat]="room"></biz-chat-item>
-    </div>
+ <div class="overflow-auto w-100 h-100">
+  <!-- segment con -->
+  <div *ngIf="segmentName === 'chatRoom'">
+   <ng-container *ngFor="let room of chatRooms">
+    <ng-container *ngIf="!searchKeyword || room.data.title.indexOf(searchKeyword.trim())>-1;">
+     <div class="px-3 chat-item-frame" bizGroupColor [hover]="true" [selected]="false">
+      <biz-chat-item  (clickedFunc)="gotoRoom($event)" [chat]="room"></biz-chat-item>
+     </div>
+    </ng-container>
    </ng-container>
-  </ng-container>
- </div>
+  </div>
 
- <div *ngIf="segmentName === 'squadChatRoom'">
-  <ng-container *ngFor="let room of squadChatRooms">
-   <ng-container *ngIf="!searchKeyword || room.data.title.indexOf(searchKeyword.trim())>-1;">
-    <div class="px-3 chat-item-frame" bizGroupColor [hover]="true" [selected]="false">
-     <biz-chat-item  (clickedFunc)="gotoRoom($event)" [chat]="room" bizGroupColor [hover]="true" [selected]="false"></biz-chat-item>
-    </div>
+  <div *ngIf="segmentName === 'squadChatRoom'">
+   <ng-container *ngFor="let room of squadChatRooms">
+    <ng-container *ngIf="!searchKeyword || room.data.title.indexOf(searchKeyword.trim())>-1;">
+     <div class="px-3 chat-item-frame" bizGroupColor [hover]="true" [selected]="false">
+      <biz-chat-item  (clickedFunc)="gotoRoom($event)" [chat]="room" bizGroupColor [hover]="true" [selected]="false"></biz-chat-item>
+     </div>
+    </ng-container>
    </ng-container>
-  </ng-container>
- </div>
+  </div>
 
- <div class="custom-fab d-flex align-items-center justify-content-center pointer"
-      [style.background-color]="group?.data.team_color"
-      *ngIf="segmentName === 'chatRoom'"
-      (click)="createChatPopover()">
-  <ion-icon name="add"></ion-icon>
+  <div class="custom-fab d-flex align-items-center justify-content-center pointer"
+       [style.background-color]="group?.data.team_color"
+       *ngIf="segmentName === 'chatRoom'"
+       (click)="createChatPopover()">
+   <ion-icon name="add"></ion-icon>
+  </div>
  </div>
 
 </ion-content>

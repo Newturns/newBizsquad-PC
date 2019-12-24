@@ -28,7 +28,6 @@ export const environment = {
 
   //일단 하드코딩.
   bizServerUri: 'https://manager.bizsquad.net:9010',
-  webJumpBaseUrl: 'https://product.bizsquad.net/auth?token=',
   publicWeb : 'https://www.bizsquad.net/',
 };
 

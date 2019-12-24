@@ -58,27 +58,10 @@ export class BizFireService {
     //------------------------------------------------------------//
     get metaData$(): Observable<IMetaData> {
         return new Observable<IMetaData>( observer => {
-            if(this._metaData){
-                observer.next(this._metaData);
-                observer.complete();
-            } else {
-                this.afStore.doc(`${STRINGS.METADATA}/server`).get().subscribe(snap => {
-                    this._metaData = snap.data();
-                    if(this._metaData.databaseUrl != null){
-                        // get data from database url
-                        // :here
-                    }
-                    observer.next(this._metaData);
-                    observer.complete();
-                }, error => {
-                    console.error(error);
-                    observer.error(error);
-                    observer.complete();
-                });
-            }
+            observer.next(this.configService.metaData);
+            observer.complete();
         });
     }
-    private _metaData: IMetaData;
 
     //------------------------------------------------------------//
     // User custom data with group gid //

@@ -60,7 +60,7 @@ export class TranslateService extends TakeUntil{
       };
       
       this.bizFire.metaData$.subscribe((metaData: IMetaData) => {
-        this.http.post(`${metaData.serverUrl}/v1/translate`, body).subscribe((res: any)=>{
+        this.http.post(`${metaData.fireFunc}/translate`, body).subscribe((res: any)=>{
     
           resolve(res.translations);
     

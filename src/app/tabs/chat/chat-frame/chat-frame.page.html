@@ -7,7 +7,7 @@
 </ion-header>
 
 <ion-content #scrollContent [scrollEvents]="true" (ionScroll)="scrollHandler($event)">
-  <div class="message-wrap">
+  <div class="h-100">
     <ng-container *ngFor="let message of chatContent; let i = index">
       <div class="d-flex align-items-center my-2" *ngIf="isDifferentDay(i)">
         <div class="d-flex flex-grow-1 ml-3" style="background-color: #ECECEC; height:1px"></div>

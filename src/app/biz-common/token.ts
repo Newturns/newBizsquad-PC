@@ -4,7 +4,7 @@ import {BizFireService} from '../biz-fire/biz-fire';
 import {LoadingProvider} from '../providers/loading';
 import {Electron} from '../providers/electron';
 import {environment} from '../../environments/environment';
-import {INotification} from '../_models';
+import {IMetaData, INotification} from '../_models';
 import {ConfigService} from '../config.service';
 
 @Injectable()
@@ -31,35 +31,36 @@ export class TokenProvider {
 
     async getToken(uid) {
       return new Promise<string>(async resolve => {
-        const path = `${environment.bizServerUri}/customToken`;
-        const header = await this.idTokenHeader();
-        const body = {
-          uid: uid
-        };
-        if(uid != null) {
-          await this.http.post(path,body,{headers: header}).subscribe((res: any) => {
-            if(res.result === true) {
-              resolve(res.customToken);
-            }
-          })
-        }
+        this.bizFire.metaData$.subscribe(async (metaData : IMetaData) => {
+          const path = `${metaData.fireFunc}/customToken`;
+          const header = await this.idTokenHeader();
+          const body = { uid: uid };
+          if(uid != null) {
+            await this.http.post(path,body,{headers: header}).subscribe((res: any) => {
+              if(res.result === true) {
+                resolve(res.customToken);
+              }
+            })
+          }
+        });
       });
     }
 
     async addCustomLink(uid,title,url) {
-      console.log(uid,title,url);
-        const path = `${environment.bizServerUri}/customLink`;
+      this.bizFire.metaData$.subscribe(async (metaData : IMetaData) => {
+        const path = `${metaData.fireFunc}/customLink`;
         const header = await this.idTokenHeader();
         const body = {
-            uid: uid,
-            title: title,
-            url: url,
+          uid: uid,
+          title: title,
+          url: url,
         };
         console.log("body :",body);
         this.http.post(path,body,{headers: header}).subscribe((res: any) => {
           console.log(res);
-            // 파이어스토어에서 링크 데이터 가져오기.
+          // 파이어스토어에서 링크 데이터 가져오기.
         })
+      });
     }
 
     async makeWebJump(type: string,sid?:string) {

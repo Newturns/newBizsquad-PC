@@ -354,7 +354,7 @@ export class NotificationService {
 
       this.bizFire.metaData$.subscribe((metaData: IMetaData)=>{
         
-        const notifyUri = `${metaData.serverUrl}/v1/notification`;
+        const notifyUri = `${metaData.fireFunc}/notification`;
         this.http.post(notifyUri, {notification: notifyData}, headers)
           .subscribe((result: any) => {
             console.log(result);
