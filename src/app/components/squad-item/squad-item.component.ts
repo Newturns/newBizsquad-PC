@@ -18,6 +18,8 @@ export class SquadItemComponent extends TakeUntil implements OnInit {
 
   memberCount;
 
+  langPack = {};
+
   @Input()
   set squad(s: IChat){
     this.loadSquad(s);
@@ -58,6 +60,10 @@ export class SquadItemComponent extends TakeUntil implements OnInit {
       this.group = g;
       this.team_color = g.data.team_color || COLORS.default;
     });
+
+    this.bizFire.onLang
+        .pipe(this.takeUntil)
+        .subscribe((l: any) => this.langPack = l.pack());
   }
 
   private loadSquad(s: IChat){
@@ -72,5 +78,16 @@ export class SquadItemComponent extends TakeUntil implements OnInit {
     console.log('onFavoritesSelect !!',this.squadBox);
 
     this.squadService.setFavorite(this.squadBox.cid, !this.star);
+  }
+
+  getSquadTitle(): string {
+    let squadName;
+    // 이전 DB 지원용. 'All' 스쿼드
+    if(this.squadBox.data.default === true){
+      squadName = this.langPack['default_squad'];
+    } else {
+      squadName = this.squadBox.data.title || this.squadBox.data.name;
+    }
+    return squadName;
   }
 }

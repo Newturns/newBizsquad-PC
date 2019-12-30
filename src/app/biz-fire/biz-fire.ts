@@ -165,6 +165,7 @@ export class BizFireService {
         * */
         this.onBizGroupChanged$.subscribe(()=>{
             // clean old data
+            this.userDataDoc = null;
             if(this.userDataDocSub){
                 this.userDataDocSub.unsubscribe();
                 this.userDataDocSub = null;
@@ -176,41 +177,11 @@ export class BizFireService {
         * Every Group changes, load /bizgroup/<gid>/userData/<uid>/ data
         * */
         this.onBizGroupSelected
-            .pipe(filter(g => g!=null))
-            .subscribe((g: IBizGroup)=> {
-
-                let reload = true;
-                const userDataPath = Commons.userDataPath(g.gid, this.uid);
-                if(this.userDataDoc){
-                    // is group changed?
-                    if(userDataPath === this.userDataDoc.ref.path){
-                        reload = false;
-                    } else {
-                        // clean old data
-                        if(this.userDataDocSub){
-                            this.userDataDocSub.unsubscribe();
-                            this.userDataDocSub = null;
-                        }
-                    }
-                }
-                if(reload){
-                    this.userDataDocSub = this.afStore.doc(userDataPath)
-                        .snapshotChanges()
-                        .pipe(this.takeUntilUserSignOut)
-                        .subscribe( (snap: any)=>{
-                            const doc: DocumentSnapshot = snap.payload;
-                            if(!doc.exists){
-                                // save new doc.
-                                doc.ref.set({
-                                    uid: this.uid
-                                }, {merge: true});
-                            } else {
-                                this.userDataDoc = doc;
-                                this.userDataSubject.next(doc.data());
-                            }
-                        });
-                }
-            });
+        .pipe(filter(g => g!=null))
+        .subscribe((g: IBizGroup)=> {
+            console.log("onbizgroupSelected() in bizfire :");
+            this.loadUserData(g.gid);
+        });
 
 
         // v2
@@ -303,17 +274,67 @@ export class BizFireService {
         this._onBizGroupSelected.next(null);
         this._currentUser.next(null);
 
+        console.log("logout Clear1",this.userDataDocSub);
+
+        if(this.userDataDocSub){
+            this.userDataDocSub.unsubscribe();
+            this.userDataDocSub = null;
+        }
+        console.log("logout Clear2",this.userDataDocSub);
+
         // unsubscribe old one for UserData
         if(this.currentUserSubscription != null){
             this.currentUserSubscription.unsubscribe();
             this.currentUserSubscription = null;
         }
 
+
         if(this.authStateSub){
             this.authStateSub.unsubscribe();
             this.authStateSub = null;
         }
 
+    }
+
+    //----------------------------------------------//
+    // userData 를 재로딩.
+    //----------------------------------------------//
+    private loadUserData(gid: string){
+        const userDataPath = Commons.userDataPath(gid, this.uid);
+        let reload = true;
+        if(this.userDataDoc){
+            // is group changed?
+            if(userDataPath === this.userDataDoc.ref.path){
+                reload = false;
+            } else {
+                // clean old data
+                if(this.userDataDocSub){
+                    this.userDataDocSub.unsubscribe();
+                    this.userDataDocSub = null;
+                }
+                this.userDataDoc = null;
+                this.userDataSubject.next('init');
+            }
+        }
+        if(reload){ // reload => true
+            this.userDataDocSub = this.afStore.doc(userDataPath)
+                .snapshotChanges()
+                .pipe(this.takeUntilUserSignOut)
+                .subscribe( (snap: any)=>{
+                    const doc: DocumentSnapshot = snap.payload;
+                    if(!doc.exists){
+                        // save new doc.
+                        doc.ref.set({
+                            uid: this.uid
+                        }, {merge: true});
+                    } else {
+                        this.userDataDoc = doc;
+                        this.userDataSubject.next(doc.data());
+                    }
+                });
+        }
+
+        console.log("reload values",reload);
     }
 
 
@@ -389,8 +410,6 @@ export class BizFireService {
                         //-------------------------------------------------//
                         console.error('Delete lastPcGid, lastWebGid,lastMobileGid');
                         this.afStore.doc(Commons.userPath(this.uid)).update({
-                            lastWebGid: null,
-                            lastMobileGid: null,
                             lastPcGid: null,
                         }).then(()=> {
                             reject();
@@ -423,10 +442,11 @@ export class BizFireService {
 
         console.log('BizFireService.signOut()');
 
-        this.afBase.database.goOffline();
-
         // delete current info
         this.clear();
+
+        this.afBase.database.goOffline();
+
 
         this.onUserSignOut.next(true);
         this.firstLogin.next(false);
