@@ -47,9 +47,6 @@ export class MessageBalloonComponent implements OnInit {
   private group : IBizGroup;
 
   //유저 정보에서 가져와야함.
-  private autoTrans : boolean = true;
-  translations: string;
-  translationError: string;
   userTranslationsFlg: boolean = false;
 
   private _unsubscribeAll;
@@ -98,13 +95,6 @@ export class MessageBalloonComponent implements OnInit {
         });
     }
 
-    // autoTrans = true; 임시. 유저정보에서 가져와야하는값.
-    if(this.isMyMessage === false && this.autoTrans) {
-      this.onTranslate(this.text,this.bizFire.currentUserValue.translateLang);
-    } else {
-      this.finishTranslation(false);
-    }
-
     /*
     * Get Unread Count.
     * 현재는 라인식 읽은이들 수
@@ -112,18 +102,6 @@ export class MessageBalloonComponent implements OnInit {
     this.calcUnreadCount();
   }
 
-  onTranslate(text: string, translateLang: string) {
-
-    this.translateService.translateText(text, translateLang)
-        .then((translations: ITranslations[]) => {
-          this.translations = translations[0].translatedText;
-          this.finishTranslation(true);
-        }).catch( (reason: any) => {
-      if(reason && reason.message){
-        this.translationError = reason.message;
-      }
-    });
-  }
 
 
   private convertMessage(message: IMessage): string {

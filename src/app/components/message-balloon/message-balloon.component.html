@@ -35,11 +35,11 @@
             <ng-template #otherText>
               <div class="d-flex flex-column">
                 <div class="font-14" [innerHTML]="text | sanitizingHtml"></div>
-                <biz-google-trans-text *ngIf="userTranslationsFlg && translations && translations !== text"
-                                       [transText]="translations"
-                                       [textColor]="'#EFEFEF'">
+                <biz-google-trans-text *ngIf="userTranslationsFlg"
+                                       [message]="message"
+                                       [textColor]="'#EFEFEF'"
+                                       (finishTranslation)="finishTranslation($event)">
                 </biz-google-trans-text>
-                <div class="text-danger" *ngIf="userTranslationsFlg && translationError">{{translationError}}</div>
               </div>
             </ng-template>
           </div>

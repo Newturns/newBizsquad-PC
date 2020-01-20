@@ -1,12 +1,14 @@
 <div class="d-flex flex-column">
-  <div [innerHTML]="transText | sanitizingHtml"
+  <div *ngIf="transText && transText !== text"
+       [innerHTML]="transText | sanitizingHtml"
        [ngStyle]="{
       'font-size': fontSize ? fontSize : '14px',
       'color': textColor ? textColor : '#000000'
      }">
   </div>
+  <div class="text-danger" *ngIf="transError">{{transError}}</div>
   <div class="ml-auto mt-1">
-    <img *ngIf="whiteBackground === false" src="assets/imgs/logo/google/white-short.png">
-    <img *ngIf="whiteBackground === true" src="assets/imgs/logo/google/color-short.png">
+    <img *ngIf="whiteBackground === false" src="assets/imgs/logo/google/white-short.png" width="97" height="13">
+    <img *ngIf="whiteBackground === true" src="assets/imgs/logo/google/color-short.png" width="97" height="13">
   </div>
 </div>

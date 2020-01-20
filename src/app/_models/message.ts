@@ -43,7 +43,13 @@ export interface IMessageData {
   status?: boolean,
   title?: string,
   updated?:any,
-  read?:{ [uid: string]: { unread: boolean, read?: any}}
+  read?:{ [uid: string]: { unread: boolean, read?: any}},
+  translate?: {
+    en? : string,
+    ja? : string,
+    ko? : string,
+    //  ...
+  }
 }
 export interface IFiles {
   name:string,
