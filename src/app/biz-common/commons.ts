@@ -8,6 +8,7 @@ export const STRINGS = {
   MY_SQUAD_STRING: 'mysquad',
   USERS: 'users',
   WORKS: 'works',
+  BILLING: 'billing',
   COMPANY: 'company',
   BBS:'bbs',
 

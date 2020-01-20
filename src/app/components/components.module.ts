@@ -33,6 +33,7 @@ import {ProfilePopoverComponent} from './profile-popover/profile-popover.compone
 import {ChatMenuPopoverComponent} from './chat-menu-popover/chat-menu-popover.component';
 import {InviteChatPopoverComponent} from './invite-chat-popover/invite-chat-popover.component';
 import {CreateChatPopoverComponent} from './create-chat-popover/create-chat-popover.component';
+import {GoogleTransTextComponent} from './google-trans-text/google-trans-text.component';
 
 @NgModule({
     declarations: [
@@ -62,7 +63,8 @@ import {CreateChatPopoverComponent} from './create-chat-popover/create-chat-popo
         CustomLinkComponent,
         ChatMenuPopoverComponent,
         InviteChatPopoverComponent,
-        CreateChatPopoverComponent
+        CreateChatPopoverComponent,
+        GoogleTransTextComponent
     ],
     imports: [
         CommonModule,
@@ -98,7 +100,8 @@ import {CreateChatPopoverComponent} from './create-chat-popover/create-chat-popo
         ProfilePopoverComponent,
         InviteChatPopoverComponent,
         CustomLinkComponent,
-        CreateChatPopoverComponent
+        CreateChatPopoverComponent,
+        GoogleTransTextComponent,
     ],
     entryComponents: [
         MembersPopoverComponent,

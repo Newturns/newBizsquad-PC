@@ -3,7 +3,8 @@ import {HttpClient} from '@angular/common/http';
 import {IMetaData} from '../_models';
 import {TakeUntil} from '../biz-common/take-until';
 import {BizFireService} from '../biz-fire/biz-fire';
-
+import {STRINGS} from '../biz-common/commons';
+import * as firebase from 'firebase/app';
 
 export interface ITranslations {
   translatedText: string
@@ -61,6 +62,10 @@ export class TranslateService extends TakeUntil{
       
       this.bizFire.metaData$.subscribe((metaData: IMetaData) => {
         this.http.post(`${metaData.fireFunc}/translate`, body).subscribe((res: any)=>{
+          //todo : 임시 | 번역 사용량 더하기.
+          const deleteHtmlTag = res.src.replace(/<[^>]*>/g, '');
+          const billingRef = this.bizFire.afStore.doc(`${STRINGS.BILLING}/${this.bizFire.gid}`);
+          billingRef.update({usedTransChar : firebase.firestore.FieldValue.increment(deleteHtmlTag.length)});
     
           resolve(res.translations);
     
