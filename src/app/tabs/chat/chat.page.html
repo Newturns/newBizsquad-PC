@@ -1,18 +1,18 @@
 
 <ion-segment (ionChange)="segmentChanged($event)" class="bg-white px-2">
- <ion-segment-button value="chatRoom" checked class="w-50">
-  <ion-label>{{ langPack['chatroom'] }}</ion-label>
-  <div class="msg-badge d-flex text-white ml-1 align-items-center justify-content-center" *ngIf="memberUnreadTotalCount">
-   {{ memberUnreadTotalCount | badgeLimit: 99 }}
-  </div>
-  <div class="segment-line w-100" *ngIf="segmentName === 'chatRoom'" [ngStyle]="{'background-color': group?.data.team_color}"></div>
- </ion-segment-button>
  <ion-segment-button value="squadChatRoom" class="w-50">
   <ion-label>{{ langPack['squad_chatroom'] }}</ion-label>
   <div class="msg-badge d-flex text-white ml-1 align-items-center justify-content-center" *ngIf="squadUnreadTotalCount">
    {{ squadUnreadTotalCount | badgeLimit: 99 }}
   </div>
   <div class="segment-line w-100" *ngIf="segmentName === 'squadChatRoom'" [ngStyle]="{'background-color': group?.data.team_color}"></div>
+ </ion-segment-button>
+ <ion-segment-button value="chatRoom" checked class="w-50">
+  <ion-label>{{ langPack['chatroom'] }}</ion-label>
+  <div class="msg-badge d-flex text-white ml-1 align-items-center justify-content-center" *ngIf="memberUnreadTotalCount">
+   {{ memberUnreadTotalCount | badgeLimit: 99 }}
+  </div>
+  <div class="segment-line w-100" *ngIf="segmentName === 'chatRoom'" [ngStyle]="{'background-color': group?.data.team_color}"></div>
  </ion-segment-button>
 </ion-segment>
 
@@ -24,21 +24,21 @@
 
  <div class="overflow-auto w-100 h-100">
   <!-- segment con -->
-  <div *ngIf="segmentName === 'chatRoom'">
-   <ng-container *ngFor="let room of chatRooms">
-    <ng-container *ngIf="!searchKeyword || room.data.title.indexOf(searchKeyword.trim())>-1;">
-     <div class="px-3 chat-item-frame" bizGroupColor [hover]="true" [selected]="false">
-      <biz-chat-item  (clickedFunc)="gotoRoom($event)" [chat]="room"></biz-chat-item>
-     </div>
-    </ng-container>
-   </ng-container>
-  </div>
-
   <div *ngIf="segmentName === 'squadChatRoom'">
    <ng-container *ngFor="let room of squadChatRooms">
     <ng-container *ngIf="!searchKeyword || room.data.title.indexOf(searchKeyword.trim())>-1;">
      <div class="px-3 chat-item-frame" bizGroupColor [hover]="true" [selected]="false">
       <biz-chat-item  (clickedFunc)="gotoRoom($event)" [chat]="room" bizGroupColor [hover]="true" [selected]="false"></biz-chat-item>
+     </div>
+    </ng-container>
+   </ng-container>
+  </div>
+
+  <div *ngIf="segmentName === 'chatRoom'">
+   <ng-container *ngFor="let room of chatRooms">
+    <ng-container *ngIf="!searchKeyword || room.data.title.indexOf(searchKeyword.trim())>-1;">
+     <div class="px-3 chat-item-frame" bizGroupColor [hover]="true" [selected]="false">
+      <biz-chat-item  (clickedFunc)="gotoRoom($event)" [chat]="room"></biz-chat-item>
      </div>
     </ng-container>
    </ng-container>

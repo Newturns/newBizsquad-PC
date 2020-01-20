@@ -26,7 +26,7 @@ export class ChatPage implements OnInit {
 
   langPack = {};
 
-  segmentName : string = 'chatRoom';
+  segmentName : string = 'squadChatRoom';
 
   group : IBizGroup;
 
