@@ -63,7 +63,7 @@ export class TokenProvider {
       });
     }
 
-    async makeWebJump(type: string,sid?:string) {
+    async makeWebJump(type: string,id?:string) {
       const loading = await this.loading.show();
       this.getToken(this.bizFire.uid).then(async (token : string) => {
         if(type === 'setting') {
@@ -73,13 +73,16 @@ export class TokenProvider {
           this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/notice`);
         }
         if(type === 'squad') {
-          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/squad/${sid}`)
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/squad/${id}`)
         }
         if(type == 'mypage') {
           this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/myPage`)
         }
         if(type === 'video_chat') {
           this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/video`);
+        }
+        if(type === 'schedule') {
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/users/schedule/${id}`)
         }
         // 미구현 된 테스크 박스
         if(type === 'taskbox') {

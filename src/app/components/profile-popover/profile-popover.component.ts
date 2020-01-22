@@ -8,6 +8,7 @@ import {LoadingProvider} from '../../providers/loading';
 import {ChatService} from '../../providers/chat.service';
 import {IChat} from '../../_models/message';
 import {Electron} from '../../providers/electron';
+import {TokenProvider} from '../../biz-common/token';
 
 @Component({
   selector: 'app-profile-popover',
@@ -50,6 +51,7 @@ export class ProfilePopoverComponent extends TakeUntil implements OnInit {
               private toastCtrl: ToastController,
               private chatService : ChatService,
               private electronService : Electron,
+              private tokenService : TokenProvider,
               private loading : LoadingProvider) {
     super();
   }
@@ -208,6 +210,10 @@ export class ProfilePopoverComponent extends TakeUntil implements OnInit {
       translucent: true,
     });
     toast.present();
+  }
+
+  goMemberSchedule() {
+    this.tokenService.makeWebJump('schedule',this.targetValue.uid);
   }
 
 
