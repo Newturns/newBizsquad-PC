@@ -22,5 +22,43 @@
     color: white !important;
     outline: none;
   }
+
+  .popup {
+    width: 100px;
+    max-width: 110px;
+    font-size: 12px;
+    color: #434343;
+    background-color: white;
+    //border: 1px solid #E2E4E5;
+    border-radius: 5px;
+    // display: none;
+    position: absolute;
+    z-index: 1;
+    top:25px;
+    box-shadow: 0 10px 25px 0 #00000019;
+  }
+
+  .popup ul, li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .popup ul {
+    margin: 4px;
+  }
+
+  .popup li {
+    height: 26px;
+    text-align: left;
+    padding-top: 3px;
+    padding-left: 5px;
+    cursor: pointer;
+    -webkit-app-region: no-drag;
+  }
+
+  .popup li:hover {
+    background-color: rgba(91, 156, 237, 0.1)
+  }
 }
 

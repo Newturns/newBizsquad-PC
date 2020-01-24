@@ -21,13 +21,14 @@
     <i class="fa fa-star"></i>
   </button>
 
-  <button type="button" class="btn {{'btn-'+size}}"
-          (click)="onClickSort('name')"
-          [ngStyle]="{'background-color': currentSort === 'name' ? subcolor :'inherit'}"
-          [ngClass]="{'select-button': currentSort === 'name'}">N</button>
+  <button type="button" class="position-relative btn {{'btn-'+size}}" style="padding-bottom: 4px" (click)="openSortList()">
+    <i class="fa fa-ellipsis-v"></i>
 
-  <button type="button" class="btn {{'btn-'+size}}"
-          (click)="onClickSort('created')"
-          [ngStyle]="{'background-color': currentSort === 'created' ? subcolor :'inherit'}"
-          [ngClass]="{'select-button': currentSort === 'created'}">C</button>
+    <div class="popup" *ngIf="showSortDiv">
+      <ul>
+        <li (click)="onClickSort('name')">Name</li>
+        <li (click)="onClickSort('created')">Created</li>
+      </ul>
+    </div>
+  </button>
 </div>

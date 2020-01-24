@@ -27,6 +27,8 @@ export class SquadFilterComponent implements OnInit {
 
   subcolor: string;
 
+  showSortDiv : boolean = false;
+
   constructor() {
   }
 
@@ -40,6 +42,11 @@ export class SquadFilterComponent implements OnInit {
   onClickSort(value: string){
     this.currentSort = value;
     this.onSort.emit(value);
+  }
+
+  openSortList() {
+    this.showSortDiv = !this.showSortDiv;
+    console.log(this.showSortDiv);
   }
 
 
