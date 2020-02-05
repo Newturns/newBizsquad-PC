@@ -84,7 +84,7 @@ export class SquadItemComponent extends TakeUntil implements OnInit {
     let squadName;
     // 이전 DB 지원용. 'All' 스쿼드
     if(this.squadBox.data.default === true){
-      squadName = this.langPack['default_squad'];
+      squadName = this.group.data.team_name;
     } else {
       squadName = this.squadBox.data.title || this.squadBox.data.name;
     }

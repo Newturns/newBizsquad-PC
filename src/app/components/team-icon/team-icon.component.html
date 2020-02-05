@@ -1,7 +1,16 @@
 <div *ngIf="teamData">
   <ng-container *ngIf="teamData.default === true">
+    <div class="d-flex custom-avatar justify-content-center"
+         *ngIf="teamData.photoURL == null"
+         [style.background-color]="teamData.team_color ? teamData.team_color : defaultColor"
+         [style.width]="size + 'px'" [style.height]="size + 'px'">
+      <div class="not-photo align-self-center" [style.font-size]="size / 3 + 'px'">
+        {{ groupName || '--' | slice:0:2 }}
+      </div>
+    </div>
     <img class="d-flex custom-avatar justify-content-center"
-         src="assets/imgs/logo512.png"
+         *ngIf="teamData.photoURL"
+         src="{{ teamData.photoURL }}"
          [style.width]="size + 'px'" [style.height]="size + 'px'">
   </ng-container>
   <ng-container *ngIf="teamData.default !== true">
