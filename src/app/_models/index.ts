@@ -178,10 +178,10 @@ export interface IBizGroupBase extends IFirestoreDoc{
 
   isMember?: (uid?: string) => boolean;
   isManager?: (uid?: string) => boolean;
-  isPartner?: (uid?: string) => boolean;
+  isGuest?: (uid?: string) => boolean;
   getMemberIds?: (includeMe?: boolean)=> string[];
   getManagerIds?: (includeMe?: boolean)=> string[];
-  getPartnerIds?: (includeMe?: boolean)=> string[];
+  getGuestIds?: (includeMe?: boolean)=> string[];
   getMemberCount?: ()=> number;
 
   // for squad.
@@ -193,7 +193,7 @@ export interface IBizGroupBase extends IFirestoreDoc{
 export interface IBizGroupData {
   manager: any,
   members: any,
-  partners?: any,
+  guest?: any,
   status?: any,
   team_color?: string,
   team_subColor?: string,
@@ -241,12 +241,12 @@ export class GroupBase implements IBizGroupBase{
     }
   }
 
-  isPartner(uid?: string): boolean {
+  isGuest(uid?: string): boolean {
     if(uid == null)uid = this.uid;
     if(this.uid == null){
       throw new Error('this.uid is null. Set uid first.');
     }
-    return this.isMember(uid, STRINGS.FIELD.PARTNER);
+    return this.isMember(uid, STRINGS.FIELD.GUEST);
   }
 
   isManager(uid?: string): boolean {
@@ -265,8 +265,8 @@ export class GroupBase implements IBizGroupBase{
     return this.getMembersUidFrom(STRINGS.FIELD.MANAGER, includeMe);
   };
 
-  getPartnerIds: (includeMe?: boolean) => string[] = (includeMe = true)=> {
-    return this.getMembersUidFrom(STRINGS.FIELD.PARTNER, includeMe);
+  getGuestIds: (includeMe?: boolean) => string[] = (includeMe = true)=> {
+    return this.getMembersUidFrom(STRINGS.FIELD.GUEST, includeMe);
   };
 
   private getMembersUidFrom(part: string, includeMe = true): string[] {

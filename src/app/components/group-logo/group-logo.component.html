@@ -15,7 +15,7 @@
     <div class="team_name pointer text-ellipsis" style="width: 250px" (click)="clickLogo.emit('click logo')">
       {{group.data.team_name}}
     </div>
-    <span *ngIf="group && group.isPartner()" class="font-12 text-danger">Partner</span>
+    <span *ngIf="group && group.isGuest()" class="font-12 text-danger">Guest</span>
   </ng-template>
 </div>
 

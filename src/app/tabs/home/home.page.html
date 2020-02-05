@@ -138,7 +138,7 @@
               <ion-icon name="ios-arrow-forward" class="font-20 biz-color-default"></ion-icon>
             </div>
           </div>
-          <ng-container *ngIf="!bizFire.currentBizGroup.isPartner(); else partner">
+          <ng-container *ngIf="!bizFire.currentBizGroup.isGuest(); else guest">
             <div class="px-3 notice-msg-con d-flex justify-content-between align-items-center"
                  *ngFor="let notice of latelyNotice">
               <div class="notice-title d-flex flex-grow-1 flex-shrink-1 align-items-center">
@@ -147,7 +147,7 @@
               <div class="notice-time d-flex flex-shrink-0 align-items-center">{{notice.data.created | timestampToDate | date:'yyyy-MM-dd hh:mm:ss a'}}</div>
             </div>
           </ng-container>
-          <ng-template #partner>
+          <ng-template #guest>
             <div class="notice-hide text-center">You do not have permission.</div>
           </ng-template>
         </div>

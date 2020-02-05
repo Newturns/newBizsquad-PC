@@ -13,7 +13,7 @@ export interface ISquad extends IBizGroupBase{
   data?: ISquadData,
   gid?: string,
   members?: any,
-  partners?: boolean
+  guest?: boolean
 }
 
 export interface ISquadData {

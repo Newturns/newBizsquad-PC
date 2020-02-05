@@ -13,9 +13,10 @@ export const STRINGS = {
   BBS:'bbs',
 
   FIELD:{
+    LEADER: 'leader',
     MEMBER: 'members',
     MANAGER: 'manager',
-    PARTNER: 'partners'
+    GUEST : 'guest'
   },
   GROUP_CHAT: 'groupChat',
   SQUAD_CHAT: 'squadChat',

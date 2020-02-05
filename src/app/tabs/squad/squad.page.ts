@@ -54,7 +54,7 @@ export class SquadPage implements OnInit {
         if(s.data.type === 'private') {
           return s.data.members[this.bizFire.uid] === true;
         } else {
-          return !this.bizFire.currentBizGroup.isPartner();
+          return !this.bizFire.currentBizGroup.isGuest();
         }
       });
       this.filterBroadCast(userData, mySquadsFilter,sortSquadBy);

@@ -422,15 +422,15 @@ export class NotificationService {
           // is ths user a manager?
           if(notificationData.info.auth === STRINGS.FIELD.MANAGER){
             // yes.
-            // add to partner
+            // add to guest
             data[STRINGS.FIELD.MANAGER][this.bizFire.currentUID] = true;
           }
 
-          // is ths user a partner?
-          if(notificationData.info.auth === STRINGS.FIELD.PARTNER){
+          // is ths user a guest?
+          if(notificationData.info.auth === STRINGS.FIELD.GUEST){
             // yes.
-            // add to partner
-            data[STRINGS.FIELD.PARTNER][this.bizFire.currentUID] = true;
+            // add to guest
+            data[STRINGS.FIELD.GUEST][this.bizFire.currentUID] = true;
           }
 
           // update group member
