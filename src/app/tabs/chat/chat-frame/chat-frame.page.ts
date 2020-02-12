@@ -161,6 +161,51 @@ export class ChatFramePage implements OnInit {
     });
 
 
+    //메세지 읽음,안읽음 처리
+    this.addedMessages$
+    .pipe(debounceTime(1500))
+    .subscribe(()=>{
+      try {
+        const batch = this.bizFire.afStore.firestore.batch();
+        let added = 0;
+        const list = this.addedMessages;
+        if (list) {
+          // filter my unread messages.
+          let unreadList = list.filter((l: IMessage) =>
+              l.data.isNotice !== true && l.data.read == null
+              || l.data.read[this.bizFire.uid] == null
+              || l.data.read[this.bizFire.uid].unread === true
+          );
+
+          if (unreadList.length > 499) {
+            // firestore write limits 500
+            unreadList = unreadList.slice(0,400);
+            //console.log(unreadList.length);
+          }
+          unreadList.forEach((l: IMessage) => {
+
+            const read = {[this.bizFire.uid]: {unread: false, read: new Date()}};
+            batch.set(l.ref, {read: read}, {merge: true});
+            added++;
+
+            // upload memory
+            l.data.read = read;
+          });
+
+          if (added > 0) {
+            console.error('unread batch call!', added);
+            batch.commit();
+          }
+        }
+      } catch (e) {
+        console.error(e);
+        this.addedMessages = [];
+      }
+      // clear processed messages
+      this.addedMessages = [];
+    });
+
+
   }
 
   async onWindowChat(gid:string,cid:string,type:string) {

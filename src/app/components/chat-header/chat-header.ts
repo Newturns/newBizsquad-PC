@@ -18,6 +18,7 @@ import {ProfilePopoverComponent} from '../profile-popover/profile-popover.compon
 import {ChatMenuPopoverComponent} from '../chat-menu-popover/chat-menu-popover.component';
 import {eventNames} from 'cluster';
 import {InviteChatPopoverComponent} from '../invite-chat-popover/invite-chat-popover.component';
+import {Subscription} from 'rxjs';
 
 
 @Component({
@@ -38,11 +39,16 @@ export class ChatHeaderComponent extends TakeUntil {
 
   autoTranslation: boolean = true;
 
+  private userDataSubscription: Subscription;
+  private selectRoomSubscription : Subscription;
+
   @Input()
   set chat(room: IChat) {
     if(room) {
       let reload = true;
-      if(room.data.lastMessage) { this.senderUid = room.data.lastMessage.sender; }
+      if(room.data.lastMessage) {
+        this.senderUid = room.data.lastMessage.sender;
+      }
       if(this.room){
         const oldCount = this._room.isPublic()? this.bizFire.currentBizGroup.getMemberCount() : this._room.getMemberCount();
         const newCount = room.isPublic() ? this.bizFire.currentBizGroup.getMemberCount() : room.getMemberCount();
@@ -50,13 +56,13 @@ export class ChatHeaderComponent extends TakeUntil {
         reload = oldCount !== newCount;
       }
 
-      this._room = room;
-
-      this.getUserData();
-
       if(reload){
-        this.reloadTitle();
+
+        this.reloadTitle(room);
+        this.getUserData(room);
       }
+
+      this._room = room;
     }
   }
 
@@ -99,19 +105,24 @@ export class ChatHeaderComponent extends TakeUntil {
     });
   }
 
-  getUserData() {
-    this.bizFire.userData
+  getUserData(room : IChat) {
+    if(this.userDataSubscription != null) {
+      this.userDataSubscription.unsubscribe();
+      this.userDataSubscription = null;
+    }
+
+    this.userDataSubscription = this.bizFire.userData
     .pipe(this.takeUntil)
     .subscribe(data => {
       this.userCustomData = data;
       // this.autoTranslation = this.userCustomData.autoTranslation;
       console.log("userCustomData::",this.userCustomData);
-      console.log(this.room);
-      if(this.userCustomData[this.room.cid] == null ||
-          this.userCustomData[this.room.cid]['notify'] == null){
+      console.log(room);
+      if(this.userCustomData[room.cid] == null ||
+          this.userCustomData[room.cid]['notify'] == null){
         this.notifications = 'Icon_Outline_bell';
       } else {
-        this.notifications = this.userCustomData[this.room.cid]['notify'] === true ? 'Icon_Outline_bell' : 'Icon_Outline_bell_off';
+        this.notifications = this.userCustomData[room.cid]['notify'] === true ? 'Icon_Outline_bell' : 'Icon_Outline_bell_off';
       }
     });
   }
@@ -124,34 +135,39 @@ export class ChatHeaderComponent extends TakeUntil {
   }
 
 
-  reloadTitle() {
+  reloadTitle(room : IChat) {
 
-    if(this.room == null){
+    if(room == null){
       return;
     }
 
-    this.chatService.onSelectChatRoom
+    if(this.selectRoomSubscription != null) {
+      this.selectRoomSubscription.unsubscribe();
+      this.selectRoomSubscription = null;
+    }
+
+    this.selectRoomSubscription = this.chatService.onSelectChatRoom
     .subscribe((chat : IChat) => {
-      if(this.room.data.title !== chat.data.title)
+      if(room.data.title !== chat.data.title)
         this.chatTitle = chat.data.title;
     });
 
-    this.memberChat = this.room.data.type === 'member';
+    this.memberChat = room.data.type === 'member';
 
     if(!this.memberChat) {
 
-      this.userCount = this.room.isPublic() ? this.bizFire.currentBizGroup.getMemberCount() : this.room.getMemberCount();
-      this.chatTitle = this.room.data.name;
+      this.userCount = room.isPublic() ? this.bizFire.currentBizGroup.getMemberCount() : room.getMemberCount();
+      this.chatTitle = room.data.name;
 
     } else {
 
-      this.userCount = this.room.getMemberCount();
-      this.chatTitle = this.room.data.title;
+      this.userCount = room.getMemberCount();
+      this.chatTitle = room.data.title;
 
       if(this.chatTitle == null) {
 
         this.chatTitle = '';
-        this.cacheService.resolvedUserList(this.room.getMemberIds(false), Commons.userInfoSorter)
+        this.cacheService.resolvedUserList(room.getMemberIds(false), Commons.userInfoSorter)
           .subscribe((users: IUser[]) => {
 
             users.forEach(u => {
