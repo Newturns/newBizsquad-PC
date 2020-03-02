@@ -15,6 +15,10 @@ export class SquadFilterComponent implements OnInit {
   set color(c : string) {
     this.subcolor = c;
   }
+
+  @Input()
+  isGuest : boolean;
+
   @Output()
   onFilter = new EventEmitter<string>();
 

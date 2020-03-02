@@ -182,6 +182,8 @@ export interface IBizGroupBase extends IFirestoreDoc{
   getMemberIds?: (includeMe?: boolean)=> string[];
   getManagerIds?: (includeMe?: boolean)=> string[];
   getGuestIds?: (includeMe?: boolean)=> string[];
+  getMemberIdsExceptGuests?:(includeMe?: boolean)=>string[];
+  getMemberIdsExceptGuestsAndLeaders?:(includeMe?: boolean)=>string[];
   getMemberCount?: ()=> number;
 
   // for squad.

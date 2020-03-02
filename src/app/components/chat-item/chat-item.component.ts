@@ -94,7 +94,7 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
     return Commons.removeHtmlTag(text);
   }
 
-  private   reloadTitle(){
+  private reloadTitle(){
 
     if(this.chatBox == null){
       return;
@@ -132,18 +132,15 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
   }
 
 
-  senderUid() : string {
+  chatIcon() : string {
 
-    const lastMessage = this.chatBox.data.lastMessage;
+    const target = Object.keys(this.chatBox.data.members).filter(uid => uid !== this.bizFire.uid);
 
-    if(lastMessage) {
-      if(lastMessage.sender) {
-        return lastMessage.sender;
-      } else {
-        return this.bizFire.uid;
-      }
+    if(target.length > 0) {
+      return target[0];
     } else {
-      return  this.bizFire.uid;
+      return this.bizFire.uid;
     }
+
   }
 }

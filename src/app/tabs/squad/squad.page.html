@@ -1,6 +1,8 @@
 <div class="p-3" [ngStyle]="{'background-color': currentBizGroup.data.team_color ? currentBizGroup.data.team_color : '#324ca8'}">
-  <biz-squad-filter [size]="'md'" [color]="currentBizGroup.data.team_subColor" (onFilter)="onSquadTypeFilter($event)" (onSort)="onSquadTypeFilter($event)">
-
+  <biz-squad-filter [size]="'md'" [color]="currentBizGroup.data.team_subColor"
+                    [isGuest]="currentBizGroup.isGuest()"
+                    (onFilter)="onSquadTypeFilter($event)"
+                    (onSort)="onSquadTypeFilter($event)">
   </biz-squad-filter>
 </div>
 

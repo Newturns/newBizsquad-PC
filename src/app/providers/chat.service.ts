@@ -210,6 +210,10 @@ export class ChatService extends TakeUntil{
     this.chatDataMap.squadChatListSub =
     this.bizFire.afStore.collection(path, (ref:any) => {
       ref = ref.where('status', '==', true);
+      if(this.bizFire.currentBizGroup.isGuest() === true){
+        //파트너 그룹일때는 agile 스쿼드만 표시
+        ref = ref.where('agile', '==', true);
+      }
       return ref;
     })
         .stateChanges()

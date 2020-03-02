@@ -5,6 +5,7 @@
           [ngClass]="{'select-button': filterButtonText === null}">All</button>
 
   <button type="button" class="btn {{'btn-'+size}}"
+          *ngIf="isGuest === false"
           (click)="onClickFilter('general')"
           [ngStyle]="{'background-color': filterButtonText === 'general' ? subcolor :'inherit'}"
           [ngClass]="{'select-button': filterButtonText === 'general'}">General</button>

@@ -18,6 +18,18 @@ export class BizGroup extends GroupBase implements IBizGroup {
             this.data.maxFileSize = 20 * 1000 * 1000; // 20MB
         }
     }
+
+    getMemberIdsExceptGuests(includeMe?: boolean): string[] {
+        const userList = this.getMemberIds(includeMe); // 전원
+        // 그룹 멤버 전원에서 게스트만 제외하고 리턴
+        return userList.filter(uid => this.data.guest != null ? this.data.guest[uid] !== true : true );
+    }
+
+    getMemberIdsExceptGuestsAndLeaders(includeMe?: boolean): string[] {
+        const userList = this.getMemberIdsExceptGuests(includeMe); // 전원
+        // 그룹 멤버 전원에서 매니저만 제외하고 리턴
+        return userList.filter(uid => this.data.manager != null ? this.data.manager[uid] !== true : true );
+    }
 }
 
 

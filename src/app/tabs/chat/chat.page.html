@@ -1,13 +1,13 @@
 
 <ion-segment (ionChange)="segmentChanged($event)" class="bg-white px-2">
- <ion-segment-button value="squadChatRoom" class="w-50" checked>
+ <ion-segment-button value="squadChatRoom" [ngClass]="group?.isGuest() === true ? 'w-100' : 'w-50'" checked>
   <ion-label>{{ langPack['squad_chatroom'] }}</ion-label>
   <div class="msg-badge d-flex text-white ml-1 align-items-center justify-content-center" *ngIf="squadUnreadTotalCount">
    {{ squadUnreadTotalCount | badgeLimit: 99 }}
   </div>
   <div class="segment-line w-100" *ngIf="segmentName === 'squadChatRoom'" [ngStyle]="{'background-color': group?.data.team_color}"></div>
  </ion-segment-button>
- <ion-segment-button value="chatRoom" class="w-50">
+ <ion-segment-button value="chatRoom" class="w-50" *ngIf="group?.isGuest() === false">
   <ion-label>{{ langPack['chatroom'] }}</ion-label>
   <div class="msg-badge d-flex text-white ml-1 align-items-center justify-content-center" *ngIf="memberUnreadTotalCount">
    {{ memberUnreadTotalCount | badgeLimit: 99 }}
@@ -46,7 +46,7 @@
 
   <div class="custom-fab d-flex align-items-center justify-content-center pointer"
        [style.background-color]="group?.data.team_color"
-       *ngIf="segmentName === 'chatRoom'"
+       *ngIf="segmentName === 'chatRoom' && group?.isGuest() === false"
        (click)="createChatPopover()">
    <ion-icon name="add"></ion-icon>
   </div>

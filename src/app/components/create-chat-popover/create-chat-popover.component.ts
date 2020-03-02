@@ -45,7 +45,7 @@ export class CreateChatPopoverComponent implements OnInit {
         .pipe(filter(g=>g!=null),takeUntil(this._unsubscribeAll))
         .subscribe((group) => {
           this.groupSubColor = group.data.team_subColor;
-          this.userList$ = this.cacheService.resolvedUserList(group.getMemberIds(false), Commons.userInfoSorter);
+          this.userList$ = this.cacheService.resolvedUserList(group.getMemberIdsExceptGuests(false), Commons.userInfoSorter);
         });
   }
 
