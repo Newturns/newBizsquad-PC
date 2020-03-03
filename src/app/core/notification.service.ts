@@ -53,7 +53,7 @@ export interface INotification extends IFirestoreDoc{
 //export type NotificationType = 'invitation' | 'notify' | 'reply';
 //export type NotificationSubType = 'post'|'comment'| 'join'| 'exit'| 'delete'|'group'|'squad';
 //export type InvitationType = 'group'|'squad';
-export type NotificationType = 'post' | 'bbs' | 'comment' | 'schedule' | 'video'| 'groupInvite' ;
+export type NotificationType = 'post' | 'bbs' | 'comment' | 'schedule' | 'video'| 'groupInvite' | 'task' | 'calendar';
 
 export interface INotificationData extends IAlarmConfig{
 

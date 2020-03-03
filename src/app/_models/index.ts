@@ -104,7 +104,7 @@ export interface INotification extends IFirestoreDoc{
   data: INotificationData,
 }
 
-export type NotificationType = 'post' | 'bbs' | 'comment' | 'schedule' | 'video'| 'groupInvite' ;
+export type NotificationType = 'post' | 'bbs' | 'comment' | 'schedule' | 'video'| 'groupInvite' | 'task' | 'calendar' ;
 
 export interface INotificationData extends IAlarmConfig {
 

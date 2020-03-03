@@ -102,9 +102,11 @@ export class TokenProvider {
         }
         //웹 점프시 알람 읽음 처리
         if(item.data.statusInfo.done !== true) {
-          item.ref.update({
-            statusInfo: { done: true }
-          });
+          if(item.data.type !== 'task') {
+            item.ref.update({
+              statusInfo: { done: true }
+            });
+          }
         }
       })
     }
