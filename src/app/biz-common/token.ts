@@ -97,7 +97,12 @@ export class TokenProvider {
         if(item.data.type === 'groupInvite') {
           this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${item.data.gid}/home`);
         } else {
-          const jumbUrl = `${this.getWebUrl()}/auth?token=${token}&url=${link}`;
+          let jumbUrl = `${this.getWebUrl()}/auth?token=${token}&url=${link}`;
+
+          if(item.data.type === 'calendar') {
+            jumbUrl += `&tab=${item.data.type}`;
+          }
+
           this.electron.goLink(jumbUrl);
         }
         //웹 점프시 알람 읽음 처리
