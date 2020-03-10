@@ -10,12 +10,13 @@
 <!--        </div>-->
       </div>
 
-      <div class="myMessage m-2 p-2">
-        <ng-container *ngIf="message.data.message.files &&  message.data.message.files.length > 0; else myText">
+      <div class="myMessage m-2 p-1" (click)="getReplay(message.data)">
+        <biz-message-reply *ngIf="message.data.reply" [message]="message.data.reply"></biz-message-reply>
+        <div class="p-2" *ngIf="message.data.message.files &&  message.data.message.files.length > 0; else myText">
           <biz-chat-attach [files]="message.data.message.files" [isMyMessage]="isMyMessage"></biz-chat-attach>
-        </ng-container>
+        </div>
         <ng-template #myText>
-          <span class="font-14" [innerHTML]="text | sanitizingHtml"></span>
+          <div class="p-2 font-14" [innerHTML]="text | sanitizingHtml"></div>
         </ng-template>
       </div>
 
@@ -28,18 +29,21 @@
       <app-avatar-button [user]="currentUserData" [displayNameOn]="true" [childContentPadding]="'7px'">
         <div class="d-flex justify-content-center">
 
-          <div class="otherMessage p-2" [ngClass]="groupColorBalloon()">
-            <ng-container *ngIf="message.data.message.files &&  message.data.message.files.length > 0; else otherText">
+          <div class="otherMessage p-1" [ngClass]="groupColorBalloon()" (click)="getReplay(message.data)">
+            <biz-message-reply *ngIf="message.data.reply" [message]="message.data.reply"></biz-message-reply>
+            <div class="p-2" *ngIf="message.data.message.files &&  message.data.message.files.length > 0; else otherText">
               <biz-chat-attach [files]="message.data.message.files" [isMyMessage]="isMyMessage"></biz-chat-attach>
-            </ng-container>
+            </div>
             <ng-template #otherText>
               <div class="d-flex flex-column">
-                <div class="font-14" [innerHTML]="text | sanitizingHtml"></div>
-                <biz-google-trans-text *ngIf="userTranslationsFlg"
-                                       [message]="message"
-                                       [textColor]="'#EFEFEF'"
-                                       (finishTranslation)="finishTranslation($event)">
-                </biz-google-trans-text>
+                <div class="font-14 px-2 pt-2" [innerHTML]="text | sanitizingHtml"></div>
+                <div class="px-2 pb-2">
+                  <biz-google-trans-text *ngIf="userTranslationsFlg"
+                                         [message]="message"
+                                         [textColor]="'#EFEFEF'"
+                                         (finishTranslation)="finishTranslation($event)">
+                  </biz-google-trans-text>
+                </div>
               </div>
             </ng-template>
           </div>

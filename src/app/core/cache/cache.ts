@@ -6,7 +6,7 @@ import {CacheOptionBuilder} from './cache-option-builder';
 import {Path} from './path';
 import { filter,map, take } from 'rxjs/operators';
 import { Commons } from '../../biz-common/commons';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import {IBizGroup, IUser} from "../../_models";
 import {BizFireService} from '../../biz-fire/biz-fire';
 

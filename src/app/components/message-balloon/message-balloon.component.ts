@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {TakeUntil} from "../../biz-common/take-until";
-import {IMessage} from "../../_models/message";
+import {IMessage, IMessageData} from '../../_models/message';
 import {IBizGroup, IUser} from "../../_models";
 import {Commons} from "../../biz-common/commons";
 import {BizFireService} from '../../biz-fire/biz-fire';
@@ -8,6 +8,7 @@ import {CacheService} from '../../core/cache/cache';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {ITranslations, TranslateService} from '../../providers/translate.service';
+import {ChatService} from '../../providers/chat.service';
 
 
 @Component({
@@ -32,6 +33,9 @@ export class MessageBalloonComponent implements OnInit {
   @Output()
   initScrollBottomForTranslation = new EventEmitter<boolean>();
 
+  @Output()
+  messageReply = new EventEmitter<IMessageData>();
+
   private _message: IMessage;
   public displayName;
   public photoURL;
@@ -54,6 +58,7 @@ export class MessageBalloonComponent implements OnInit {
   constructor(
     private translateService: TranslateService,
     private bizFire : BizFireService,
+    private chatService : ChatService,
     private cacheService : CacheService) {
     this._unsubscribeAll = new Subject<any>();
   }
@@ -150,6 +155,10 @@ export class MessageBalloonComponent implements OnInit {
   //번역이 되면 부모컴포넌트에 알려준다 -> 스크롤초기화를 위해서.
   finishTranslation(result){
     this.initScrollBottomForTranslation.emit(result);
+  }
+
+  getReplay(msg: IMessageData){
+    this.messageReply.emit(msg);
   }
 
 }

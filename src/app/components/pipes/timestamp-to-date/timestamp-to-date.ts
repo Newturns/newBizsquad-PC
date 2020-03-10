@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 
 /**
  * Generated class for the TimestampToDatePipe pipe.

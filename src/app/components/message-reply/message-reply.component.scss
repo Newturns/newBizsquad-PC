@@ -1,0 +1,12 @@
+.reply-frame {
+  //color: #707c97;
+  //opacity: 0.8;
+  border-radius: 6px;
+  background-color: rgba( 235, 235, 235, 0.4 );
+
+  ::ng-deep p{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

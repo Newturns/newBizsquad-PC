@@ -4,7 +4,7 @@ import {BizFireService} from '../../../biz-fire/biz-fire';
 import {ActivatedRoute} from '@angular/router';
 import {IBizGroup, IBizGroupData, IUserData} from '../../../_models';
 import {debounceTime, filter, takeUntil} from 'rxjs/operators';
-import {IChat, IMessage, MessageBuilder} from '../../../_models/message';
+import {IChat, IMessage, IMessageData, MessageBuilder} from '../../../_models/message';
 import {Electron} from '../../../providers/electron';
 import {Commons} from '../../../biz-common/commons';
 import {BizGroupBuilder} from '../../../biz-fire/biz-group';
@@ -17,6 +17,7 @@ import {ToastProvider} from '../../../providers/toast';
 import {IonContent} from '@ionic/angular';
 import {formatDate} from '@angular/common';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {CacheService} from '../../../core/cache/cache';
 
 @Component({
   selector: 'app-chat-frame',
@@ -81,6 +82,8 @@ export class ChatFramePage implements OnInit {
   //프로그래스바
   loadProgress : number = 0;
 
+  replyMessage : IMessageData;
+
   constructor(private configService : ConfigService,
               private activatedRoute: ActivatedRoute,
               private electronService: Electron,
@@ -88,6 +91,7 @@ export class ChatFramePage implements OnInit {
               private loading: LoadingProvider,
               private toastProvider : ToastProvider,
               private fb: FormBuilder,
+              private cacheService : CacheService,
               private bizFire : BizFireService) {
     this.chatForm = fb.group(
         {
@@ -272,8 +276,11 @@ export class ChatFramePage implements OnInit {
       const text = Commons.chatInputConverter(value);
 
       if(text.length > 0) {
-        this.chatService.addChatMessage(text,this.chatRoom).then(() => {
-          timer(0).subscribe(() => this.contentArea.scrollToBottom(0));
+        this.chatService.addChatMessage(text,this.chatRoom,null,this.replyMessage).then(() => {
+          timer(0).subscribe(() => {
+            this.replyMessage = null;
+            this.contentArea.scrollToBottom(0);
+          });
         });
         this.chatForm.setValue({chat:''});
         //textarea 높이 초기화를 위한 이벤트 전달.
@@ -503,5 +510,13 @@ export class ChatFramePage implements OnInit {
         this.contentArea.scrollToBottom(0);
       }, 100);
     }
+  }
+
+  removeHtml(text: string): string {
+    return Commons.removeHtmlTag(text);
+  }
+
+  removeReplyInfo(){
+    this.replyMessage = null;
   }
 }

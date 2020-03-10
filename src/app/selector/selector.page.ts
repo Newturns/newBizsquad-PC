@@ -6,7 +6,7 @@ import {Router} from '@angular/router';
 import {Electron} from '../providers/electron';
 import {BizGroupBuilder} from '../biz-fire/biz-group';
 import {STRINGS} from '../biz-common/commons';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 @Component({

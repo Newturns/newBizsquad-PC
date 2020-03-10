@@ -29,7 +29,8 @@ export class ChatAttachComponent implements OnInit {
     return Commons.isImageFile(file);
   }
 
-  goLink(url) {
+  goLink(e,url) {
+    e.stopPropagation();
     this.electronService.goLink(url);
   }
 

@@ -50,6 +50,8 @@ export interface IMessageData {
     ko? : string,
     //  ...
   }
+
+  reply?: IMessageData,
 }
 export interface IFiles {
   name:string,

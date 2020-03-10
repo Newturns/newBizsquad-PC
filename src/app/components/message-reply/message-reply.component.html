@@ -1,0 +1,4 @@
+<div class="reply-frame d-flex flex-column font-12 p-2">
+  <div *ngIf="toData">{{toData.displayName}}</div>
+  <div [innerHTML]="text | sanitizingHtml"></div>
+</div>

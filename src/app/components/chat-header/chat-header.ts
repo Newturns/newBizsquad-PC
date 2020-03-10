@@ -8,7 +8,7 @@ import {TakeUntil} from "../../biz-common/take-until";
 import {MembersPopoverComponent} from "../members-popover/members-popover";
 import {ChangeTitlePopoverComponent} from "../change-title-popover/change-title-popover";
 import {WarnPopoverComponent} from "../warn-popover/warn-popover";
-import * as firebase from "firebase";
+import * as firebase from 'firebase/app';
 import {AlertController, PopoverController} from '@ionic/angular';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {Electron} from '../../providers/electron';

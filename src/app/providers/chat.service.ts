@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 
 import {SquadService, ISquad, ISquadData} from './squad.service';
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import * as firebase from 'firebase';
+import * as firebase from 'firebase/app';
 import {Commons, STRINGS} from '../biz-common/commons';
 
 import {debounceTime, filter, takeUntil} from 'rxjs/operators';
@@ -355,7 +355,7 @@ export class ChatService extends TakeUntil{
     }
   }
 
-  async addChatMessage(text: string, currentChat: IChat, files?: File[]) {
+  async addChatMessage(text: string, currentChat: IChat, files?: File[],reply? : IMessageData) {
 
     if(currentChat.ref == null) {
       console.error('addChatMessage', currentChat);
@@ -364,7 +364,7 @@ export class ChatService extends TakeUntil{
 
     const members = currentChat.isPublic() ? this.bizFire.currentBizGroup.data.members : currentChat.data.members;
 
-    const msg = await this.addMessage(text,currentChat.ref,members,files);
+    const msg = await this.addMessage(text,currentChat.ref,members,files,true,reply);
 
     const pushTitle = `[${this.bizFire.currentBizGroup.data.team_name}] ${this.bizFire.currentUserValue.displayName}`;
     const pushData = { cid: currentChat.cid, type: currentChat.data.type, gid: currentChat.data.gid };
@@ -377,7 +377,7 @@ export class ChatService extends TakeUntil{
   }
 
   async addMessage(text: string,parentRef: any,unreadMembers : any,
-                   files?: any[],saveLastMessage = true) {
+                   files?: any[],saveLastMessage = true,replyMessage?:IMessageData) {
     try{
       if(parentRef == null) {
         throw new Error('parentRef has no data.');
@@ -394,6 +394,13 @@ export class ChatService extends TakeUntil{
         read : null,
         type : 'chat',
         file: false
+      };
+
+      if(replyMessage){
+        if(replyMessage.reply){
+          delete replyMessage.reply;
+        }
+        msg.reply = replyMessage;
       };
 
       if(unreadMembers) {

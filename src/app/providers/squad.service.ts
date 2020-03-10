@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import {Commons, STRINGS} from '../biz-common/commons';
 import { takeUntil, map } from 'rxjs/operators';
-import * as firebase from "firebase";
+import * as firebase from 'firebase/app';
 import {IBizGroupBase} from "../_models";
 import {IChat} from "../_models/message";
 import {TakeUntil} from "../biz-common/take-until";

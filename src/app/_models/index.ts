@@ -1,7 +1,11 @@
-import * as firebase from "firebase";
+import * as firebase from 'firebase/app';
 import {STRINGS} from "../biz-common/commons";
 import {IChat, IMessage, IMessageData} from "./message";
 import {ISquad} from '../providers/squad.service';
+
+
+export const defaultSquadName:string = 'Public Square';
+export const defaultSquadDesc:string = 'Anyone can talk to anyone';
 
 export interface userLinks {
   mid: string,

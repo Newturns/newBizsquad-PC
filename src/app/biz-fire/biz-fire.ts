@@ -63,6 +63,14 @@ export class BizFireService {
         });
     }
 
+    // 라우터 용 util firebaseName추가.
+    get firebaseRouteName(): string {
+        if(this.configService.firebaseName == null){
+            throw new Error('this.configService.firebaseName is empty.');
+        }
+        return `${this.configService.firebaseName}`;
+    }
+
     //------------------------------------------------------------//
     // User custom data with group gid //
     //------------------------------------------------------------//
