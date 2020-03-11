@@ -108,7 +108,7 @@ export class TokenProvider {
 
         // task 의 'task'
         let update = true;
-        if(item.data.type === 'task' && this.item.data.info.type === 'task') {
+        if(item.data.type === 'task' && item.data.info.type === 'task') {
           update = false;
         }
 
