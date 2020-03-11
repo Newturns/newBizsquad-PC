@@ -105,12 +105,16 @@ export class TokenProvider {
 
           this.electron.goLink(jumbUrl);
         }
-        //웹 점프시 알람 읽음 처리
-        if(item.data.statusInfo.done !== true) {
-          if(item.data.type !== 'task') {
-            item.ref.update({
-              statusInfo: { done: true }
-            });
+
+        // task 의 'task'
+        let update = true;
+        if(item.data.type === 'task' && this.item.data.info.type === 'task') {
+          update = false;
+        }
+
+        if(update){
+          if(item.data.statusInfo.done === false) {
+            item.ref.update({statusInfo: {done: true}});
           }
         }
       })

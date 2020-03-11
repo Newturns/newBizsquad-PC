@@ -181,9 +181,16 @@ export class NoticeItemComponent extends BizComponent implements OnInit {
 
     console.log(this.item);
 
-    // staus 를 done으로 수정.
-    if(this.item.data.statusInfo.done !== true && this.item.data.type !== 'task'){
-      this.item.ref.update({ statusInfo: { done: true } });
+    // task 의 'task'
+    let update = true;
+    if(this.item.data.type === 'task' && this.item.data.info.type === 'task') {
+      update = false;
+    }
+
+    if(update){
+      if(this.item.data.statusInfo.done === false) {
+        this.item.ref.update({statusInfo: {done: true}});
+      }
     }
   }
 
