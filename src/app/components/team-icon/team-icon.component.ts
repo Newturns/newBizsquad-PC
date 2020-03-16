@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {TakeUntil} from "../../biz-common/take-until";
 import {COLORS} from "../../biz-common/colors";
 import {Commons} from "../../biz-common/commons";
-import {IBizGroupData} from "../../_models";
+import {defaultSquadName, IBizGroupData} from '../../_models';
 import {ISquadData} from "../../providers/squad.service";
 import {CacheService} from '../../core/cache/cache';
 import {BizFireService} from '../../biz-fire/biz-fire';
@@ -47,13 +47,16 @@ export class TeamIconComponent extends TakeUntil implements OnInit {
   public defaultColor : string = COLORS.default;
   public groupName : string;
 
+  defaultSquadName : string;
+
   constructor(private cacheService: CacheService,
               private bizFire : BizFireService) {
     super();
+
+    this.defaultSquadName = defaultSquadName;
   }
 
   ngOnInit() {
-    this.groupName = this.bizFire.currentBizGroup.data.team_name;
   }
 
   private load() {

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {TakeUntil} from "../../biz-common/take-until";
 import {ISquad, SquadService} from "../../providers/squad.service";
-import {IBizGroup} from "../../_models";
+import {defaultSquadName, IBizGroup} from '../../_models';
 import {COLORS} from "../../biz-common/colors";
 import {IChat} from "../../_models/message";
 import {BizFireService} from '../../biz-fire/biz-fire';
@@ -81,13 +81,8 @@ export class SquadItemComponent extends TakeUntil implements OnInit {
   }
 
   getSquadTitle(): string {
-    let squadName;
-    // 이전 DB 지원용. 'All' 스쿼드
-    if(this.squadBox.data.default === true){
-      squadName = this.group.data.team_name;
-    } else {
-      squadName = this.squadBox.data.title || this.squadBox.data.name;
-    }
-    return squadName;
+
+    return this.squadBox.data.default === true ? defaultSquadName : this.squadBox.data.title || this.squadBox.data.name;
+
   }
 }
