@@ -24,7 +24,7 @@
       </div>
 
       <div class="chat-date flex-shrink-0">
-        {{chatBox?.data.lastMessage?.created | timestampToDate | date:'MM-dd HH:mm' }}
+        {{chatBox?.data.lastMessage?.created | timestampToDate | date:"h:mma',' EEE d" }}
       </div>
 
     </div>

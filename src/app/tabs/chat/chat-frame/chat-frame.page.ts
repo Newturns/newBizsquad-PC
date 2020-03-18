@@ -495,7 +495,7 @@ export class ChatFramePage implements OnInit {
         return this.langPack['yesterday'];
       } else {
         return formatDate(this.chatContent[messageIndex].data.created.toDate(),
-            `yyyy-MM-dd`,
+            `EEE d MMMM',' y`,
             'en');
       }
     } else {

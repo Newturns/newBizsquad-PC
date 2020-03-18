@@ -17,9 +17,6 @@
     </div>
 
     <div class="badge-btn">
-      <ion-button (click)="tokenService.makeWebJump('setting')" class="mr-2 ion-no-padding" fill="clear" slot="ioon-only" [hidden]="!bizFire.currentBizGroup.isManager()">
-        <ion-icon src="assets/imgs/renewal/Icon_Outline_settings.svg"></ion-icon>
-      </ion-button>
       <ion-button class="mr-1 ion-no-padding" fill="clear" slot="ioon-only" (click)="showNotify()">
         <ion-icon src="assets/imgs/renewal/Icon_Outline_bell.svg"></ion-icon>
       </ion-button>
@@ -144,7 +141,7 @@
               <div class="notice-title d-flex flex-grow-1 flex-shrink-1 align-items-center">
                 <span>{{notice.data.title}}</span>
               </div>
-              <div class="notice-time d-flex flex-shrink-0 align-items-center">{{notice.data.created | timestampToDate | date:'yyyy-MM-dd hh:mm:ss a'}}</div>
+              <div class="notice-time d-flex flex-shrink-0 align-items-center">{{notice.data.created | timestampToDate | date:"h:mma',' EEE d MMMM',' y"}}</div>
             </div>
           </ng-container>
           <ng-template #guest>
