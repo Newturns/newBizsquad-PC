@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {filter} from "rxjs/operators";
+import {filter, take} from 'rxjs/operators';
 import {TakeUntil} from "../../biz-common/take-until";
 import {IChat, IMessageData} from "../../_models/message";
 import {ChatService} from "../../providers/chat.service";
@@ -52,6 +52,8 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
   chatTitle: string;
   unreadCount: number = 0;
 
+  chatIcon : IUser;
+
   constructor(private cacheService: CacheService,
               private bizFire : BizFireService,
               private chatService: ChatService) {
@@ -84,6 +86,7 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
       this.chatBox = c;
       this.chatTitle = this.chatBox.data.title;
       this.lastMessage = this.chatBox.data.lastMessage;
+      this.makeChatIcon();
       if(this.chatTitle == null){
         this.reloadTitle();
       }
@@ -132,14 +135,23 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
   }
 
 
-  chatIcon() : string {
+  async makeChatIcon() {
 
-    const target = Object.keys(this.chatBox.data.members).filter(uid => uid !== this.bizFire.uid);
+    //uids : string[];
+    const uids = Object.keys(this.chatBox.data.members).filter(uid => uid !== this.bizFire.uid);
 
-    if(target.length > 0) {
-      return target[0];
-    } else {
-      return this.bizFire.uid;
+    for(const uid of uids) {
+      if(this.chatIcon == null) {
+        const userData = await this.cacheService.userGetObserver(uid).pipe(take(1)).toPromise();
+        this.chatIcon = userData;
+      } else {
+        break;
+      }
+    }
+    //대화상대가 모두 탈퇴하고 자신만 남으면 자신의 아이콘이라도 표시하기 위함.
+    if(uids == null || uids.length === 0) {
+      const userData = await this.cacheService.userGetObserver(this.bizFire.uid).pipe(take(1)).toPromise();
+      this.chatIcon = userData;
     }
 
   }

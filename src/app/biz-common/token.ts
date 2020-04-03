@@ -31,35 +31,31 @@ export class TokenProvider {
 
     async getToken(uid) {
       return new Promise<string>(async resolve => {
-        this.bizFire.metaData$.subscribe(async (metaData : IMetaData) => {
-          const path = `${metaData.fireFunc}/customToken`;
-          const header = await this.idTokenHeader();
-          const body = { uid: uid };
-          if(uid != null) {
-            await this.http.post(path,body,{headers: header}).subscribe((res: any) => {
-              if(res.result === true) {
-                resolve(res.customToken);
-              }
-            })
-          }
-        });
+        const getTokenUrl = `${this.bizFire.fireFunc}/customToken`;
+        const header = await this.idTokenHeader();
+        const body = { uid: uid };
+        if(uid != null) {
+          await this.http.post(getTokenUrl,body,{headers: header}).subscribe((res: any) => {
+            if(res.result === true) {
+              resolve(res.customToken);
+            }
+          })
+        }
       });
     }
 
     async addCustomLink(uid,title,url) {
-      this.bizFire.metaData$.subscribe(async (metaData : IMetaData) => {
-        const path = `${metaData.fireFunc}/customLink`;
-        const header = await this.idTokenHeader();
-        const body = {
-          uid: uid,
-          title: title,
-          url: url,
-        };
-        console.log("body :",body);
-        this.http.post(path,body,{headers: header}).subscribe((res: any) => {
-          console.log(res);
-          // 파이어스토어에서 링크 데이터 가져오기.
-        })
+      const addLinkUrl = `${this.bizFire.fireFunc}/customLink`;
+      const header = await this.idTokenHeader();
+      const body = {
+        uid: uid,
+        title: title,
+        url: url,
+      };
+      console.log("body :",body);
+      this.http.post(addLinkUrl,body,{headers: header}).subscribe((res: any) => {
+        console.log(res);
+        // 파이어스토어에서 링크 데이터 가져오기.
       });
     }
 

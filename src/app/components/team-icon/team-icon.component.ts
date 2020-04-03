@@ -5,7 +5,6 @@ import {Commons} from "../../biz-common/commons";
 import {defaultSquadName, IBizGroupData} from '../../_models';
 import {ISquadData} from "../../providers/squad.service";
 import {CacheService} from '../../core/cache/cache';
-import {BizFireService} from '../../biz-fire/biz-fire';
 
 @Component({
   selector: 'biz-team-icon',
@@ -44,20 +43,16 @@ export class TeamIconComponent extends TakeUntil implements OnInit {
     this.load();
   }
 
+  @Input()
+  groupName : string;
+
   public defaultColor : string = COLORS.default;
-  public groupName : string;
 
-  defaultSquadName : string;
-
-  constructor(private cacheService: CacheService,
-              private bizFire : BizFireService) {
+  constructor(private cacheService: CacheService,) {
     super();
-
-    this.defaultSquadName = defaultSquadName;
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() { }
 
   private load() {
 

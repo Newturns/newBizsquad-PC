@@ -59,22 +59,18 @@ export class TranslateService extends TakeUntil{
         target: target, //'ko', 'ja', 'en' 등
         mimeType: mimeType
       };
-      
-      this.bizFire.metaData$.subscribe((metaData: IMetaData) => {
-        this.http.post(`${metaData.fireFunc}/translate`, body).subscribe((res: any)=>{
-          //todo : 임시 | 번역 사용량 더하기.
-          const deleteHtmlTag = res.src.replace(/<[^>]*>/g, '');
-          const billingRef = this.bizFire.afStore.doc(`${STRINGS.BILLING}/${this.bizFire.gid}`);
-          billingRef.update({usedTransChar : firebase.firestore.FieldValue.increment(deleteHtmlTag.length)});
-    
-          resolve(res.translations);
-    
-        }, error => {
-          console.error(error.error.reason);
-          reject(error.error.reason);
-        });
+
+      // fireFunc url needed
+      const url = `${this.bizFire.fireFunc}/translate`;
+
+      this.http.post(url, body).subscribe((res: any)=>{
+
+        resolve(res.translations);
+
+      }, error => {
+        console.error(error);
+        reject(error);
       });
-      
     });
     
   }

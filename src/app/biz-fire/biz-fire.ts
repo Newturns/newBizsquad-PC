@@ -52,17 +52,6 @@ export class BizFireService {
         return this.currentUID;
     }
 
-    //------------------------------------------------------------//
-    // MetaData
-    // '/metaData' collection, 'server' 도큐먼트 리턴
-    //------------------------------------------------------------//
-    get metaData$(): Observable<IMetaData> {
-        return new Observable<IMetaData>( observer => {
-            observer.next(this.configService.metaData);
-            observer.complete();
-        });
-    }
-
     // 라우터 용 util firebaseName추가.
     get firebaseRouteName(): string {
         if(this.configService.firebaseName == null){
@@ -148,6 +137,16 @@ export class BizFireService {
 
     public get authState(): Observable<any> {
         return this.afAuth.authState;
+    }
+
+
+    // util func
+    get fireFunc(): string{
+        return this.configService.metaData && this.configService.metaData.fireFunc;
+    }
+
+    get userDataValue(): any {
+        return this.userDataSubject.getValue();
     }
 
     constructor(

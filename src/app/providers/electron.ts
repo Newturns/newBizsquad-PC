@@ -91,4 +91,8 @@ export class Electron {
     clearChatWindows() {
         this.ipcRenderer.send('userLogOut');
     }
+
+
+    mouseRightClick() {
+    }
 }

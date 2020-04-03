@@ -221,6 +221,7 @@ export interface IBizGroupData {
 
   // max upload file size byte.
   maxFileSize?: number,
+  transPack? : string[],
 }
 
 export class GroupBase implements IBizGroupBase{

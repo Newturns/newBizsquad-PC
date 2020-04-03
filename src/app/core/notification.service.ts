@@ -333,37 +333,24 @@ export class NotificationService {
   /*
   * Change to biz-server call later.
   * */
-  private postNotificationToServer(notifyData: INotificationData) {
+  private postNotificationToServer(notifyData: INotificationData, multiUserIdList?: string[]) {
+
+    console.log('postNotificationToServer', notifyData);
 
     return new Promise( resolve => {
-
-      if(this.bizFire.currentBizGroup == null){
-        throw new Error('this.bizFire.currentBizGroup is null. Cannot send notification');
+      const body = {notification: notifyData};
+      if(multiUserIdList){
+        body['userIdList'] = multiUserIdList;
       }
-
-      //** notifyData must have 'to' field.
-      if(notifyData.to == null){
-        throw new Error('to field must be set.');
-      }
-      
-      const headers = {
-        headers: new HttpHeaders({
-          'authorization': this.bizFire.uid
-        })
-      };
-
-      this.bizFire.metaData$.subscribe((metaData: IMetaData)=>{
-        
-        const notifyUri = `${metaData.fireFunc}/notification`;
-        this.http.post(notifyUri, {notification: notifyData}, headers)
+      const notifyUri = `${this.bizFire.fireFunc}/notification`;
+      this.http.post(notifyUri, body)
           .subscribe((result: any) => {
-            console.log(result);
+            console.log(`${this.bizFire.fireFunc}/notification:`, result);
             resolve(result);
+          }, error => {
+            console.error(error);
           });
-      });
-      
     });
-    
   }
 
   buildData(type: NotificationType, info?: NotificationInfo, sid?: string): INotificationData {

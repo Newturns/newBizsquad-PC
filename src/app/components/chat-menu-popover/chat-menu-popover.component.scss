@@ -4,12 +4,11 @@ ion-content{
   .menu-div{
     padding: 2px 0;
     height: 22px;
-    text-align: center;
-    font-size: 15px;
+    font-size: 13px;
   }
   .menu-div:hover {
-    color: white;
-    background-color: #50A5F6;
+    cursor: pointer;
+    color: #50A5F6;
   }
 }
 

@@ -2,7 +2,7 @@
   <div class="squad-item w-100 d-flex align-items-center" (mouseover)="squadSelected = true" (mouseleave)="squadSelected = false">
       <div class="squad-image d-flex justify-content-center align-items-center">
 
-        <biz-team-icon [teamData]="squadBox?.data"  [size]="32"></biz-team-icon>
+        <biz-team-icon [teamData]="squadBox?.data" [groupName]="getSquadTitle()" [size]="32"></biz-team-icon>
 
       </div>
       <div class="h-100 flex-grow-1 d-flex  flex-column justify-content-center">

@@ -62,15 +62,22 @@ export class GoogleTransTextComponent implements OnInit {
   private checkTransMsg(message : IMessage) {
     this.text = this.convertMessage(message);
     const transMsgs = message.data.translate;
-    const transLang = this.bizFire.currentUserValue.translateLang;
+    const currentGroup = this.bizFire.currentBizGroup;
+    const groupUserData = this.bizFire.userDataValue;
+    const transLang = groupUserData.translateLang || currentGroup.data.transPack[0];
 
-    if(transMsgs) {
-      this.transText = transMsgs[transLang];
-      if(this.transText == null) {
+    console.log("currentGroup",currentGroup);
+    console.log("groupUserData",groupUserData);
+
+    if(transLang) {
+      if(transMsgs) {
+        this.transText = transMsgs[transLang];
+        if(this.transText == null) {
+          this.onTranslate(this.text,transLang);
+        }
+      } else {
         this.onTranslate(this.text,transLang);
       }
-    } else {
-      this.onTranslate(this.text,transLang);
     }
   }
 
