@@ -78,6 +78,11 @@ export class ChatService extends TakeUntil{
     return this.chatDataMap.squadChatSubject.asObservable().pipe(filter(d=> d!= null));
   }
 
+  /***********************************************************/
+  // 채팅방 로딩시 푸쉬 보낼 상대를 미리 읽어 놓는다.
+  /***********************************************************/
+  pushTargetUserIdList: string[];
+
   constructor(
       public bizFire : BizFireService,
       public electron: Electron,
@@ -367,11 +372,16 @@ export class ChatService extends TakeUntil{
     const msg = await this.addMessage(text,currentChat.ref,members,files,true,reply);
 
     const pushTitle = `[${this.bizFire.currentBizGroup.data.team_name}] ${this.bizFire.currentUserValue.displayName}`;
-    const pushData = { cid: currentChat.cid, type: currentChat.data.type, gid: currentChat.data.gid };
-    pushData.type = pushData.type === 'member' ? STRINGS.GROUP_CHAT : STRINGS.SQUAD_CHAT;
-    console.log("pushDatapushData",pushData);
 
-    this.sendPush(Commons.memberUID(members),pushTitle,this.convertMessage(text),pushData);
+    const pushData = { gid: currentChat.data.gid, cid: currentChat.cid, type: currentChat.data.type };
+
+    pushData.type = pushData.type === 'member' ? STRINGS.GROUP_CHAT : STRINGS.SQUAD_CHAT;
+
+    // 미리 로딩해 놓은 현재 채팅방 PUSH 수신 허용자들
+    const targetUserList = this.pushTargetUserIdList;
+
+
+    this.sendPush(targetUserList,pushTitle,this.convertMessage(text),pushData);
 
     return msg;
   }
@@ -507,32 +517,29 @@ export class ChatService extends TakeUntil{
       }
     };
 
-    const userWithPushAllowed = await this.getPushAllowedUserListFrom(data.gid, data.cid, targetUids);
-    console.log(userWithPushAllowed);
+    // const userWithPushAllowed = await this.getPushAllowedUserListFrom(data.gid, data.cid, targetUids);
+    // console.log(userWithPushAllowed);
 
     const body = {
-      usersUid: userWithPushAllowed,
+      usersUid: targetUids,
       payload: payload
     };
 
     //-----------------------------------------------//
     // send push
     //-----------------------------------------------//
-    const path = `${environment.bizServerUri}/sendFCM`;
+    const path = `${this.bizFire.fireFunc}/sendFCM`;
 
-    const headers = {
-      headers: new HttpHeaders({
-        'authorization': this.bizFire.uid
-      })
-    };
-
-    this.http.post(path, body, headers)
+    // push 결과는 async로 출력만 한다.
+    this.http.post(path, body)
         .subscribe((result: any) => {
-          console.log("resultresult",result);
-        },(error => {
-          console.error("sendPush error",error);
+          console.log('sendPush result', result);
+
+        }, (error1 => {
+          console.error('sendPush error', error1);
         }));
 
+    // push 결과를 기다리지 않고 종료.
     return true;
   }
 
@@ -599,6 +606,39 @@ export class ChatService extends TakeUntil{
         'body': msg,
       });
     })
+  }
+
+  /*
+  * 채팅방이 바뀔때마다 PUSH 보낼 상대리스트를 미리 로딩해놓는다.
+  * */
+  async loadPushTargetList(currentChat: IChat){
+
+    // push 대상자들. 제네럴 퍼블릭은 채팅방이 없으므로 제외되지만 사양변경시를 대비해 일단 구현.
+    const targetUserList: string[] = currentChat.isPublic() === true ?
+        this.bizFire.currentBizGroup.getMemberIdsExceptGuests(false) : currentChat.getMemberIds(false);
+
+    const gid = this.bizFire.gid;
+    const cid = currentChat.cid;
+    const promises = targetUserList.map(async uid => {
+      const snap = await this.bizFire.afStore.doc(Commons.userDataPath(gid, uid)).get().toPromise();
+      let ret = uid;
+      if(snap.exists){
+        const userData = snap.data();
+        if(userData[cid] && userData[cid]['notify'] === false){
+          //console.log(`${uid} 는 제외`);
+          ret = null;
+        }
+      }
+      // userData 가 없으면,
+      // 일단 PUSH는 보낸다.
+      return ret;
+    });
+
+    let userWithPushAllowed = await Promise.all(promises);
+    // null 인 상대에게는 PUSH 안보냄
+    userWithPushAllowed = userWithPushAllowed.filter(uid => uid != null);
+    console.log('userWithPushAllowed:', userWithPushAllowed);
+    return userWithPushAllowed;
   }
 
 

@@ -19,7 +19,6 @@
                            (messageReply)="replyMessage = $event"
                            (initScrollBottomForTranslation)="translationResult($event)">
       </biz-message-balloon>
-      <!--      <app-message [menu]="false" [comment]="false" [message]="message" [showUnreadCount]=true></app-message>-->
     </ng-container>
   </div>
 </ion-content>
@@ -42,7 +41,7 @@
 
   <form [formGroup]="chatForm">
     <div class="chat-input-frame p-2 d-flex align-items-end">
-      <div class="file-attach-div d-flex align-items-center justify-content-center pointer" (click)="fileAttach.click()"
+      <div *ngIf="replyMessage == null" class="file-attach-div d-flex align-items-center justify-content-center pointer" (click)="fileAttach.click()"
       style="margin-bottom: 2px">
         <img src="assets/imgs/renewal/Icon_circle_attach.svg">
         <input type="file" style="display: none;" accept="*" #fileAttach (change)="file($event)">

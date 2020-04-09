@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {filter, take} from 'rxjs/operators';
 
-import {language} from './lang';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 
@@ -30,12 +29,14 @@ export class LangService {
         return this.onLangMap;
     }
 
+    langItem = {};
+
     constructor(private http: HttpClient) {
 
-        this.http.get(`${environment.masterUrl}/lang.json`)
-            .subscribe((language: any) => {
-                this.originalLangData$.next(language); // just save lang.ts file of from firebase
-            });
+        // this.http.get(`${environment.masterUrl}/lang.json`)
+        //     .subscribe((language: any) => {
+        //         this.originalLangData$.next(language); // just save lang.ts file of from firebase
+        //     });
     }
 
 
@@ -68,6 +69,18 @@ export class LangService {
 
     get(key: string): string {
         return this.filteredLangMap[key] || key;
+    }
+
+
+    setLang(language: any){
+        console.log("setLang::",language);
+        if(language != null){
+            this.originalLangData$.next(language); // just save lang.ts file of from firebase
+        }
+    }
+
+    setLangItem(langItem: any){
+        this.langItem = langItem;
     }
 
     /*

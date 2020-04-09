@@ -82,6 +82,6 @@ export class SquadItemComponent extends TakeUntil implements OnInit {
 
   getSquadTitle(): string {
     return this.squadBox.data.default === true ?
-        this.langPack[this.bizFire.firebaseRouteName+'_squad'] : this.squadBox.data.title || this.squadBox.data.name;
+        this.langPack['public_square'] : this.squadBox.data.title || this.squadBox.data.name;
   }
 }

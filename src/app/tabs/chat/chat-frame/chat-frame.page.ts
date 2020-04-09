@@ -3,7 +3,7 @@ import {ConfigService} from '../../../config.service';
 import {BizFireService} from '../../../biz-fire/biz-fire';
 import {ActivatedRoute} from '@angular/router';
 import {IBizGroup, IBizGroupData, IUserData} from '../../../_models';
-import {debounceTime, filter, takeUntil} from 'rxjs/operators';
+import {debounceTime, filter, take, takeUntil} from 'rxjs/operators';
 import {IChat, IMessage, IMessageData, MessageBuilder} from '../../../_models/message';
 import {Electron} from '../../../providers/electron';
 import {Commons} from '../../../biz-common/commons';
@@ -116,13 +116,11 @@ export class ChatFramePage implements OnInit {
   }
 
   ngOnInit() {
-    console.log('------------chat frame DB ----------');
-    console.log("firebaseName ::",this.configService.firebaseName);
-    console.log("currentUserValue ::",this.bizFire.currentUserValue);
     this.gid = this.activatedRoute.snapshot.queryParamMap.get('gid');
     this.cid = this.activatedRoute.snapshot.queryParamMap.get('cid');
     this.type = this.activatedRoute.snapshot.queryParamMap.get('type');
-    console.log("gid ::",this.gid,"cid ::",this.cid, "type ::",this.type);
+
+    this.getMessages(this.gid,this.cid,this.type);
 
     //파일 업로드 프로그레스바
     this.chatService.fileUploadProgress.subscribe(per => {
@@ -209,7 +207,18 @@ export class ChatFramePage implements OnInit {
       this.addedMessages = [];
     });
 
-
+    //푸시 대상 데이터 가져오기.
+    this.chatService.onSelectChatRoom
+        .pipe(
+            filter(c => c != null)
+            ,take(1)
+        )
+        .subscribe((chat : IChat) => {
+          console.log("푸시 대상 데이터 가져오기.");
+          console.log(chat);
+          this.chatService.loadPushTargetList(chat)
+          .then( (userWithPushAllowed: string[])=> this.chatService.pushTargetUserIdList = userWithPushAllowed);
+    });
   }
 
   async onWindowChat(gid:string,cid:string,type:string) {
@@ -217,8 +226,6 @@ export class ChatFramePage implements OnInit {
       await this.bizFire.loadBizGroup(gid);
 
       await this.chatDataLoad(gid,cid,type);
-
-      await this.getMessages(gid,cid,type);
 
     } catch (e) {
       this.electronService.windowClose();
