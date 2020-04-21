@@ -369,7 +369,7 @@ export class ChatService extends TakeUntil{
 
     const members = currentChat.isPublic() ? this.bizFire.currentBizGroup.data.members : currentChat.data.members;
 
-    const msg = await this.addMessage(text,currentChat.ref,members,files,true,reply);
+    const msg = await this.addMessage(text,currentChat,members,files,true,reply);
 
     const pushTitle = `[${this.bizFire.currentBizGroup.data.team_name}] ${this.bizFire.currentUserValue.displayName}`;
 
@@ -386,18 +386,22 @@ export class ChatService extends TakeUntil{
     return msg;
   }
 
-  async addMessage(text: string,parentRef: any,unreadMembers : any,
+  async addMessage(text: string,chat: IChat,unreadMembers : any,
                    files?: any[],saveLastMessage = true,replyMessage?:IMessageData) {
     try{
-      if(parentRef == null) {
+      if(chat.ref == null) {
         throw new Error('parentRef has no data.');
       }
       const membersUids = [];
       const now = new Date();
+
+      console.log("채팅칠때 그룹gid 있나요.",this.bizFire.gid);
+
       const msg: IMessageData = {
         message: {
           text : text
         },
+        gid: this.bizFire.gid,
         sender: this.bizFire.uid,
         created: now,
         isNotice : false,
@@ -406,12 +410,16 @@ export class ChatService extends TakeUntil{
         file: false
       };
 
+      if(chat.cid === STRINGS.SQUAD_CHAT) {
+        msg.sid = chat.cid;
+      }
+
       if(replyMessage){
         if(replyMessage.reply){
           delete replyMessage.reply;
         }
         msg.reply = replyMessage;
-      };
+      }
 
       if(unreadMembers) {
         msg.read = Commons.makeReadFrom(unreadMembers, this.bizFire.uid);
@@ -422,11 +430,11 @@ export class ChatService extends TakeUntil{
             })
       }
 
-      const newChatRef = parentRef.collection('chat').doc();
+      const newChatRef = chat.ref.collection('chat').doc();
 
       if(files && files.length > 0) {
         msg.file = true;
-        const storageChatPath = parentRef.path;
+        const storageChatPath = chat.ref.path;
         const mid = newChatRef.id;
         msg.message.files = [];
         const loads = files.map(async file => {
@@ -453,11 +461,13 @@ export class ChatService extends TakeUntil{
 
       const newMessage = {mid: newChatRef.id, data: msg};
 
-      if(saveLastMessage){
-        await parentRef.update({
-          lastMessage: msg,
-        });
-      }
+      // todo - 04.14 라스트 메시지 업데이트 부분 주석처리 (펑션으로 이동)
+      // if(saveLastMessage){
+      //   await parentRef.update({
+      //     lastMessage: msg,
+      //   });
+      // }
+
       return newMessage;
 
     } catch (e) {
@@ -509,6 +519,7 @@ export class ChatService extends TakeUntil{
       notification: {
         title: pushTitle,
         body: msg,
+        sound: 'default'
       },
       data: {
         cid: data.cid,

@@ -320,6 +320,8 @@ export class ChatFramePage implements OnInit {
           if(snapshots && snapshots.docs) {
             this.start = snapshots.docs[snapshots.docs.length - 1];
 
+            console.log("startstartstart!!!",this.start);
+
             await this.getNewMessages(msgPath, this.start);
 
             const loading = await this.loading.show();

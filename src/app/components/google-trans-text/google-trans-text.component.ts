@@ -3,6 +3,7 @@ import {SafeHtml} from '@angular/platform-browser';
 import {IMessage} from '../../_models/message';
 import {ITranslations, TranslateService} from '../../providers/translate.service';
 import {BizFireService} from '../../biz-fire/biz-fire';
+import {filter, take} from 'rxjs/operators';
 
 @Component({
   selector: 'biz-google-trans-text',
@@ -63,22 +64,29 @@ export class GoogleTransTextComponent implements OnInit {
     this.text = this.convertMessage(message);
     const transMsgs = message.data.translate;
     const currentGroup = this.bizFire.currentBizGroup;
-    const groupUserData = this.bizFire.userDataValue;
-    const transLang = groupUserData.translateLang || currentGroup.data.transPack[0];
 
-    console.log("currentGroup",currentGroup);
-    console.log("groupUserData",groupUserData);
+    this.bizFire.userData
+    .pipe(take(1),filter(d => d != null))
+    .subscribe((userData:any) => {
+      const groupUserData = this.bizFire.userDataValue;
+      const transLang = groupUserData.translateLang || currentGroup.data.transPack[0];
 
-    if(transLang) {
-      if(transMsgs) {
-        this.transText = transMsgs[transLang];
-        if(this.transText == null) {
+      console.log("currentGroup",currentGroup);
+      console.log("groupUserData",groupUserData);
+
+      if(transLang) {
+        if(transMsgs) {
+          this.transText = transMsgs[transLang];
+          if(this.transText == null) {
+            this.onTranslate(this.text,transLang);
+          }
+        } else {
           this.onTranslate(this.text,transLang);
         }
-      } else {
-        this.onTranslate(this.text,transLang);
       }
-    }
+
+    });
+
   }
 
   onTranslate(text: string, translateLang: string) {

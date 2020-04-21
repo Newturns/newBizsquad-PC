@@ -27,6 +27,8 @@ export interface IMessage extends IFirestoreDoc{
 
 export interface IMessageData {
   created?: any,
+  gid?: string,
+  sid?: string,
   type?: string,
   message: {
     text?: string,
