@@ -345,6 +345,7 @@ export class ChatFramePage implements OnInit {
 
           const list: IMessage[] = changes.filter(c => c.type === 'added').map(c => MessageBuilder.buildFromSnapshot(c));
           const modified: IMessage[] = changes.filter(c => c.type === 'modified').map(c => MessageBuilder.buildFromSnapshot(c));
+          const removed: IMessage[] = changes.filter(c => c.type === 'removed').map(c => MessageBuilder.buildFromSnapshot(c));
 
           if(list.length > 0){
             list.forEach((l) => {
@@ -368,6 +369,15 @@ export class ChatFramePage implements OnInit {
               }
             });
           }
+
+          if(removed.length > 0){
+            // 채팅 메시지가 지워짐.
+            removed.forEach(m => {
+              const index = this.chatContent.findIndex(c => c.mid === m.mid);
+              this.chatContent.splice(index, 1);
+            });
+          }
+
           if(this.bottomCheck) {
             timer(100).subscribe(() => {
               // call ion-content func
@@ -399,6 +409,7 @@ export class ChatFramePage implements OnInit {
 
                 const list: IMessage[] = changes.filter(c => c.type === 'added').map(c => MessageBuilder.buildFromSnapshot(c));
                 const modified: IMessage[] = changes.filter(c => c.type === 'modified').map(c => MessageBuilder.buildFromSnapshot(c));
+                const removed: IMessage[] = changes.filter(c => c.type === 'removed').map(c => MessageBuilder.buildFromSnapshot(c));
 
                 if(list.length > 0){
                   this.addAddedMessages(list.filter(m => m.data.sender !== this.bizFire.uid));
@@ -417,6 +428,16 @@ export class ChatFramePage implements OnInit {
                     }
                   });
                 }
+
+                if(removed.length > 0){
+                  // 채팅 메시지가 지워짐.
+                  removed.forEach(m => {
+                    const index = this.chatContent.findIndex(c => c.mid === m.mid);
+                    this.chatContent.splice(index, 1);
+                  });
+                }
+
+
 
                 timer(100).subscribe(() => {
                   this.contentArea.getScrollElement().then(el => {
