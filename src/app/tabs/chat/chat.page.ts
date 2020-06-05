@@ -100,7 +100,7 @@ export class ChatPage implements OnInit {
           const onlyPrivateSquad = squad.filter(s => {
             return s.data.type === 'private' && s.data.members[this.bizFire.uid] === true;
           });
-          this.squadChatRooms = onlyPrivateSquad.sort(Commons.sortDataByCreated());
+          this.squadChatRooms = onlyPrivateSquad;
         });
 
     // unread count map
@@ -117,42 +117,6 @@ export class ChatPage implements OnInit {
               this.squadUnreadTotalCount += item.unreadList.length;
             }
           });
-        });
-
-
-    /*
-    * sort 채팅방
-    * 마지막 메시지가 도착한 순으로 소팅
-    * */
-    this.sortChatRooms$
-        .pipe(takeUntil(this._unsubscribeAll),
-            distinctUntilChanged() // 같은 채팅창이면 이미 소팅되어있으므로 무시
-        )
-        .subscribe((cid: string) => {
-          let target;
-          if(this.chatRooms){
-            if(this.chatRooms.findIndex(c => c.cid === cid) !== -1) {
-              // cid goes to top.
-              target = this.chatRooms;
-            }
-          }
-          if(!target && this.squadChatRooms){
-            if(this.squadChatRooms.findIndex(c => c.cid === cid) !== -1) {
-              target = this.squadChatRooms;
-            }
-          }
-          console.log(target);
-          if(target){
-            target.sort( (a: IChat, b: IChat) => {
-              let ret = 0;
-              if(a.cid === cid){
-                ret = -1; //a up
-              } else if(b.cid === cid){
-                ret = 1;//b up
-              }
-              return ret;
-            });
-          }
         });
   }
 

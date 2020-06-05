@@ -6,6 +6,9 @@
       </ion-button>
     </ion-buttons>
     <ion-buttons slot="end" class="login-top-menu ion-no-padding no-drag">
+      <ion-button fill="clear" size="small" class="font-12" (click)="signOut()">
+        Logout
+      </ion-button>
       <ion-button class="ion-no-padding" fill="clear" size="small" slot="icon-only" color="light" (click)="windowMimimize()">
         <img src="assets/imgs/renewal/Icon_Outline_minimize.svg">
       </ion-button>
@@ -18,20 +21,30 @@
 
 <ion-content class="content-color ion-no-padding">
   <div class="groupList-scroll-con py-3">
-    <div class="group-card d-flex mx-3 my-2" *ngFor="let group of groups" (click)="gotoTeam(group)">
-      <div class="d-flex align-items-center flex-shrink-0">
-        <div class="d-flex mx-3">
-          <biz-group-logo [group]="group"></biz-group-logo>
+    <ng-container *ngIf="groups?.length > 0; else noGroup">
+      <div class="group-card d-flex mx-3 my-2" *ngFor="let group of groups" (click)="gotoTeam(group)">
+        <div class="d-flex align-items-center flex-shrink-0">
+          <div class="d-flex mx-3">
+            <biz-group-logo [group]="group"></biz-group-logo>
+          </div>
+        </div>
+        <div class="group-detail d-flex flex-column justify-content-center flex-grow-1 flex-shrink-1 mr-3">
+          <div class="d-flex group-name pb-1">
+            <div>{{ group.data.team_name }}</div>
+          </div>
+          <div class="d-flex group-description">
+            <div>{{ group.data.team_description }}</div>
+          </div>
         </div>
       </div>
-      <div class="group-detail d-flex flex-column justify-content-center flex-grow-1 flex-shrink-1 mr-3">
-        <div class="d-flex group-name pb-1">
-          <div>{{ group.data.team_name }}</div>
-        </div>
-        <div class="d-flex group-description">
-          <div>{{ group.data.team_description }}</div>
-        </div>
+    </ng-container>
+
+    <ng-template #noGroup>
+      <div class="no-group d-flex flex-column align-items-center justify-content-center">
+        <div>There are no groups to choose from.</div>
+        <div>Please create a group on the web page.</div>
       </div>
-    </div>
+    </ng-template>
+
   </div>
 </ion-content>

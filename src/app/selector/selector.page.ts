@@ -93,4 +93,8 @@ export class SelectorPage implements OnInit {
     this._unsubscribeAll.complete();
   }
 
+  signOut() {
+    this.bizFire.signOut();
+  }
+
 }

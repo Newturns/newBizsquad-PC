@@ -1,13 +1,14 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {filter, take} from 'rxjs/operators';
 import {TakeUntil} from "../../biz-common/take-until";
-import {IChat, IMessageData} from "../../_models/message";
+import {IChat, IFiles, IMessageData} from '../../_models/message';
 import {ChatService} from "../../providers/chat.service";
 import {Commons} from "../../biz-common/commons";
 import {IUnreadItem, IUser} from '../../_models';
 import {CacheService} from '../../core/cache/cache';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {IUnreadMap} from '../classes/unread-counter';
+import {BehaviorSubject} from 'rxjs';
 
 @Component({
   selector: 'biz-chat-item',
@@ -54,6 +55,10 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
 
   chatIcon : IUser;
 
+  noticeMessage$: BehaviorSubject<string>;
+
+  langPack = {};
+
   constructor(private cacheService: CacheService,
               private bizFire : BizFireService,
               private chatService: ChatService) {
@@ -86,7 +91,19 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
       this.chatBox = c;
       this.chatTitle = this.chatBox.data.title;
       this.lastMessage = this.chatBox.data.lastMessage;
+
       this.makeChatIcon();
+
+      // notice message 를 준비한다.
+      if(this.lastMessage && this.lastMessage.isNotice){
+        if(this.noticeMessage$ == null){
+          this.noticeMessage$ = new BehaviorSubject<string>(null);
+        }
+        this.makeNoticeMessage();
+      }
+
+
+
       if(this.chatTitle == null){
         this.reloadTitle();
       }
@@ -155,4 +172,75 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
     }
 
   }
+
+  isImage(f: IFiles): boolean {
+    return Commons.isImageFile(f);
+  }
+
+  // create notice message with current langPack
+  makeNoticeMessage(){
+    this.bizFire.onLang
+        .pipe(take(1))
+        .subscribe((l: any)=> {
+
+          this.langPack = l.pack();
+          const notice = this.chatBox.data.lastMessage.message.notice;
+
+          if(notice.type === 'exit'){
+            const uid = notice.uid;
+            if(uid){
+              this.cacheService.userGetObserver(uid[0]).subscribe((user: IUser) => {
+                if(user){
+                  const text = this.langPack['chat_exit_user_notice'].replace('$DISPLAYNAME', user.data.displayName);
+                  this.noticeMessage$.next(text);
+                } else {
+                  console.error(`user [${uid[0]}] not fount.`);
+                  this.noticeMessage$.next(`user exit chat`);
+                }
+              });
+            }
+          }
+
+          if(notice.type === 'init'){
+            const text = this.langPack['create_chat_room'];
+            this.noticeMessage$.next(text);
+          }
+
+          if(notice.type === 'invite'){
+            const uids = notice.uid;
+            let inviteUserNames = '';
+            for(let uid of uids) {
+              this.cacheService.userGetObserver(uid).subscribe((user : IUser) => {
+                if(user && user.data.displayName) {
+                  if(inviteUserNames.length > 0){
+                    inviteUserNames += ',';
+                  }
+                  inviteUserNames += user.data.displayName;
+                }
+              })
+            }
+            const text = this.langPack['chat_invite_user_notice'].replace('$DISPLAYNAME',inviteUserNames);
+            this.noticeMessage$.next(text);
+          }
+
+          if(notice.type === 'video'){
+            const uid = notice.uid;
+            // const vid = notice.vid;
+            if(uid){
+              this.cacheService.userGetObserver(uid[0]).subscribe((user: IUser) => {
+                if(user){
+                  const text = this.langPack['video_notice_msg'].replace('$DISPLAYNAME',user.data.displayName);
+                  // console.log('text:', text);
+                  this.noticeMessage$.next(text);
+                }
+                else {
+                  console.error(`user [${uid[0]}] not fount.`);
+                  this.noticeMessage$.next(`User created video chat`);
+                }
+              });
+            }
+          }
+        });
+  }
+
 }

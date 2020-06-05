@@ -2,6 +2,7 @@ import { FormControl } from '@angular/forms';
 import {IUser, IUserData} from "../_models";
 import {ISquad} from "../providers/squad.service";
 import {NEWCOLORS} from "./colors";
+import {IChat} from '../_models/message';
 
 export const STRINGS = {
   STRING_BIZGROUPS: 'bizgroups',
@@ -322,14 +323,19 @@ export class Commons {
         }
       }
 
-      static sortDataByLastMessage(asc = true){
-        return  (a: any, b: any) => {
-          let ret = 0;
-          const down = asc ? 1 : -1;
-          const up = asc ? -1 : 1;
-          const key = 'lastMessage';
-          if(a.data && a.data[key] && b && b.data && b.data[key]){
-            ret = a.data[key].created.toMillis() > b.data[key].created.toMillis() ? down : up;
+      static sortDataByLastMessage(){
+        return  (a: IChat, b: IChat)=>{
+          // lastMessage 가 없으면 제일 밑으로 보낸다.
+          let ret = 1;
+          if(a.data.lastMessage == null){
+            return 1;
+          }
+          if(b.data.lastMessage == null){
+            return -1;
+          }
+          if(a.data.lastMessage && b.data.lastMessage){
+            // a 가 오래된 경우 밑으로 보낸다.
+            ret = a.data.lastMessage.created.toMillis() < b.data.lastMessage.created.toMillis() ? 1 : -1;
           }
           return ret;
         }

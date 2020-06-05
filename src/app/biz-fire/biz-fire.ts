@@ -379,7 +379,7 @@ export class BizFireService {
                 )
                 .subscribe((data: any)=>{
 
-                    if(data && data['status'] === true){
+                    if(data && data['status'] === true && data['members'][this.uid] === true){
 
                         const group: IBizGroup = BizGroupBuilder.buildWithData(gid, data, this.uid);
 
@@ -524,6 +524,7 @@ export class BizFireService {
                 this.userCustomLinks.next(links);
             });
     }
+
     deleteLink(link){
         return this.afStore.collection(`users/${this.currentUID}/customlinks`).doc(link.mid).delete();
     }

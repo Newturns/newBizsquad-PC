@@ -30,10 +30,36 @@
     </div>
 
     <div class="flex-grow-1 d-flex justify-content-between align-items-start chat-last-msg">
-      <div *ngIf="chatBox?.data.lastMessage?.message.text != null; else noMessage"
-           class="flex-grow-1 text-wrap text-truncate text-break">
-        {{removeHtml(chatBox?.data.lastMessage?.message.text)}}
-      </div>
+
+      <ng-container *ngIf="chatBox && chatBox.data.lastMessage != null; else noMessage">
+
+        <ng-container *ngIf="chatBox.data.lastMessage.message.text && !chatBox.data.lastMessage.file">
+          <div class="flex-grow-1 text-wrap text-truncate text-break">
+            {{removeHtml(chatBox?.data.lastMessage?.message.text)}}
+          </div>
+        </ng-container>
+
+        <!--Notice-->
+        <ng-container *ngIf="chatBox.data.lastMessage.message.text == null && chatBox.data.lastMessage.message.notice">
+          {{noticeMessage$ | async}}
+        </ng-container>
+
+        <!--file-->
+        <ng-container
+            *ngIf="chatBox.data.lastMessage.file && chatBox.data.lastMessage.message.files && chatBox.data.lastMessage.message.files.length>0">
+          <div class="d-flex">
+            <ng-container *ngIf="isImage(chatBox.data.lastMessage.message.files[0])">
+              <img class="mr-1" src="assets/imgs/renewal/Icon_file_attach1.svg">
+            </ng-container>
+            <ng-container *ngIf="!isImage(chatBox.data.lastMessage.message.files[0])">
+              <img class="mr-1" src="assets/imgs/renewal/Icon_Outline_file.svg">
+            </ng-container>
+            <div>{{chatBox.data.lastMessage.message.files[0].name}}</div>
+          </div>
+        </ng-container>
+
+      </ng-container>
+
       <ng-template #noMessage>
         <div class="flex-grow-1">
           No Message
@@ -42,6 +68,8 @@
       <div class="msg-badge d-flex text-white mr-2 align-items-center justify-content-center flex-shrink-0" *ngIf="unreadCount">
         {{ unreadCount | badgeLimit: 999 }}
       </div>
+
+
     </div>
   </div>
 </div>

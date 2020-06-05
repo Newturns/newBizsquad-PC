@@ -170,13 +170,12 @@ export class ChatService extends TakeUntil{
               this.takeUntil,
               takeUntil(this.bizFire.onUserSignOut),
           ).subscribe( (changes: any[]) => {
+
             changes.forEach((change: DocumentChangeAction<any>) => {
-
               this.processChange(change, this.chatDataMap.chatList, 'groupChat');
-
             }); // end of for
 
-            this.chatDataMap.chatList.sort(Commons.sortDataByLastMessage(false));
+            this.chatDataMap.chatList.sort(Commons.sortDataByLastMessage());
 
             this.chatDataMap.chatListSubject.next(this.chatDataMap.chatList);
             this._chatList = this.chatDataMap.chatList;
@@ -230,7 +229,7 @@ export class ChatService extends TakeUntil{
           });
 
           // sort by latest.
-          this.chatDataMap.squadChatList.sort(Commons.sortDataByLastMessage(false));
+          this.chatDataMap.squadChatList.sort(Commons.sortDataByLastMessage());
 
           this.chatDataMap.squadChatSubject.next(this.chatDataMap.squadChatList);
 
