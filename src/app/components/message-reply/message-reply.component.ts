@@ -1,9 +1,10 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {TakeUntil} from '../../biz-common/take-until';
 import {IMessageData} from '../../_models/message';
 import {IUser, IUserData} from '../../_models';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {CacheService} from '../../core/cache/cache';
+import {Commons} from '../../biz-common/commons';
 
 @Component({
   selector: 'biz-message-reply',
@@ -24,6 +25,9 @@ export class MessageReplyComponent extends TakeUntil implements OnInit {
   @Input()
   bgColor : string;
 
+  @Output()
+  imageDidLoad = new EventEmitter<any>();
+
   get message(){
     return this._message;
   }
@@ -33,12 +37,18 @@ export class MessageReplyComponent extends TakeUntil implements OnInit {
 
   toData : IUserData;
 
+  isImage = false;
+  imageLoadError = false;
+
   constructor(private bizFire : BizFireService,
               private cacheService : CacheService) {
     super();
   }
 
   ngOnInit() {
+    if(this.message && this.message.file && this.message.message.files){
+      this.isImage = this.message.message.files.length > 0 && Commons.isImageFile(this.message.message.files[0]);
+    }
   }
 
   private loadMessage(message: IMessageData) {
@@ -74,5 +84,9 @@ export class MessageReplyComponent extends TakeUntil implements OnInit {
       ret = text;
     }
     return ret;
+  }
+
+  onImageDidLoad(e: any){
+    this.imageDidLoad.emit(true);
   }
 }

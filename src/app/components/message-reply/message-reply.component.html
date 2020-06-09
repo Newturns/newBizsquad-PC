@@ -1,4 +1,20 @@
-<div class="reply-frame d-flex flex-column font-12 p-2">
+<div class="reply-frame d-flex flex-column font-12 p-2 mb-2">
   <div *ngIf="toData">{{toData.displayName}}</div>
-  <div [innerHTML]="text | sanitizingHtml"></div>
+
+  <ng-container *ngIf="isImage">
+    <div class="d-flex justify-content-center py-2">
+      <ng-container *ngIf="!imageLoadError">
+        <biz-img [file]="message.message.files[0]" (imgDidLoad)="onImageDidLoad($event)"></biz-img>
+      </ng-container>
+      <ng-container *ngIf="imageLoadError">
+        <span color="secondary">deleted image</span>
+      </ng-container>
+
+    </div>
+
+  </ng-container>
+  <ng-container *ngIf="!isImage">
+    <div [innerHTML]="text | sanitizingHtml"></div>
+  </ng-container>
+
 </div>
