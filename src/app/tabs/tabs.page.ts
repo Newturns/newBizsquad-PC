@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {TakeUntil} from '../biz-common/take-until';
 import {BizFireService} from '../biz-fire/biz-fire';
 import {IBizGroup} from '../_models';
 import {Router} from '@angular/router';
@@ -64,7 +63,6 @@ export class TabsPage {
     this.bizFire.onBizGroupSelected
     .pipe(filter(d=>d!=null),takeUntil(this._unsubscribeAll))
     .subscribe((group : IBizGroup) => {
-      console.log("onBizGroupSelected !",group);
       this.group = group;
       this.teamColor = this.group.data.team_color;
     });
@@ -73,8 +71,6 @@ export class TabsPage {
     .pipe(takeUntil(this._unsubscribeAll))
     .subscribe((map: IUnreadMap)=> {
       this.chatUnreadCount = map.totalUnreadCount();
-      console.log("chatUnreadCount ::",this.chatUnreadCount);
-      console.log("chat list item",map.getValues());
     });
   }
 
@@ -82,7 +78,6 @@ export class TabsPage {
     //탭을 선택하면 이벤트 발생.
     //현재 선택된 탭 이름을 가져온다 (string)
     this.selectTabName = e.tab;
-    console.log("selectTabName : ",this.selectTabName);
   }
 
   groupSelectPage() {

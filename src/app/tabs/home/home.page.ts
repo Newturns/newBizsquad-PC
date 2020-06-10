@@ -1,7 +1,6 @@
-import {Component, ElementRef, OnInit, Renderer2, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {TokenProvider} from '../../biz-common/token';
-import {TakeUntil} from '../../biz-common/take-until';
 import {NotificationService} from '../../core/notification.service';
 import {filter, map, takeUntil} from 'rxjs/operators';
 import {INotification, userLinks} from '../../_models';
@@ -9,7 +8,7 @@ import {UserStatusProvider} from '../../core/user-status';
 import {Electron} from '../../providers/electron';
 import {IMessage, Message} from '../../_models/message';
 import {Commons} from '../../biz-common/commons';
-import {IonGrid, PopoverController} from '@ionic/angular';
+import {PopoverController} from '@ionic/angular';
 import {CustomLinkComponent} from '../../components/custom-link/custom-link.component';
 import {Router} from '@angular/router';
 import {ConfigService} from '../../config.service';

@@ -1,12 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {Electron} from '../../providers/electron';
-import {TakeUntil} from '../../biz-common/take-until';
 import {IBizGroup, IUser} from '../../_models';
 import {CacheService} from '../../core/cache/cache';
-import {Commons} from '../../biz-common/commons';
-import {BehaviorSubject, combineLatest, Observable, Subject, timer} from 'rxjs';
-import {CustomLinkComponent} from '../../components/custom-link/custom-link.component';
+import { Observable, Subject } from 'rxjs';
 import {PopoverController} from '@ionic/angular';
 import {ProfilePopoverComponent} from '../../components/profile-popover/profile-popover.component';
 import {filter, takeUntil} from 'rxjs/operators';

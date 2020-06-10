@@ -53,23 +53,23 @@
         <span>{{item.data.info?.title || langPack['join_group']}}</span>
       </div>
 
-      <div class="flex-shrink-0 d-flex align-items-center">
+      <div class="d-flex align-items-center justify-content-between">
 
         <ng-container *ngIf="item.data.groupInvite">
-          <div class="notice-item-link text-danger mr-3" *ngIf="item.data.info.title" (click)="onAcceptClicked()">
+          <div class="notice-item-link text-danger" *ngIf="item.data.info.title" (click)="onAcceptClicked()">
             {{langPack['accept']}}
           </div>
         </ng-container>
 
         <ng-container *ngIf="!item.data.groupInvite">
-          <div class="notice-item-link mr-3" (click)="onLinkClicked(item)">
+          <div class="notice-item-link mr-1" (click)="onLinkClicked(item)">
             <ng-container *ngIf="link$ | async as link">
               {{link}}
             </ng-container>
           </div>
         </ng-container>
 
-        <div class="notice-item-time">
+        <div class="notice-item-time flex-shrink-0">
           {{item.data.created | timestampToDate | date: 'MM-dd HH:mm'}}
         </div>
       </div>

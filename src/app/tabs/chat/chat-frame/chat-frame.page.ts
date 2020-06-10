@@ -2,12 +2,11 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ConfigService} from '../../../config.service';
 import {BizFireService} from '../../../biz-fire/biz-fire';
 import {ActivatedRoute} from '@angular/router';
-import {IBizGroup, IBizGroupData, IUserData} from '../../../_models';
-import {debounceTime, filter, take, takeUntil} from 'rxjs/operators';
+import {IBizGroup, IUserData} from '../../../_models';
+import {debounceTime, filter, take} from 'rxjs/operators';
 import {IChat, IMessage, IMessageData, MessageBuilder} from '../../../_models/message';
 import {Electron} from '../../../providers/electron';
 import {Commons} from '../../../biz-common/commons';
-import {BizGroupBuilder} from '../../../biz-fire/biz-group';
 import {Chat} from '../../../biz-common/chat';
 import {ChatService} from '../../../providers/chat.service';
 import {LoadingProvider} from '../../../providers/loading';
@@ -93,6 +92,7 @@ export class ChatFramePage implements OnInit {
               private fb: FormBuilder,
               private cacheService : CacheService,
               private bizFire : BizFireService) {
+
     this.chatForm = fb.group(
         {
           'chat': ['', Validators.compose([
@@ -113,6 +113,7 @@ export class ChatFramePage implements OnInit {
         this.chatLengthError = null;
       }
     });
+
   }
 
   ngOnInit() {
@@ -555,5 +556,9 @@ export class ChatFramePage implements OnInit {
 
   removeReplyInfo(){
     this.replyMessage = null;
+  }
+
+  onFileDropped(e) {
+    console.log("start drop!!",e);
   }
 }

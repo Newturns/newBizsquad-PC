@@ -6,7 +6,7 @@
   <progress-bar [progress]="loadProgress"></progress-bar>
 </ion-header>
 
-<ion-content #scrollContent [scrollEvents]="true" (ionScroll)="scrollHandler($event)">
+<ion-content #scrollContent [scrollEvents]="true" (ionScroll)="scrollHandler($event)" dropzone (dropped)="onFileDropped($event)">
   <div class="h-100">
     <img class="translate-logo position-fixed" src="assets/imgs/logo/google/color-short.png" width="97" height="13">
     <ng-container *ngFor="let message of chatContent; let i = index">

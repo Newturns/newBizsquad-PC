@@ -5,7 +5,6 @@ import {IBizGroupData, ICustomMenu, INotification, INotificationItem} from '../.
 import {BehaviorSubject, combineLatest, Subject} from 'rxjs';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {Commons} from '../../biz-common/commons';
-import {TakeUntil} from '../../biz-common/take-until';
 import {NotificationService} from '../../core/notification.service';
 import {Electron} from '../../providers/electron';
 import {PopoverController} from '@ionic/angular';
@@ -145,8 +144,8 @@ export class NotifyPage implements OnInit {
       cssClass: 'warn-popover'
     });
 
-    popover.onDidDismiss().then(async (ok) => {
-      if(ok) {
+    popover.onDidDismiss().then(async (result) => {
+      if(result.data === true) {
         const done = this.messages.filter(m => m.data.statusInfo.done === true);
         if(done.length > 0) {
           const batch = this.bizFire.afStore.firestore.batch();
@@ -176,16 +175,12 @@ export class NotifyPage implements OnInit {
       cssClass: 'warn-popover'
     });
 
-    popover.onDidDismiss().then(async (ok) => {
-      if(ok === true) {
+    popover.onDidDismiss().then(async (result) => {
+      if(result.data === true) {
         const batch = this.bizFire.afStore.firestore.batch();
-        this.messages.forEach(msg => {
-          const ref = this.bizFire.afStore.firestore.collection(Commons.notificationPath(this.bizFire.currentUID)).doc(msg.mid);
-          batch.delete(ref);
-        });
-        batch.commit().then(()=>{
-          this.hasFinished = this.messages.filter(m => m.data.statusInfo.done === true).length > 0;
-        }).catch(e => console.error(e));
+        const alarmCol = await this.bizFire.afStore.firestore.collection(Commons.notificationPath(this.bizFire.currentUID)).get();
+        alarmCol.docs.map(alarm => batch.delete(alarm.ref));
+        await batch.commit();
       }
     });
     return await popover.present();

@@ -5,9 +5,6 @@ import {ConfigService} from '../config.service';
 import {BizFireService} from '../biz-fire/biz-fire';
 import {Router} from '@angular/router';
 import {Electron} from '../providers/electron';
-import * as electron from "electron";
-import {UserStatusProvider} from '../core/user-status';
-// import * as electron from 'electron';
 
 @Component({
   selector: 'app-login',

@@ -18,7 +18,7 @@ import {GroupColorProvider} from '../../biz-common/group-color';
     IonicModule,
     ChatPageRoutingModule,
     ComponentsModule,
-    PipesModule
+    PipesModule,
   ],
   declarations: [ChatPage],
   providers: [GroupColorProvider]

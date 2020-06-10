@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import {TakeUntil} from '../../biz-common/take-until';
 import {Electron} from '../../providers/electron';
 import {BizFireService} from '../../biz-fire/biz-fire';
-import {IBizGroup, IUnreadItem, IUser} from '../../_models';
+import {IBizGroup, IUser} from '../../_models';
 import {ChatService} from '../../providers/chat.service';
 import {Subject} from 'rxjs';
-import {distinctUntilChanged, filter, map, takeUntil} from 'rxjs/operators';
+import { filter, map, takeUntil} from 'rxjs/operators';
 import {IChat} from '../../_models/message';
 import {Commons} from '../../biz-common/commons';
 import {CacheService} from '../../core/cache/cache';

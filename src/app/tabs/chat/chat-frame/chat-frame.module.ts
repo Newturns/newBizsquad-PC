@@ -12,6 +12,7 @@ import {ComponentsModule} from '../../../components/components.module';
 import {LoadingProvider} from '../../../providers/loading';
 import {ToastProvider} from '../../../providers/toast';
 import {Autosize} from '../../../biz-common/directives/autosize';
+import {DropzoneDirective} from '../../../biz-common/directives/dropzone.directive';
 
 @NgModule({
   imports: [
@@ -23,8 +24,9 @@ import {Autosize} from '../../../biz-common/directives/autosize';
     ReactiveFormsModule
   ],
   declarations: [
-      ChatFramePage,
-      Autosize
+    ChatFramePage,
+    Autosize,
+    DropzoneDirective
   ],
   providers: [
     LoadingProvider,
