@@ -1,5 +1,5 @@
 
-<div *ngIf="room" class="d-flex p-3 drag header-frame">
+<div class="d-flex p-3 drag header-frame">
   <!-- 채팅방 아이콘 -->
   <div class="d-flex align-items-center mr-2" *ngIf="!memberChat; else personal">
     <biz-team-icon [teamData]="room?.data"  [size]="40"></biz-team-icon>

@@ -22,11 +22,10 @@ export class InviteChatPopoverComponent implements OnInit {
 
   roomData : IChat;
 
-  userList$: Observable<IUser[]>;
+  userList : IUser[] = [];
+  checkedUser : IUser[] = [];
 
   currentGroup: IBizGroup;
-
-  isChecked : IUser[] = [];
 
   groupSubColor: string;
 
@@ -47,43 +46,60 @@ export class InviteChatPopoverComponent implements OnInit {
   ngOnInit() {
     combineLatest(this.chatService.onSelectChatRoom,this.bizFire.onBizGroupSelected)
         .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe(([chat,group]) => {
+        .subscribe(async ([chat,group]) => {
           this.roomData = chat;
           this.currentGroup = group;
           this.groupSubColor = group.data.team_subColor;
 
-          const inviteUids = this.currentGroup.getMemberIds(false)
+          const inviteUids = this.currentGroup.getMemberIdsExceptGuests(false)
               .filter(uid => Object.keys(this.roomData.data.members)
                   .find(cUid => cUid === uid) == null);
 
-          this.userList$ = this.cacheService.resolvedUserList(inviteUids, Commons.userInfoSorter);
+          this.userList = await this.cacheService.resolvedUserList(inviteUids, Commons.userInfoSorter).toPromise();
+
         });
   }
 
-  invite(){
-    let members = {};
-    let makeNoticeUsers = [];
-    this.isChecked.forEach(d => {
-      members[d.data.uid] = true;
-      makeNoticeUsers.push(d.data.uid);
-    });
-    this.bizFire.afStore.doc(Commons.chatDocPath(this.roomData.data.gid,this.roomData.cid)).set({
-      members : members
-    },{merge : true}).then(() =>{
-      this.chatService.makeRoomNoticeMessage('member-chat','invite',this.roomData.data.gid,this.roomData.cid,makeNoticeUsers);
-      this.popoverCtrl.dismiss();
-    })
+  invite() {
+
+    if(this.checkedUser.length > 0) {
+
+      let members = {};
+      let makeNoticeUsers = [];
+
+      this.checkedUser.forEach((u: IUser) => {
+        members[u.data.uid] = true;
+        makeNoticeUsers.push(u.data.uid);
+      });
+
+      this.bizFire.afStore.doc(Commons.chatDocPath(this.roomData.data.gid,this.roomData.cid)).set({
+        members : members
+      },{merge : true})
+          .then(() => {
+            this.chatService.makeRoomNoticeMessage('member-chat','invite',this.roomData.data.gid,this.roomData.cid,makeNoticeUsers);
+            this.popoverCtrl.dismiss();
+          })
+          .catch((e) => console.error(e));
+    }
+
   }
 
   checkedUsers(user : IUser) {
-    if(user['checked']) {
-      user['checked'] = false;
-    } else {
-      user['checked'] = true;
-      this.isChecked.push(user);
+    if(this.checkedUser.length > 0) {
+      if(this.checkedUser.find(u => u.uid === user.uid)) {
+        //이미 있으면 배열에서 삭제.
+        this.checkedUser = this.checkedUser.filter(u => u.uid !== user.uid);
+      } else {
+        //없으면 배열에 추가.
+        this.checkedUser.push(user);
+      }
+      return;
     }
-    this.isChecked = this.isChecked.filter(user => user['checked'] === true);
-    console.log(this.isChecked);
+    this.checkedUser.push(user);
+  }
+
+  isChecked(user : IUser) : boolean {
+    return this.checkedUser.find(u => u.uid === user.uid) != null;
   }
 
   async closePopup(){
@@ -91,7 +107,7 @@ export class InviteChatPopoverComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this.isChecked.forEach(u => u.data.isChecked = false);
+    this.checkedUser = [];
     this._unsubscribeAll.next();
     this._unsubscribeAll.complete();
   }
