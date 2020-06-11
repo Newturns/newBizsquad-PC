@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {IFiles} from "../../_models/message";
 import {Commons} from "../../biz-common/commons";
 import {Electron} from '../../providers/electron';
@@ -20,6 +20,9 @@ export class ChatAttachComponent implements OnInit {
   @Input()
   postFiles : boolean = false;
 
+  @Output()
+  imgDidLoad = new EventEmitter<any>();
+
   constructor(public electronService: Electron) { }
 
   ngOnInit() {
@@ -32,6 +35,10 @@ export class ChatAttachComponent implements OnInit {
   goLink(e,url) {
     e.stopPropagation();
     this.electronService.goLink(url);
+  }
+
+  imgLoad(e) {
+    this.imgDidLoad.emit(e);
   }
 
 }

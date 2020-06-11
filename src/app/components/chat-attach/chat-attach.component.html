@@ -8,7 +8,7 @@
        }">
     <!--  이미지 표시  -->
     <ng-container *ngIf="isImageFile(file) === true">
-      <biz-img [file]="file"></biz-img>
+      <biz-img [file]="file" (imgDidLoad)="imgLoad($event)"></biz-img>
     </ng-container>
 
     <ng-container *ngIf="isImageFile(file) === false">

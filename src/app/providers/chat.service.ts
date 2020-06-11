@@ -394,8 +394,6 @@ export class ChatService extends TakeUntil{
       const membersUids = [];
       const now = new Date();
 
-      console.log("채팅칠때 그룹gid 있나요.",this.bizFire.gid);
-
       const msg: IMessageData = {
         message: {
           text : text
@@ -406,12 +404,9 @@ export class ChatService extends TakeUntil{
         isNotice : false,
         read : null,
         type : 'chat',
-        file: false
+        file: false,
+        sid: chat.cid,
       };
-
-      if(chat.cid === STRINGS.SQUAD_CHAT) {
-        msg.sid = chat.cid;
-      }
 
       if(replyMessage){
         if(replyMessage.reply){
@@ -430,6 +425,8 @@ export class ChatService extends TakeUntil{
       }
 
       const newChatRef = chat.ref.collection('chat').doc();
+
+      const batch = this.bizFire.afStore.firestore.batch();
 
       msg.id = newChatRef.id;
 
@@ -454,46 +451,22 @@ export class ChatService extends TakeUntil{
 
       }
 
-      // if(files && files.length > 0) {
-      //   msg.file = true;
-      //   const storageChatPath = chat.ref.path;
-      //   const mid = newChatRef.id;
-      //   msg.message.files = [];
-      //   const loads = files.map(async file => {
-      //
-      //     const storagePath = `${storageChatPath}/chat/${mid}/${file.name}`;
-      //     const storageRef = this.bizFire.afStorage.storage.ref(storagePath);
-      //     const fileSnapshot = await storageRef.put(file);
-      //
-      //     // get download url
-      //     const downloadUrl = await fileSnapshot.ref.getDownloadURL();
-      //
-      //     msg.message.files.push({
-      //       name: file.name,
-      //       size: file.size,
-      //       type: file.type,
-      //       url : downloadUrl,
-      //       storagePath: storagePath
-      //     } as IFiles)
-      //
-      //   });
-      //   await Promise.all(loads);
-      // }
-      await newChatRef.set(msg);
-
-      const newMessage = {mid: newChatRef.id, data: msg};
+      batch.set(newChatRef, msg);
 
       // todo - 04.14 라스트 메시지 업데이트 부분 주석처리 (펑션으로 이동)
-      // if(saveLastMessage){
-      //   await parentRef.update({
-      //     lastMessage: msg,
-      //   });
-      // }
+      if(saveLastMessage){
+        const {read, ...lastMssage} = msg;
+        batch.update(chat.ref,{
+          lastMessage: lastMssage,
+        });
+      }
 
-      return newMessage;
+      await batch.commit();
+
+      return {mid: newChatRef.id, data: msg} as IMessage;
 
     } catch (e) {
-      console.log('addMessage',e,text);
+      console.log('addMessageError',e);
       return null;
     }
   }

@@ -9,7 +9,7 @@
 <ion-content #scrollContent [scrollEvents]="true" (ionScroll)="scrollHandler($event)" dropzone (dropped)="onFileDropped($event)">
   <div class="h-100">
     <img class="translate-logo position-fixed" src="assets/imgs/logo/google/color-short.png" width="97" height="13">
-    <ng-container *ngFor="let message of chatContent; let i = index">
+    <ng-container *ngFor="let message of chatContent; trackBy:chatTrackBy; let i = index let last = last">
       <div class="d-flex align-items-center my-2" *ngIf="isDifferentDay(i)">
         <div class="d-flex flex-grow-1 ml-3" style="background-color: #ECECEC; height:1px"></div>
         <div class="differentDay pl-3 pr-3">{{ getMessageDate(i) }}</div>
@@ -17,7 +17,8 @@
       </div>
       <biz-message-balloon [message]="message"
                            (messageReply)="replyMessage = $event"
-                           (initScrollBottomForTranslation)="translationResult($event)">
+                           (initScrollBottomForTranslation)="translationResult($event,last)"
+                           (imgDidLoad)="scrollToBottom(last)">
       </biz-message-balloon>
     </ng-container>
   </div>
@@ -44,7 +45,7 @@
       <div *ngIf="replyMessage == null" class="file-attach-div d-flex align-items-center justify-content-center pointer" (click)="fileAttach.click()"
       style="margin-bottom: 2px">
         <img src="assets/imgs/renewal/Icon_circle_attach.svg">
-        <input type="file" style="display: none;" accept="*" #fileAttach (change)="file($event)">
+        <input type="file" style="display: none;" accept="*" #fileAttach (change)="file($event)" multiple>
       </div>
 
       <div class="flex-grow-1 mx-2">

@@ -34,6 +34,9 @@ export class MessageBalloonComponent implements OnInit {
   initScrollBottomForTranslation = new EventEmitter<boolean>();
 
   @Output()
+  imgDidLoad = new EventEmitter<any>();
+
+  @Output()
   messageReply = new EventEmitter<IMessageData>();
 
   private _message: IMessage;
@@ -159,6 +162,10 @@ export class MessageBalloonComponent implements OnInit {
 
   getReplay(msg: IMessageData){
     this.messageReply.emit(msg);
+  }
+
+  imgLoad() {
+    this.imgDidLoad.emit(true);
   }
 
 }

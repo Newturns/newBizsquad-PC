@@ -243,13 +243,11 @@ export class ChatFramePage implements OnInit {
       return;
     }
 
-    this.chatService.addChatMessage(files.map(f => f.name).join(' '),this.chatRoom,files).then(() => {
-      timer(800).subscribe(() => {
-        // call ion-content func
-        this.contentArea.scrollToBottom(0);
-      });
-    });
+    this.chatService.addChatMessage(files.map(f => f.name).join(' '),this.chatRoom,files);
+  }
 
+  chatTrackBy(index: number, msg: IMessage){
+    return msg.mid;
   }
 
   keydown(e : any) {
@@ -282,15 +280,12 @@ export class ChatFramePage implements OnInit {
       const text = Commons.chatInputConverter(value);
 
       if(text.length > 0) {
-        this.chatService.addChatMessage(text,this.chatRoom,null,this.replyMessage).then(() => {
-          timer(0).subscribe(() => {
-            this.replyMessage = null;
-            this.contentArea.scrollToBottom(0);
-          });
-        });
+
+        this.chatService.addChatMessage(text,this.chatRoom,null,this.replyMessage);
         this.chatForm.setValue({chat:''});
         //textarea 높이 초기화를 위한 이벤트 전달.
         this.adjustTextarea(e);
+
       }
     }
   }
@@ -323,37 +318,38 @@ export class ChatFramePage implements OnInit {
 
             await this.getNewMessages(msgPath, this.start);
 
-            const loading = await this.loading.show();
-
-            timer(2500).subscribe(async () => {
-              // call ion-content func
-              this.showContent = true;
-              this.contentArea.scrollToBottom(0);
-              await loading.dismiss();
-            });
+            this.showContent = true;
           }
         })
   }
 
-  getNewMessages(msgPath,start) {
-    this.bizFire.afStore.collection(msgPath,ref => ref.orderBy('created')
+  async getNewMessages(msgPath,start) {
+    return this.bizFire.afStore.collection(msgPath,ref => ref.orderBy('created')
         .startAt(start))
         .stateChanges()
         .pipe(filter(snaps => snaps && snaps.length > 0))
         .subscribe((changes : DocumentChangeAction<any>[]) => {
 
-          const list: IMessage[] = changes.filter(c => c.type === 'added').map(c => MessageBuilder.buildFromSnapshot(c));
+          const added: IMessage[] = changes.filter(c => c.type === 'added').map(c => MessageBuilder.buildFromSnapshot(c));
           const modified: IMessage[] = changes.filter(c => c.type === 'modified').map(c => MessageBuilder.buildFromSnapshot(c));
           const removed: IMessage[] = changes.filter(c => c.type === 'removed').map(c => MessageBuilder.buildFromSnapshot(c));
 
-          if(list.length > 0){
-            list.forEach((l) => {
+          if(added.length > 0) {
+            added.forEach((l) => {
               this.chatContent.push(l);
-              if(!this.bottomCheck && l.data.sender !== this.bizFire.uid && this.startToast) {
-                this.toastProvider.showToast(this.langPack['new_message'],'top');
+              if (!this.bottomCheck && l.data.sender !== this.bizFire.uid && this.startToast) {
+                this.toastProvider.showToast(this.langPack['new_message'], 'top');
               }
             });
-            this.addAddedMessages(list.filter(m => m.data.sender !== this.bizFire.uid));
+
+            //최초 실행시..
+            if (this.startToast === false || added.find(m => m.data.sender === this.bizFire.uid)) {
+              const dueTime : number = this.startToast === true ? 0 : 1500;
+              timer(dueTime).subscribe(() => this.contentArea.scrollToBottom(0));
+            }
+
+            this.addAddedMessages(added.filter(m => m.data.sender !== this.bizFire.uid));
+
           }
 
           if(modified.length > 0){
@@ -376,15 +372,6 @@ export class ChatFramePage implements OnInit {
               this.chatContent.splice(index, 1);
             });
           }
-
-          if(this.bottomCheck) {
-            timer(100).subscribe(() => {
-              // call ion-content func
-              this.contentArea.scrollToBottom(0);
-              this.startToast = true;
-            });
-          }
-          console.log(this.contentArea.ionScrollEnd)
         });
   }
 
@@ -436,8 +423,6 @@ export class ChatFramePage implements OnInit {
                   });
                 }
 
-
-
                 timer(100).subscribe(() => {
                   this.contentArea.getScrollElement().then(el => {
                     this.contentArea.scrollToPoint(0,el.scrollHeight - this.oldHeight);
@@ -469,8 +454,17 @@ export class ChatFramePage implements OnInit {
   }
 
 
+
+
   // read , unread
   private addAddedMessages(list: IMessage[]){
+
+    this.startToast = true;
+
+    if(this.bottomCheck) {
+      this.contentArea.scrollToBottom(0);
+    }
+
     if(this.addedMessages == null){
       this.addedMessages = [];
     }
@@ -533,11 +527,9 @@ export class ChatFramePage implements OnInit {
 
   }
 
-  translationResult(result) {
-    if(result && this.bottomCheck) {
-      setTimeout(() => {
-        this.contentArea.scrollToBottom(0);
-      }, 100);
+  translationResult(result,islast : boolean) {
+    if(result && this.scrolled && islast) {
+      this.contentArea.scrollToBottom(0);
     }
   }
 
@@ -554,5 +546,11 @@ export class ChatFramePage implements OnInit {
 
     //test
     this.file(e,true);
+  }
+
+  scrollToBottom(isLast : boolean) {
+    if(isLast || this.bottomCheck) {
+      this.contentArea.scrollToBottom(0);
+    }
   }
 }

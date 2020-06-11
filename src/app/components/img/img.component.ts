@@ -141,20 +141,7 @@ export class ImgComponent extends TakeUntil implements OnInit {
     //console.log(e, e.target.value);
     this.imgLoad$.next('loaded');
 
-    const data = {
-      file: this.file,
-      width: null,
-      height: null
-    };
-
-    if(e && e.target){
-      const width = e.target.naturalWidth;
-      const height = e.target.naturalHeight;
-      data.width = width;
-      data.height = height;
-    }
-
-    this.imgDidLoad.emit(data);
+    this.imgDidLoad.emit(true);
   }
 
 }
