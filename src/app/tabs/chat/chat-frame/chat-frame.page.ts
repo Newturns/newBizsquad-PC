@@ -123,25 +123,6 @@ export class ChatFramePage implements OnInit {
 
     this.getMessages(this.gid,this.cid,this.type);
 
-    //파일 업로드 프로그레스바
-    this.chatService.fileUploadProgress.subscribe(per => {
-      if(per === 100) {
-
-        // 용량이 작을때 프로그레스 바가 안나오므로..
-        this.loadProgress = per;
-
-        // 1.5초 뒤 값을 초기화한다.
-        timer(1500).subscribe(() => {
-          this.chatService.fileUploadProgress.next(null);
-          this.loadProgress = 0;
-          this.contentArea.scrollToBottom(0);
-        })
-      } else {
-        this.loadProgress = per;
-      }
-      console.log(per);
-    });
-
     this.bizFire.currentUser.subscribe((user: IUserData) => {
       if(user) {
         //한번만 실행.
@@ -240,25 +221,35 @@ export class ChatFramePage implements OnInit {
     }
   }
 
-  file(file){
-    if(file.target.files.length === 0 ){
+  file(file, dndMode = false){
+
+    let fileList: FileList;
+
+    if(dndMode === false) {
+      if(file.target.files.length === 0){
+        return;
+      }
+      fileList = file.target.files; // FileList is a object
+    } else {
+      fileList = file;
+    }
+
+    const files = Object.keys(fileList).map(l => fileList[l]);
+
+    const maxFileSize = this.selectBizGroup.data.maxFileSize;
+
+    if(files.filter(f => f.size > maxFileSize).length > 0) {
+      this.electronService.showErrorMessages("Failed to send file.","sending files larger than 10mb.");
       return;
     }
-    const maxFileSize = this.selectBizGroup.data.maxFileSize == null ? this.maxFileSize : this.selectBizGroup.data.maxFileSize;
 
-    if(file.target.files[0].size > maxFileSize){
-      this.electronService.showErrorMessages("Failed to send file.","sending files larger than 10mb.");
-    } else {
-      const attachedFile  = file.target.files[0];
-      const converterText = Commons.chatInputConverter(attachedFile.name);
-
-      this.chatService.addChatMessage(converterText,this.chatRoom,[attachedFile]).then(() => {
-        timer(800).subscribe(() => {
-          // call ion-content func
-          this.contentArea.scrollToBottom(0);
-        });
+    this.chatService.addChatMessage(files.map(f => f.name).join(' '),this.chatRoom,files).then(() => {
+      timer(800).subscribe(() => {
+        // call ion-content func
+        this.contentArea.scrollToBottom(0);
       });
-    }
+    });
+
   }
 
   keydown(e : any) {
@@ -560,5 +551,8 @@ export class ChatFramePage implements OnInit {
 
   onFileDropped(e) {
     console.log("start drop!!",e);
+
+    //test
+    this.file(e,true);
   }
 }

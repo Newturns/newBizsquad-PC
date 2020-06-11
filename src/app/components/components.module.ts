@@ -1,5 +1,4 @@
 import {ModuleWithProviders, NgModule} from '@angular/core';
-import { ProgressBarComponent } from './progress-bar/progress-bar';
 import { ChatRoomComponent } from './chat-room/chat-room';
 import {CommonModule} from "@angular/common";
 import {LastMessageComponent} from "./last-message/last-message.component";
@@ -38,7 +37,6 @@ import {MessageReplyComponent} from './message-reply/message-reply.component';
 
 @NgModule({
     declarations: [
-        ProgressBarComponent,
         ChatRoomComponent,
         LastMessageComponent,
         ChatHeaderComponent,
@@ -76,7 +74,6 @@ import {MessageReplyComponent} from './message-reply/message-reply.component';
         ReactiveFormsModule,
     ],
     exports: [
-        ProgressBarComponent,
         ChatRoomComponent,
         LastMessageComponent,
         ChatHeaderComponent,

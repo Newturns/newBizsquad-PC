@@ -25,10 +25,14 @@ export interface IMessage extends IFirestoreDoc{
   type?: any
 }
 
-export interface IMessageData {
+export interface IFirestoreDocData {
+  id?: string, // 각 데이터 안에 id 를 적을 경우를 위해.
+  gid?: string, // 모든 데이터들은 어떤 그룹의 소속이므로.
+  sid?: string, // 모든 데이터들은 어떤 스쿼드의 소속이므로.
+}
+
+export interface IMessageData extends IFirestoreDocData{
   created?: any,
-  gid?: string,
-  sid?: string,
   type?: string,
   message: {
     text?: string,
@@ -56,11 +60,11 @@ export interface IMessageData {
   reply?: IMessageData,
 }
 export interface IFiles {
-  name:string,
-  size:number,
-  type:string,
-  storagePath:string,
-  url:string,
+  name?:string,
+  size?:number,
+  type?:string,
+  storagePath?:string,
+  url?:string,
   thumbUrl?: string
 }
 

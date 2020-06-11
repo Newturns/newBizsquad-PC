@@ -6,7 +6,7 @@ import {BehaviorSubject, Observable, of} from 'rxjs';
 import * as firebase from 'firebase/app';
 import {Commons, STRINGS} from '../biz-common/commons';
 
-import {debounceTime, filter, takeUntil} from 'rxjs/operators';
+import {debounceTime, filter, finalize, takeUntil} from 'rxjs/operators';
 import {IChat, IChatData, IFiles, IMessage, IMessageData} from "../_models/message";
 import {IBizGroup, IUser} from '../_models';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
@@ -16,11 +16,12 @@ import {LangService} from '../core/lang.service';
 import {CacheService} from '../core/cache/cache';
 import {environment} from '../../environments/environment';
 import {ConfigService} from '../config.service';
-import {IonContent} from '@ionic/angular';
+import {IonContent, PopoverController} from '@ionic/angular';
 import {IUnreadMap, UnreadCounter} from '../components/classes/unread-counter';
 import {TakeUntil} from '../biz-common/take-until';
 import {Chat} from '../biz-common/chat';
 import {DocumentChangeAction} from '@angular/fire/firestore';
+import {IUploadItem, UploadProgressComponent} from '../components/upload-progress/upload-progress.component';
 
 @Injectable({
     providedIn: 'root'
@@ -33,8 +34,6 @@ export class ChatService extends TakeUntil{
   // onChatRoomListChanged = new BehaviorSubject<IChat[]>(null);
 
   onSelectChatRoom = new BehaviorSubject<IChat>(null);
-
-  fileUploadProgress = new BehaviorSubject<number>(null);
 
   langPack: any = {};
 
@@ -90,6 +89,7 @@ export class ChatService extends TakeUntil{
       private http: HttpClient,
       private cacheService : CacheService,
       private configService: ConfigService,
+      private popoverCtrl : PopoverController,
       private unreadCounter: UnreadCounter) {
     super();
 
@@ -431,31 +431,54 @@ export class ChatService extends TakeUntil{
 
       const newChatRef = chat.ref.collection('chat').doc();
 
+      msg.id = newChatRef.id;
+
       if(files && files.length > 0) {
-        msg.file = true;
-        const storageChatPath = chat.ref.path;
+
         const mid = newChatRef.id;
-        msg.message.files = [];
-        const loads = files.map(async file => {
-          const storagePath = `${storageChatPath}/chat/${mid}/${file.name}`;
-          const storageRef = this.bizFire.afStorage.storage.ref(storagePath);
-          const fileSnapshot = await storageRef.put(file);
+        const storagePath = `${chat.ref.path}/chat/${mid}`;
+        const success = await this.uploadFileTask(files, storagePath);
 
-          this.fileUploadProgress.next(fileSnapshot.bytesTransferred / fileSnapshot.totalBytes * 100);
+        if (success.data == null) {
+          console.error('file upload canceled. Do nothing.');
+          return null;
+        }
 
-          // get download url
-          const downloadUrl = await fileSnapshot.ref.getDownloadURL();
+        // IFile
+        msg.message.files = success.data
+            .filter(s => s.state === 'done')
+            .map(s => s.result);
 
-          msg.message.files.push({
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            url : downloadUrl,
-            storagePath: storagePath
-          } as IFiles)
-        });
-        await Promise.all(loads);
+        // set true if file added.
+        msg.file = success.data.length > 0;
+
       }
+
+      // if(files && files.length > 0) {
+      //   msg.file = true;
+      //   const storageChatPath = chat.ref.path;
+      //   const mid = newChatRef.id;
+      //   msg.message.files = [];
+      //   const loads = files.map(async file => {
+      //
+      //     const storagePath = `${storageChatPath}/chat/${mid}/${file.name}`;
+      //     const storageRef = this.bizFire.afStorage.storage.ref(storagePath);
+      //     const fileSnapshot = await storageRef.put(file);
+      //
+      //     // get download url
+      //     const downloadUrl = await fileSnapshot.ref.getDownloadURL();
+      //
+      //     msg.message.files.push({
+      //       name: file.name,
+      //       size: file.size,
+      //       type: file.type,
+      //       url : downloadUrl,
+      //       storagePath: storagePath
+      //     } as IFiles)
+      //
+      //   });
+      //   await Promise.all(loads);
+      // }
       await newChatRef.set(msg);
 
       const newMessage = {mid: newChatRef.id, data: msg};
@@ -473,6 +496,43 @@ export class ChatService extends TakeUntil{
       console.log('addMessage',e,text);
       return null;
     }
+  }
+  
+  private async uploadFileTask(files : File[], path : string) {
+
+    if(files == null || files.length === 0) return null;
+
+    try {
+
+      // create upload items.
+      const uploadItemList = files.map((f, index) => {
+        return {
+          storagePath: path, // 파일을 저장할 부모 폴더 패스. 일반적으로 그룹/스쿼드/채팅/메시지ID
+          file: f,
+          index: index,
+          result: null
+        } as IUploadItem;
+      });
+
+      const uploadResult = await this.popoverCtrl.create({
+        component: UploadProgressComponent,
+        cssClass: 'upload-progress-popover',
+        translucent: true,
+        componentProps: {item : uploadItemList, sequentialTask: false},
+        animated: false,
+        backdropDismiss: false // 뒷배경을 클릭해도 팝업이 닫히지 않도록...
+      });
+
+      await uploadResult.present();
+
+      return await uploadResult.onDidDismiss();
+
+
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+
   }
 
   makeRoomNoticeMessage(room_type,type,gid,cid,uid?) {

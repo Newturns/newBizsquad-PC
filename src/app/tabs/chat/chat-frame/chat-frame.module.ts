@@ -13,6 +13,9 @@ import {LoadingProvider} from '../../../providers/loading';
 import {ToastProvider} from '../../../providers/toast';
 import {Autosize} from '../../../biz-common/directives/autosize';
 import {DropzoneDirective} from '../../../biz-common/directives/dropzone.directive';
+import {ChatService} from '../../../providers/chat.service';
+import {ProgressBarComponent} from '../../../components/progress-bar/progress-bar';
+import {UploadProgressComponent} from '../../../components/upload-progress/upload-progress.component';
 
 @NgModule({
   imports: [
@@ -26,11 +29,22 @@ import {DropzoneDirective} from '../../../biz-common/directives/dropzone.directi
   declarations: [
     ChatFramePage,
     Autosize,
-    DropzoneDirective
+    DropzoneDirective,
+    ProgressBarComponent,
+    UploadProgressComponent,
+  ],
+  exports: [
+    ProgressBarComponent,
+    UploadProgressComponent,
+  ],
+  entryComponents : [
+    ProgressBarComponent,
+    UploadProgressComponent,
   ],
   providers: [
     LoadingProvider,
-    ToastProvider
+    ToastProvider,
+    ChatService
   ]
 })
 export class ChatFramePageModule {}

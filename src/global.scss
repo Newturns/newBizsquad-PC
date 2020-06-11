@@ -173,6 +173,7 @@ ion-item:hover a {
     background-color: white !important;
   }
 }
+
 .change-title-popover {
   .popover-content{
     width: 80% !important;
@@ -180,6 +181,14 @@ ion-item:hover a {
     border-radius: 5px;
     top:25% !important;
     left:10% !important;
+  }
+}
+
+.upload-progress-popover {
+  .popover-content{
+    width: 80% !important;
+    border-radius: 5px;
+    top:10% !important;
   }
 }
 
