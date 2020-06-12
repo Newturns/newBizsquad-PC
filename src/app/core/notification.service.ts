@@ -384,7 +384,7 @@ export class NotificationService {
   * */
   acceptInvitation(notificationData: INotificationData): Promise<any> {
 
-    return new Promise<any>( resolve => {
+    return new Promise<boolean>( resolve => {
       // get type
       let path;
       if(notificationData.info.type !== 'squad'){
@@ -401,39 +401,45 @@ export class NotificationService {
         .pipe(take(1))
         .subscribe((g: IBizGroup)=>{
 
-          const data = g.data;
+          if(g.getMemberIds().indexOf(this.bizFire.currentUID) === -1){
 
-          // set me
-          data.members[this.bizFire.currentUID] = true;
+            const data = g.data;
 
-          // is ths user a manager?
-          if(notificationData.info.auth === STRINGS.FIELD.MANAGER){
-            // yes.
-            // add to guest
-            data[STRINGS.FIELD.MANAGER][this.bizFire.currentUID] = true;
+            // set me
+            data.members[this.bizFire.currentUID] = true;
+
+            // is ths user a manager?
+            if(notificationData.info.auth === STRINGS.FIELD.MANAGER){
+              // yes.
+              // add to guest
+              data[STRINGS.FIELD.MANAGER][this.bizFire.currentUID] = true;
+            }
+
+            // is ths user a guest?
+            if(notificationData.info.auth === STRINGS.FIELD.GUEST){
+              // yes.
+              // add to guest
+              data[STRINGS.FIELD.GUEST][this.bizFire.currentUID] = true;
+            }
+
+            // update group member
+            this.bizFire.afStore.doc(path).update(data);
+
+            // send someone joined alarm
+            const membersId = Object.keys(data.members).filter(uid=> uid !== this.bizFire.uid && data.members[uid] === true);
+
+            const notifyData = this.buildData('groupInvite');
+
+            notifyData.gid = notificationData.gid;
+            notifyData.info.auth = notificationData.info.auth;
+
+            this.sendTo(membersId, notifyData);
+
+            resolve(true);
+
+          } else {
+            resolve(false);
           }
-
-          // is ths user a guest?
-          if(notificationData.info.auth === STRINGS.FIELD.GUEST){
-            // yes.
-            // add to guest
-            data[STRINGS.FIELD.GUEST][this.bizFire.currentUID] = true;
-          }
-
-          // update group member
-          this.bizFire.afStore.doc(path).update(data);
-
-          // send someone joined alarm
-          const membersId = Object.keys(data.members).filter(uid=> uid !== this.bizFire.uid && data.members[uid] === true);
-
-          const notifyData = this.buildData('groupInvite');
-
-          notifyData.gid = notificationData.gid;
-          notifyData.info.auth = notificationData.info.auth;
-
-          this.sendTo(membersId, notifyData);
-
-          resolve(true);
 
         });
     });

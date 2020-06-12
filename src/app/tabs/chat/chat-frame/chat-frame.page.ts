@@ -443,7 +443,7 @@ export class ChatFramePage implements OnInit {
       this.bottomCheck = Number(top.toFixed(0))+offset === height;
 
       // 100px 보다 크면 스크롤 판정.
-      this.scrolled = height - (offset + top) > 100;
+      this.scrolled = top > 0 && height - (offset + top) > 10;
       // console.log('top:', top, 'height', height, 'offset', offset, this.scrolled);
 
       if(el.scrollTop === 0) {
@@ -528,8 +528,10 @@ export class ChatFramePage implements OnInit {
   }
 
   translationResult(result,islast : boolean) {
-    if(result && this.scrolled && islast) {
-      this.contentArea.scrollToBottom(0);
+    if(result && this.bottomCheck && islast) {
+      timer(0)
+          .pipe(take(1))
+          .subscribe(() =>this.contentArea.scrollToBottom(0));
     }
   }
 

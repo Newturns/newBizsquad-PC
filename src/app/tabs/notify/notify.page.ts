@@ -122,13 +122,14 @@ export class NotifyPage implements OnInit {
   }
 
   onAccept(msg: INotification) {
-    this.notificationService.acceptInvitation(msg.data).then(() => {
+    this.notificationService.acceptInvitation(msg.data).then(result => {
+        if(result) {
+        //해당 디비와 관련된 웹으로 점프.
+        this.tokenService.notifyWebJump(msg);
 
-      //해당 디비와 관련된 웹으로 점프.
-      this.tokenService.notifyWebJump(msg);
-
-      if(msg.ref) {
-        msg.ref.delete()
+        if(msg.ref) {
+          msg.ref.delete();
+        }
       }
     })
   }
