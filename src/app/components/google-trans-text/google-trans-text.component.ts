@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {SafeHtml} from '@angular/platform-browser';
 import {IMessage} from '../../_models/message';
 import {ITranslations, TranslateService} from '../../providers/translate.service';
 import {BizFireService} from '../../biz-fire/biz-fire';

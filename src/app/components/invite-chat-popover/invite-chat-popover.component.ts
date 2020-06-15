@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {combineLatest, Observable, Subject} from 'rxjs';
+import {combineLatest, Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {ChatService} from '../../providers/chat.service';

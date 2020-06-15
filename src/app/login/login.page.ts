@@ -18,7 +18,7 @@ export class LoginPage implements OnInit {
 
   loginForm: FormGroup;
 
-  private autoLoign : boolean = false;
+  autoLoign : boolean = false;
 
   private companyValidator: ValidatorFn = Validators.compose([
     Validators.required,

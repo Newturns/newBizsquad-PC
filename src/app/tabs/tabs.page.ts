@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {BizFireService} from '../biz-fire/biz-fire';
 import {IBizGroup} from '../_models';
 import {Router} from '@angular/router';

@@ -4,7 +4,7 @@ import {TakeUntil} from "../../biz-common/take-until";
 import {IChat, IMessageData} from "../../_models/message";
 import {IUnreadItem, IUser} from "../../_models";
 import {ChatService} from "../../providers/chat.service";
-import {filter, map, takeUntil} from "rxjs/operators";
+import {filter} from "rxjs/operators";
 import {CacheService} from '../../core/cache/cache';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {LangService} from '../../core/lang.service';

@@ -39,7 +39,7 @@ export class ChatFramePage implements OnInit {
 
   private user : IUserData;
 
-  private selectBizGroup : IBizGroup;
+  selectBizGroup : IBizGroup;
 
   public chatRoom : IChat;
 
@@ -90,7 +90,7 @@ export class ChatFramePage implements OnInit {
               private loading: LoadingProvider,
               private toastProvider : ToastProvider,
               private fb: FormBuilder,
-              private cacheService : CacheService,
+              public cacheService : CacheService,
               private bizFire : BizFireService) {
 
     this.chatForm = fb.group(

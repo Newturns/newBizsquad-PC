@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {filter, takeUntil} from 'rxjs/operators';
-import {IBizGroup, IUser} from '../../_models';
+import {IUser} from '../../_models';
 import {Commons} from '../../biz-common/commons';
 import {CacheService} from '../../core/cache/cache';
 import {ChatService} from '../../providers/chat.service';
@@ -20,7 +20,7 @@ export class CreateChatPopoverComponent implements OnInit {
 
   private _unsubscribeAll;
 
-  private langPack = {};
+  langPack = {};
 
   isChecked : IUser[] = [];
 

@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BizFireService} from '../../biz-fire/biz-fire';
 
 @Component({
   selector: 'biz-squad-filter',

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {TakeUntil} from "../../biz-common/take-until";
-import {ISquad, SquadService} from "../../providers/squad.service";
-import {defaultSquadName, IBizGroup} from '../../_models';
+import {SquadService} from "../../providers/squad.service";
+import {IBizGroup} from '../../_models';
 import {COLORS} from "../../biz-common/colors";
 import {IChat} from "../../_models/message";
 import {BizFireService} from '../../biz-fire/biz-fire';

@@ -1,4 +1,4 @@
-import {Injectable, NgZone, Optional, SkipSelf} from '@angular/core';
+import {Injectable, Optional, SkipSelf} from '@angular/core';
 import {CanLoad, Route, Router, UrlSegment} from '@angular/router';
 import {environment} from '../environments/environment';
 import {HttpClient} from '@angular/common/http';
@@ -23,17 +23,6 @@ export class ConfigService implements CanLoad {
     this.firebaseName$.next(this._firebaseName);
   }
   firebaseName$ = new BehaviorSubject<string>(null);
-  
-  // run time data test.
-  /*static taxline = {
-    apiKey: "AIzaSyDXseHSdM-TRJcR_OpNBH2PWERP2PRxDlk",
-    authDomain: "dev-bizsquad.firebaseapp.com",
-    databaseURL: "https://dev-bizsquad.firebaseio.com",
-    projectId: "dev-bizsquad",
-    storageBucket: "dev-bizsquad.appspot.com",
-    messagingSenderId: "247168431751",
-    appId: "1:247168431751:web:d57417b40da2cdc6696a22"
-  };*/
   
   constructor(@Optional() @SkipSelf() private mySelf: ConfigService,
               private http: HttpClient,
@@ -134,11 +123,4 @@ export class ConfigService implements CanLoad {
         });
     });
   }
-  
-  
-  /*static taxlineFactory(){
-    return (platformId: Object, zone: NgZone) => {
-      return new AngularFirestore(this.taxline, 'taxline', false, null, platformId, zone, null);
-    }
-  }*/
 }

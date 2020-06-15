@@ -4,7 +4,7 @@ import {TakeUntil} from "../../biz-common/take-until";
 import {IChat, IFiles, IMessageData} from '../../_models/message';
 import {ChatService} from "../../providers/chat.service";
 import {Commons} from "../../biz-common/commons";
-import {IUnreadItem, IUser} from '../../_models';
+import {IUser} from '../../_models';
 import {CacheService} from '../../core/cache/cache';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {IUnreadMap} from '../classes/unread-counter';
@@ -18,11 +18,6 @@ import {BehaviorSubject} from 'rxjs';
 export class ChatItemComponent extends TakeUntil implements OnInit {
 
   chatBox: IChat;
-//시간, 메시지내용, 언리드?, 아이콘
-// lastMessage.created
-// lastMessage.message.text
-// data.members.length
-//
 
   @Input()
   set chat(c: IChat){

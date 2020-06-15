@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import {Commons} from "../../biz-common/commons";
-import {Observable} from "rxjs";
-import {IBizGroup, IUser} from "../../_models";
+import {IUser} from "../../_models";
 import {ChatService} from "../../providers/chat.service";
 import {IChat} from "../../_models/message";
 import {map} from "rxjs/operators";

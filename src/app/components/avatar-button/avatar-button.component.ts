@@ -1,5 +1,5 @@
 import {
-  Component, ContentChild, ElementRef,
+  Component,
   EventEmitter,
   Input,
   OnInit,

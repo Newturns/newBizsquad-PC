@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import {Observable } from 'rxjs';
 import {Commons, STRINGS} from '../biz-common/commons';
 import { takeUntil, map } from 'rxjs/operators';
 import * as firebase from 'firebase/app';

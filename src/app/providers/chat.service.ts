@@ -1,22 +1,19 @@
 
 import { Injectable } from '@angular/core';
-
-import {SquadService, ISquad, ISquadData} from './squad.service';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import * as firebase from 'firebase/app';
 import {Commons, STRINGS} from '../biz-common/commons';
 
-import {debounceTime, filter, finalize, takeUntil} from 'rxjs/operators';
-import {IChat, IChatData, IFiles, IMessage, IMessageData} from "../_models/message";
+import {debounceTime, filter, takeUntil} from 'rxjs/operators';
+import {IChat, IChatData, IMessage, IMessageData} from "../_models/message";
 import {IBizGroup, IUser} from '../_models';
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {BizFireService} from '../biz-fire/biz-fire';
 import {Electron} from './electron';
 import {LangService} from '../core/lang.service';
 import {CacheService} from '../core/cache/cache';
-import {environment} from '../../environments/environment';
 import {ConfigService} from '../config.service';
-import {IonContent, PopoverController} from '@ionic/angular';
+import {PopoverController} from '@ionic/angular';
 import {IUnreadMap, UnreadCounter} from '../components/classes/unread-counter';
 import {TakeUntil} from '../biz-common/take-until';
 import {Chat} from '../biz-common/chat';

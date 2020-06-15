@@ -14,9 +14,7 @@ import {BizFireService} from '../../biz-fire/biz-fire';
 import {Electron} from '../../providers/electron';
 import {CacheService} from '../../core/cache/cache';
 import {ChatService} from '../../providers/chat.service';
-import {ProfilePopoverComponent} from '../profile-popover/profile-popover.component';
 import {ChatMenuPopoverComponent} from '../chat-menu-popover/chat-menu-popover.component';
-import {eventNames} from 'cluster';
 import {InviteChatPopoverComponent} from '../invite-chat-popover/invite-chat-popover.component';
 import {Subscription} from 'rxjs';
 

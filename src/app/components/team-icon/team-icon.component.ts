@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {TakeUntil} from "../../biz-common/take-until";
 import {COLORS} from "../../biz-common/colors";
 import {Commons} from "../../biz-common/commons";
-import {defaultSquadName, IBizGroupData} from '../../_models';
+import {IBizGroupData} from '../../_models';
 import {ISquadData} from "../../providers/squad.service";
 import {CacheService} from '../../core/cache/cache';
 

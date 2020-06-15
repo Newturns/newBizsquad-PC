@@ -1,10 +1,7 @@
-import {Inject, Injectable, InjectionToken} from '@angular/core';
+import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {IMetaData} from '../_models';
 import {TakeUntil} from '../biz-common/take-until';
 import {BizFireService} from '../biz-fire/biz-fire';
-import {STRINGS} from '../biz-common/commons';
-import * as firebase from 'firebase/app';
 
 export interface ITranslations {
   translatedText: string

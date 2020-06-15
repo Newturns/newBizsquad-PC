@@ -6,7 +6,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'direction', pathMatch: 'full' },
   // 첫실행시 로그인패이지로, 채팅룸 클릭시 채팅프레임으로...
   { path: 'direction', loadChildren: () => import('./direction/direction.module').then( m => m.DirectionPageModule)},
-  { path: 'login', loadChildren: './login/login.module#LoginPageModule' },
+  { path: 'login', loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)},
   { path: ':firebaseName', canLoad:[ ConfigService], loadChildren: ()=> import('./main/main.module').then(m => m.MainModule)},
 ];
 

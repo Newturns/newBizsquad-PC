@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {TakeUntil} from "../../biz-common/take-until";
 import {IMessage, IMessageData} from '../../_models/message';
 import {IBizGroup, IUser} from "../../_models";
 import {Commons} from "../../biz-common/commons";
@@ -7,7 +6,7 @@ import {BizFireService} from '../../biz-fire/biz-fire';
 import {CacheService} from '../../core/cache/cache';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
-import {ITranslations, TranslateService} from '../../providers/translate.service';
+import {TranslateService} from '../../providers/translate.service';
 import {ChatService} from '../../providers/chat.service';
 
 

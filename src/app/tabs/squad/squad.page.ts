@@ -32,7 +32,7 @@ export class SquadPage implements OnInit {
   constructor(private bizFire : BizFireService,
               private squadService : SquadService,
               private chatService : ChatService,
-              private tokenService : TokenProvider) {
+              public tokenService : TokenProvider) {
     this._unsubscribeAll = new Subject<any>();
   }
 
