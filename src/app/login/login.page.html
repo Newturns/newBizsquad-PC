@@ -31,18 +31,12 @@
       </form>
       <div class="w-100 mx-5 px-5">
         <div class="d-flex mb-3 align-items-center no-drag">
-          <biz-check-btn [checked]="autoLoign" [useGroupColor]="false" (click)="onAutoLogin()"></biz-check-btn>
+          <div class="check-btn-frame d-flex align-items-center justify-content-center pointer" (click)="onAutoLogin()"
+               [ngStyle]="{'background-color': autoLoign ? '#324CA8' : 'white'}">
+            <i class="fa fa-check text-white font-17" *ngIf="autoLoign"></i>
+          </div>
           <span class="ml-3 auto-login-text">Auto Login</span>
         </div>
-<!--        <div class="d-flex justify-content-between align-items-center mb-3">-->
-<!--          <div class="sign-up-text">New to Bizsquad?</div>-->
-<!--          <div class="d-flex justify-content-between align-items-center">-->
-<!--            <div class="sign-up-btn">-->
-<!--              <biz-button [title]="'Sign up'" [teamColor]="false" class="w-100 h-100 m-0" (click)="gotoSignUp()">-->
-<!--              </biz-button>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
       </div>
     </div>
 

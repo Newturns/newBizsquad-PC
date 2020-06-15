@@ -13,6 +13,7 @@ import {filter, takeUntil} from 'rxjs/operators';
   templateUrl: './members.page.html',
   styleUrls: ['./members.page.scss'],
 })
+
 export class MembersPage implements OnInit {
 
   filteredUserList: string[] = null;

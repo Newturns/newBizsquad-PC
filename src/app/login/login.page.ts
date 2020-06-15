@@ -48,9 +48,6 @@ export class LoginPage implements OnInit {
       password: ['', this.passwordValidator]
     });
 
-    // this.electronService.ipcRenderer.on('autoUpdate',(e,data) => {
-    //   console.log(data);
-    // });
   }
 
   ngOnInit() {

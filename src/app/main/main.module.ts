@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {HomeGuard} from '../core/home-guard';
 import {GidLoadService} from '../core/gid-load.service';
-import {isChatValue} from '../core/isChatValue';
 
 const routes: Routes = [
   {
