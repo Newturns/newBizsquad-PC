@@ -1,12 +1,4 @@
 <div class="memeberList-frame d-flex flex-column">
-  <div class="d-flex justify-content-between align-items-center p-3">
-    <div class="apps-title">
-      {{langPack['member_list']}}
-    </div>
-    <div>
-      <img class="pointer" src="assets/imgs/renewal/Icon_Outline_close.svg" (click)="closePopup()">
-    </div>
-  </div>
   <div class="list-scroll-con">
     <ng-container *ngIf="userInfos">
       <ng-container *ngFor="let user of userInfos">

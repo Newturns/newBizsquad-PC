@@ -69,20 +69,23 @@ export class TokenProvider {
           this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/notice`);
         }
         if(type === 'squad') {
-          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/squad/${id}`)
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/squad/${id}`);
         }
         if(type == 'mypage') {
-          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/myPage`)
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/myPage`);
         }
         if(type === 'video_chat') {
           this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/video`);
         }
         if(type === 'schedule') {
-          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/users/schedule/${id}`)
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/users/schedule/${id}`);
+        }
+        if(type === 'article') {
+          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/article`);
         }
         // 미구현 된 테스크 박스
         if(type === 'taskbox') {
-          this.electron.goLink(environment.publicWeb);
+          // this.electron.goLink(environment.publicWeb);
         }
         await loading.dismiss();
       })
