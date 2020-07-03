@@ -403,14 +403,12 @@ export class ChatFramePage implements OnInit {
                 }
 
                 if(modified.length > 0){
-                  let replaced = 0;
                   modified.forEach(m => {
                     const index = this.chatContent.findIndex(c => c.mid === m.mid);
                     if(index !== -1){
                       // this.chatContent[index].data = m.data;
                       this.chatContent[index] = m;
                       //console.log(m.mid, m.data.message.text, 'replaced');
-                      replaced ++;
                     }
                   });
                 }
@@ -481,17 +479,25 @@ export class ChatFramePage implements OnInit {
   }
 
 
-  isDifferentDay(messageIndex : number) {
+  isDifferentDay(messageIndex : number,useTime = false) {
     if (messageIndex === 0) return true;
+
+    let ret = false;
 
     const d1 = new Date(this.chatContent[messageIndex - 1].data.created.toDate());
     const d2 = new Date(this.chatContent[messageIndex].data.created.toDate());
 
-    return (
-        d1.getFullYear() !== d2.getFullYear() ||
+    ret = d1.getFullYear() !== d2.getFullYear() ||
         d1.getMonth() !== d2.getMonth() ||
-        d1.getDate() !== d2.getDate()
-    )
+        d1.getDate() !== d2.getDate();
+
+    //작성시간이 다른 경우 아바타를 표시하려면 사용
+    if(useTime) {
+      ret = d1.getHours() !== d2.getHours() ||
+          d1.getMinutes() !== d2.getMinutes()
+    }
+
+    return ret;
   }
 
   getMessageDate(messageIndex: number): string {
@@ -554,5 +560,17 @@ export class ChatFramePage implements OnInit {
     if(isLast || this.bottomCheck) {
       this.contentArea.scrollToBottom(0);
     }
+  }
+
+  checkSameUser(msg : IMessage, prevMsg : IMessage) : boolean {
+    let ret = false;
+    if(msg && prevMsg) {
+      if(msg.data && prevMsg.data) {
+        if(!msg.data.isNotice && !prevMsg.data.isNotice) {
+          ret = msg.data.sender === prevMsg.data.sender;
+        }
+      }
+    }
+    return ret;
   }
 }

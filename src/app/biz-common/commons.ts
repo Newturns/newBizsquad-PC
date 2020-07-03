@@ -293,22 +293,26 @@ export class Commons {
       }
 
       static makeUserStatus(userData : IUserData) {
-        switch(userData.onlineStatus) {
-          case 'online':
-            return '#32db64';
-            break;
-          case 'wait':
-            return '#FFBF00';
-            break;
-          case 'busy':
-            return '#f53d3d';
-            break;
-          case 'offline':
-            return '#C7C7C7';
-            break;
-          case undefined :
-            return '#C7C7C7';
-            break;
+        if(userData.onlineStatus && userData.onlineStatus.pc) {
+          switch(userData.onlineStatus.pc) {
+            case 'online':
+              return '#32db64';
+              break;
+            case 'wait':
+              return '#FEA926';
+              break;
+            case 'busy':
+              return '#f53d3d';
+              break;
+            case 'offline':
+              return '#C7C7C7';
+              break;
+            default :
+              return '#C7C7C7';
+              break;
+          }
+        } else {
+          return '#C7C7C7';
         }
       }
 

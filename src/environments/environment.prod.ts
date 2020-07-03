@@ -1,5 +1,6 @@
 export const environment = {
-  production: true,
+  production: false,
+
   masterUrl: 'https://master-35042.firebaseio.com',
 
   bizsquad : {
@@ -20,4 +21,8 @@ export const environment = {
     messagingSenderId: "247168431751",
     appId: "1:247168431751:web:d57417b40da2cdc6696a22"
   },
+
+  //일단 하드코딩.
+  bizServerUri: 'https://manager.bizsquad.net:9010',
+  publicWeb : 'https://www.bizsquad.net/',
 };

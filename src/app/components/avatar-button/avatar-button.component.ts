@@ -9,6 +9,7 @@ import {TakeUntil} from "../../biz-common/take-until";
 import {IUser, IUserData} from "../../_models";
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {CacheService} from '../../core/cache/cache';
+import {Commons} from '../../biz-common/commons';
 
 @Component({
   selector: 'app-avatar-button',
@@ -119,23 +120,8 @@ export class AvatarButtonComponent extends TakeUntil implements OnInit {
       if(photoURL){
         this.photoURL = photoURL;
       }
-      const userStatus = this.userData.onlineStatus;
-      switch (userStatus) {
-        case 'online':
-          this.statusColor = '#32db64';
-          break;
-        case 'wait':
-          this.statusColor = '#FEA926';
-          break;
-        case 'busy':
-          this.statusColor = '#f53d3d';
-          break;
-        case 'offline':
-          this.statusColor = '#C7C7C7';
-          break;
-        case null:
-          this.statusColor = '#C7C7C7';
-      }
+      this.statusColor = Commons.makeUserStatus(userData);
+
     } else {
 
       // deleted user.

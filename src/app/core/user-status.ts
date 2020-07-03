@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
 import {BizFireService} from '../biz-fire/biz-fire';
-import {ConfigService} from '../config.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,24 +7,17 @@ import {ConfigService} from '../config.service';
 
 export class UserStatusProvider {
 
-  firebaseName : string;
-
-  constructor(private http: HttpClient,
-              private configService : ConfigService,
-              private bizFire : BizFireService)
-  {
-    this.firebaseName = configService.firebaseName;
-  }
+  constructor(private bizFire : BizFireService) { }
 
   onUserStatusChange() {
 
     const firebase = this.bizFire.afBase;
 
-    const userStatusDatabaseRef = firebase.database.ref(`/status/${this.bizFire.uid}`);
+    const userStatusDatabaseRef = firebase.database.ref(`/status/${this.bizFire.uid}/onlineStatus`);
     const userStatusFirestoreRef = this.bizFire.afStore.doc(`users/${this.bizFire.uid}`);
 
-    const isOnlineForFirestore = { onlineStatus : 'online' };
-    const isOfflineForFirestore = { onlineStatus : 'offline' };
+    const isOnlineForFirestore = { onlineStatus : { pc : 'online' } };
+    const isOfflineForFirestore = { onlineStatus : { pc : 'offline' } };
 
     const connectedRef = firebase.database.ref('.info/connected');
 
@@ -44,23 +35,23 @@ export class UserStatusProvider {
 
       const onDisconnectRef = userStatusDatabaseRef.onDisconnect();
 
-      onDisconnectRef.set(isOfflineForFirestore)
-      .then(() => {
-          userStatusDatabaseRef.set(isOnlineForFirestore);
+      onDisconnectRef.update({ pc : 'offline' })
+        .then(() => {
+          userStatusDatabaseRef.update({ pc : 'online' });
           userStatusFirestoreRef.set(isOnlineForFirestore,{merge : true});
-      });
+        });
     });
   }
 
   windowCloseAndUserStatus() {
     return this.bizFire.afStore.doc(`users/${this.bizFire.uid}`).update({
-      onlineStatus : 'offline'
+      onlineStatus : { pc : 'offline' }
     })
   }
 
   statusChanged(value) {
     return this.bizFire.afStore.doc(`users/${this.bizFire.uid}`).update({
-      onlineStatus : value
+      onlineStatus : { pc : value }
     })
   }
 

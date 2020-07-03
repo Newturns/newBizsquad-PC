@@ -50,7 +50,11 @@ export interface IUserData {
   // + pc version
   user_icon?: string,
   isChecked?: boolean,
-  onlineStatus?: string,
+  onlineStatus?: {
+    pc? : string,
+    web? : string,
+    mobile? : string
+  },
   user_onlineColor?: string,
   lastWebGid?: string,
   lastPcGid?:string

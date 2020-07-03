@@ -18,6 +18,7 @@
       <biz-message-balloon [message]="message"
                            (messageReply)="replyMessage = $event"
                            (initScrollBottomForTranslation)="translationResult($event,last)"
+                           [sameUser]="checkSameUser(message,chatContent[i-1]) && !isDifferentDay(i,false)"
                            (imgDidLoad)="scrollToBottom(last)">
       </biz-message-balloon>
     </ng-container>

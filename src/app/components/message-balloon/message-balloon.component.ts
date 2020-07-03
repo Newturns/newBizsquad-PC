@@ -29,6 +29,9 @@ export class MessageBalloonComponent implements OnInit {
     return this._message;
   }
 
+  @Input()
+  sameUser : boolean = false;
+
   @Output()
   initScrollBottomForTranslation = new EventEmitter<boolean>();
 
@@ -37,6 +40,8 @@ export class MessageBalloonComponent implements OnInit {
 
   @Output()
   messageReply = new EventEmitter<IMessageData>();
+
+  singleChatRoom = false;
 
   private _message: IMessage;
   public displayName;

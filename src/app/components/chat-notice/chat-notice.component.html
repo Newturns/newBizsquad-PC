@@ -28,17 +28,25 @@
 
       <!--VIDEO 화상채팅방 생성.-->
       <ng-container *ngSwitchCase="'video'">
-        <div class="d-flex flex-column align-items-center">
-          <div class="text-secondary">
-            {{makeNoticeMessage() | async}}
-          </div>
-          <div class="text-primary font-12 pointer" (click)="joinVideo()">
-            {{langPack['join_now']}}
-          </div>
-        </div>
+        <ng-container *ngIf="getVideoObserver() | async; let videoChatData">
+          <ng-container *ngIf="videoChatData !== 'null'">
+            <div class="d-flex flex-column align-items-center">
+              <div class="text-secondary">
+                {{makeNoticeMessage() | async}}
+              </div>
+              <div *ngIf="videoChatData.status !== false" class="text-primary font-12 pointer" (click)="joinVideo()">
+                {{langPack['join_now']}}
+              </div>
+              <div *ngIf="videoChatData.status === false" class="text-danger font-12">
+                {{langPack['shutdown']}}
+              </div>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="videoChatData === 'null'">
+            <!--채팅방을 db 에서 지운 경우. 아무것도 표시안함-->
+          </ng-container>
+        </ng-container>
       </ng-container>
-
-
 
     </ng-container>
   </ng-container>

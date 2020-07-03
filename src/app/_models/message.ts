@@ -40,7 +40,8 @@ export interface IMessageData extends IFirestoreDocData{
     notice?: {
       langKey?: string,
       uid?: string[],
-      type?: string
+      type?: string,
+      vid?: string,
     }
   };
   isNotice?: boolean,

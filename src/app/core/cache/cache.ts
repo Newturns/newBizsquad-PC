@@ -9,17 +9,19 @@ import { Commons } from '../../biz-common/commons';
 import * as firebase from 'firebase/app';
 import {IBizGroup, IUser} from "../../_models";
 import {BizFireService} from '../../biz-fire/biz-fire';
+import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
 
 export declare type CacheOptionDataBuilder = (data: any)=> any;
 export declare type CacheOptionListBuilder = (id: string, data?: any)=> any;
 export declare type CacheOptionBuilderFn = (ref: ICacheOptionBuilder) => ICacheOptionBuilder;
 
 interface ICacheDataItem {
-  path: ICachePath,
-  subject: BehaviorSubject<any>
-  createAt: any | null,
-  sub: Subscription,
-  lastIndex?: string
+  path?: ICachePath | string,
+  subject?: BehaviorSubject<any>
+  createAt?: any | null,
+  sub?: Subscription,
+  lastIndex?: string,
+  doc?: DocumentSnapshot,
 }
 
 @Injectable({
@@ -32,6 +34,8 @@ export class CacheService {
 
   private observerMap: ICacheDataItem[] = [];
   private listObserverMap: ICacheDataItem[] = [];
+
+  private valueChangeMap: {[path: string]: ICacheDataItem } = {};
 
   constructor(
     @Optional() @SkipSelf() otherMe: CacheService,
@@ -78,11 +82,12 @@ export class CacheService {
     this.listObserverMap = [];
   }
 
-  private findWithPath(path: ICachePath): ICacheDataItem {
-    return this.observerMap.find(d => d.path.isSamePath(path));
-  }
   private findListWithPath(path: ICachePath): ICacheDataItem {
-    return this.listObserverMap.find(d => d.path.isSamePath(path));
+    return this.listObserverMap.find(d => (<ICachePath>d.path).isSamePath(path));
+  }
+
+  private findWithPath(path: ICachePath): ICacheDataItem {
+    return this.observerMap.find(d => (<ICachePath>d.path).isSamePath(path));
   }
 
   /*
@@ -376,5 +381,23 @@ export class CacheService {
     return new Promise<any>(resolve => {
       this.getObserver(path).pipe(take(1)).subscribe( data => resolve(data));
     });
+  }
+
+
+  getValueChanges(path: string): Observable<any>{
+    if(this.valueChangeMap[path] == null){
+      const data: ICacheDataItem = {
+        path: path,
+        subject: new BehaviorSubject<any>('init'),
+        sub: null,
+        doc: null,
+      };
+      this.valueChangeMap[path] = data;
+      this.valueChangeMap[path].sub = this.bizFire.afStore.doc(path).valueChanges().pipe(this.bizFire.takeUntilUserSignOut)
+          .subscribe((value: any)=> {
+            this.valueChangeMap[path].subject.next(value || null)
+          });
+    }
+    return this.valueChangeMap[path].subject.asObservable().pipe(filter(n => n!== 'init'));
   }
 }

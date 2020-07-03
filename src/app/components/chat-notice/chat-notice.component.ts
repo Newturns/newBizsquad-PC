@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {filter} from "rxjs/operators";
+import {filter, map} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from "rxjs";
 import {TakeUntil} from "../../biz-common/take-until";
 import {IMessage} from "../../_models/message";
@@ -23,6 +23,9 @@ export class ChatNoticeComponent extends TakeUntil implements OnInit {
 
   // use to display notice
   private noticeMessageSubject = new BehaviorSubject<string>('hello');
+
+  // video 채팅방 시작/종료 메시지 표시용
+  private videoChat$: Observable<any>;
 
   constructor(private bizFire : BizFireService,
               private tokenService : TokenProvider,
@@ -95,6 +98,14 @@ export class ChatNoticeComponent extends TakeUntil implements OnInit {
 
   joinVideo() {
     this.tokenService.makeWebJump('video_chat');
+  }
+
+  getVideoObserver(): Observable<any>{
+    if(this.videoChat$ == null){
+      this.videoChat$ = this.cacheService.getValueChanges(`video/${this.message.data.message.notice.vid}`)
+          .pipe(map(value => value == null ? 'null' : value));
+    }
+    return this.videoChat$;
   }
 
 }
