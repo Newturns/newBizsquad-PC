@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { ipcRenderer, webFrame, remote } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
+import {BizFireService} from '../biz-fire/biz-fire';
 
 @Injectable()
 export class Electron {

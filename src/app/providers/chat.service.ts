@@ -337,6 +337,8 @@ export class ChatService extends TakeUntil{
               .then(() => {
                 this.onSelectChatRoom.next(this.var_chatRooms);
                 this.electron.openChatRoom(this.var_chatRooms);
+                this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid))
+                    .set({ lastChatId:{ pc: this.var_chatRooms.cid } }, {merge: true});
               });
         })
       });

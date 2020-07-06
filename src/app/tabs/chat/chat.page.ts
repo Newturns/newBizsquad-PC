@@ -147,10 +147,14 @@ export class ChatPage implements OnInit {
   }
 
   gotoRoom(c : IChat) {
-    const cutRefValue = {cid: c.cid, data: c.data};
     this.chatService.onSelectChatRoom.next(c);
-    this.electronService.openChatRoom(cutRefValue);
     console.log(c);
+    this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid))
+        .set({ lastChatId:{ pc: c.cid } }, {merge: true});
+
+    const cutRefValue = {cid: c.cid, data: c.data};
+    this.electronService.openChatRoom(cutRefValue);
+
   }
 
   goLink(url) {

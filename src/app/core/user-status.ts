@@ -44,15 +44,15 @@ export class UserStatusProvider {
   }
 
   windowCloseAndUserStatus() {
-    return this.bizFire.afStore.doc(`users/${this.bizFire.uid}`).update({
+    return this.bizFire.afStore.doc(`users/${this.bizFire.uid}`).set({
       onlineStatus : { pc : 'offline' }
-    })
+    },{merge : true})
   }
 
   statusChanged(value) {
-    return this.bizFire.afStore.doc(`users/${this.bizFire.uid}`).update({
+    return this.bizFire.afStore.doc(`users/${this.bizFire.uid}`).set({
       onlineStatus : { pc : value }
-    })
+    },{merge : true})
   }
 
 }

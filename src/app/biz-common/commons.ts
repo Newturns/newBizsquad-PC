@@ -293,27 +293,44 @@ export class Commons {
       }
 
       static makeUserStatus(userData : IUserData) {
-        if(userData.onlineStatus && userData.onlineStatus.pc) {
-          switch(userData.onlineStatus.pc) {
-            case 'online':
-              return '#32db64';
-              break;
-            case 'wait':
-              return '#FEA926';
-              break;
-            case 'busy':
-              return '#f53d3d';
-              break;
-            case 'offline':
-              return '#C7C7C7';
-              break;
-            default :
-              return '#C7C7C7';
-              break;
-          }
-        } else {
-          return '#C7C7C7';
+        switch(this.makeUserStatusMultiPlatform(userData)) {
+          case 'online':
+            return '#32db64';
+            break;
+          case 'wait':
+            return '#FEA926';
+            break;
+          case 'busy':
+            return '#f53d3d';
+            break;
+          case 'offline':
+            return '#C7C7C7';
+            break;
+          default :
+            return '#C7C7C7';
+            break;
         }
+      }
+
+      static makeUserStatusMultiPlatform(userData : IUserData) : string {
+
+        let status = 'offline';
+        const statusList = ['online','wait','busy'];
+
+        if(userData.onlineStatus == null) {
+          return status;
+        }
+
+        statusList.forEach(l => {
+          if(userData.onlineStatus.web === l
+              || userData.onlineStatus.pc === l
+              || userData.onlineStatus.mobile === l) {
+            status = l;
+          }
+        });
+
+        return status;
+
       }
 
 
