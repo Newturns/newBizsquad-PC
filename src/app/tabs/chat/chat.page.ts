@@ -94,12 +94,19 @@ export class ChatPage implements OnInit {
 
     // 스쿼드 채팅방
     this.chatService.squadChatList$
-        .pipe(filter(d=>d != null),takeUntil(this._unsubscribeAll))
+        .pipe(
+            filter(d=>d != null),
+            takeUntil(this._unsubscribeAll)
+        )
         .subscribe((squad : IChat[]) => {
-          const onlyPrivateSquad = squad.filter(s => {
-            return s.data.type === 'private' && s.data.members[this.bizFire.uid] === true;
-          });
-          this.squadChatRooms = onlyPrivateSquad;
+          if(squad && squad.length > 0) {
+            const onlyPrivateSquad = squad.filter(s => {
+              return s.data.type === 'private' && s.data.memberArray.find(uid => uid === this.bizFire.uid);
+            });
+
+            console.log("squadChatRooms",this.squadChatRooms);
+            this.squadChatRooms = onlyPrivateSquad;
+          }
         });
 
     // unread count map

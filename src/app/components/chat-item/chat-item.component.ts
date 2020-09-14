@@ -150,7 +150,8 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
   async makeChatIcon() {
 
     //uids : string[];
-    const uids = Object.keys(this.chatBox.data.members).filter(uid => uid !== this.bizFire.uid);
+    // const uids = Object.keys(this.chatBox.data.members).filter(uid => uid !== this.bizFire.uid);
+    const uids = this.chatBox.data.memberArray.filter(uid => uid !== this.bizFire.uid);
 
     for(const uid of uids) {
       if(this.chatIcon == null) {

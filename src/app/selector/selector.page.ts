@@ -42,7 +42,7 @@ export class SelectorPage implements OnInit {
     // find all biz group
     this.bizFire.afStore.collection(STRINGS.STRING_BIZGROUPS, ref => {
       let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
-      query = query.where(new firebase.firestore.FieldPath(STRINGS.FIELD.MEMBER, userData.uid),'==', true);
+      query = query.where(STRINGS.MEMBER_ARRAY, 'array-contains', this.bizFire.uid);
       query = query.where('status', '==', true);
       return query;
     }).snapshotChanges()

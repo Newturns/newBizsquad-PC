@@ -14,7 +14,7 @@ export interface IChatData extends ISquadData{
   gid?: string,
   lastMessage?: IMessageData
   manager?: any,
-
+  memberArray?: any,
   read?: any,
   status: boolean
 }

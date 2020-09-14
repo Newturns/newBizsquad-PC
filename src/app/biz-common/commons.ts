@@ -27,6 +27,7 @@ export const STRINGS = {
   },
   USER_IMAGE_FILENAME: 'profile.jpeg',
   METADATA: 'metaData',
+  MEMBER_ARRAY: 'memberArray',
 };
 
 export declare type ProcessChangeUpdater = (oldItem: any, newItem: any, change: any) => void;

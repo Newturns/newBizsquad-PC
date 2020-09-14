@@ -379,7 +379,7 @@ export class BizFireService {
                 )
                 .subscribe((data: any)=>{
 
-                    if(data && data['status'] === true && data['members'][this.uid] === true){
+                    if(data && data['status'] === true){
 
                         const group: IBizGroup = BizGroupBuilder.buildWithData(gid, data, this.uid);
 

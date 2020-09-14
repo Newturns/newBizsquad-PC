@@ -51,7 +51,7 @@ export class SquadPage implements OnInit {
       console.log("squadList",squadList);
       const mySquadsFilter = squadList.filter(s => {
         if(s.data.type === 'private') {
-          return s.data.members[this.bizFire.uid] === true;
+          return s.data.memberArray.find(uid => uid === this.bizFire.uid);
         } else {
           return !this.bizFire.currentBizGroup.isGuest();
         }
