@@ -8,7 +8,6 @@ import {TakeUntil} from "../../biz-common/take-until";
 import {MembersPopoverComponent} from "../members-popover/members-popover";
 import {ChangeTitlePopoverComponent} from "../change-title-popover/change-title-popover";
 import {WarnPopoverComponent} from "../warn-popover/warn-popover";
-import * as firebase from 'firebase/app';
 import {AlertController, PopoverController} from '@ionic/angular';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {Electron} from '../../providers/electron';
@@ -17,7 +16,7 @@ import {ChatService} from '../../providers/chat.service';
 import {ChatMenuPopoverComponent} from '../chat-menu-popover/chat-menu-popover.component';
 import {InviteChatPopoverComponent} from '../invite-chat-popover/invite-chat-popover.component';
 import {Subscription} from 'rxjs';
-
+import * as firebase from 'firebase/app';
 
 @Component({
   selector: 'chat-header',
@@ -46,6 +45,8 @@ export class ChatHeaderComponent extends TakeUntil {
       let reload = true;
       if(room.data.lastMessage) {
         this.senderUid = room.data.lastMessage.sender;
+      } else {
+        this.senderUid = room.data.memberArray.filter(uid => uid !== this.bizFire.uid)[0];
       }
       if(this.room){
         const oldCount = this._room.isPublic()? this.bizFire.currentBizGroup.getMemberCount() : this._room.getMemberCount();
@@ -265,11 +266,11 @@ export class ChatHeaderComponent extends TakeUntil {
     await popover.onDidDismiss().then((e :any) => {
       const ok = e.data;
       if(ok) {
-        this._room.ref
-        .update({['members.'+this.bizFire.uid]: firebase.firestore.FieldValue.delete()})
+        this._room.ref.update({
+          memberArray : firebase.firestore.FieldValue.arrayRemove(this.bizFire.uid)
+        })
         .then(() => {
-          this.chatService
-          .makeRoomNoticeMessage('member-chat','exit',this.bizFire.gid,this._room.cid,[this.bizFire.uid])
+          this.chatService.makeRoomNoticeMessage('member-chat','exit',this.bizFire.gid,this._room.cid,[this.bizFire.uid])
           .then(() => this.electron.windowClose());
         })
       } else {

@@ -14,11 +14,11 @@ import {LangService} from '../core/lang.service';
 import {CacheService} from '../core/cache/cache';
 import {ConfigService} from '../config.service';
 import {PopoverController} from '@ionic/angular';
-import {IUnreadMap, UnreadCounter} from '../components/classes/unread-counter';
 import {TakeUntil} from '../biz-common/take-until';
 import {Chat} from '../biz-common/chat';
 import {DocumentChangeAction} from '@angular/fire/firestore';
 import {IUploadItem, UploadProgressComponent} from '../components/upload-progress/upload-progress.component';
+import {MessageBuilder} from '../biz-common/message';
 
 @Injectable({
     providedIn: 'root'
@@ -47,18 +47,7 @@ export class ChatService extends TakeUntil{
     squadChatList: null
   };
 
-  //CHAT CONTENT CACHE
-  private chatContentMap = {};
-
   private currentGroupId: string;
-
-  get unreadCountMap$(): Observable<IUnreadMap> {
-    return this.unreadCounter.unreadChanged$.asObservable()
-        .pipe(
-            filter(d=>d!=null),
-            debounceTime(800), // 0.8 sec
-        );
-  }
 
   get chatList$(): Observable<IChat[]>{
     if(this.chatDataMap == null){
@@ -86,8 +75,7 @@ export class ChatService extends TakeUntil{
       private http: HttpClient,
       private cacheService : CacheService,
       private configService: ConfigService,
-      private popoverCtrl : PopoverController,
-      private unreadCounter: UnreadCounter) {
+      private popoverCtrl : PopoverController) {
     super();
 
     this.langService.onLangMap
@@ -101,7 +89,6 @@ export class ChatService extends TakeUntil{
     });
     this.bizFire.onBizGroupChanged$.subscribe(()=> {
       console.log("onBizGroupChanged$.subscribe = clear unread count");
-      console.log(this.unreadCounter);
       this.clear();
     });
 
@@ -160,7 +147,7 @@ export class ChatService extends TakeUntil{
       this.chatDataMap.chatListSub = this.bizFire.afStore.collection(path, (ref:any)=> {
         let q: any = ref;
         q = q.where('status', '==', true);
-        q = q.where(new firebase.firestore.FieldPath(STRINGS.FIELD.MEMBER, this.bizFire.uid), '==', true);
+        q = q.where(STRINGS.MEMBER_ARRAY, 'array-contains', this.bizFire.uid);
         return q;
       }).stateChanges()
           .pipe(
@@ -243,7 +230,6 @@ export class ChatService extends TakeUntil{
       // add new message to top
       const item = new Chat(mid, data, this.bizFire.uid, change.payload.doc.ref);
       chatList.push(item);
-      this.unreadCounter.register(mid, item);
 
     } else if (change.type === 'modified') {
 
@@ -266,7 +252,6 @@ export class ChatService extends TakeUntil{
         if (chatList[index].cid === mid) {
           // remove from array
           chatList.splice(index, 1);
-          this.unreadCounter.unRegister(mid);
           break;
         }
       }
@@ -287,11 +272,9 @@ export class ChatService extends TakeUntil{
     const now = new Date();
     const newRoom:IChatData = {
       created:  now,
+      createdBy: this.bizFire.uid,
       gid: this.bizFire.gid,
-      members: {
-        [this.bizFire.uid] : true,
-        [target.uid] : true
-      },
+      memberArray : [this.bizFire.uid,target.uid],
       status: true,
       type: 'member'
     };
@@ -304,21 +287,23 @@ export class ChatService extends TakeUntil{
     console.log("newRoomnewRoom",isChecked);
 
     const now = new Date();
-    const myValue = this.bizFire.currentUserValue;
-    // fabs invite에서 초대 한 멤버가 한명일 경우 그룹채팅이 아니다.
+    const memberArray = [];
+
+    memberArray.push(this.bizFire.uid);
+
+    if(isChecked.length > 0) {
+      isChecked.forEach(u => memberArray.push(u.uid));
+    }
+
 
     const newRoom:IChatData = {
       created:  now,
+      createdBy: this.bizFire.uid,
       gid: this.bizFire.gid,
-      members : {
-        [myValue.uid] : true
-      },
+      memberArray: memberArray,
       status: true,
       type: 'member'
     };
-    if(isChecked.length > 0){
-      isChecked.forEach(u => { newRoom.members[u.uid] = true; });
-    }
 
     console.log("newRoomnewRoom",newRoom);
     this.createRoom(newRoom);
@@ -365,7 +350,7 @@ export class ChatService extends TakeUntil{
       throw new Error('currentChat.ref is null.');
     }
 
-    const members = currentChat.isPublic() ? this.bizFire.currentBizGroup.data.members : currentChat.data.members;
+    const members = currentChat.data.memberArray;
 
     const msg = await this.addMessage(text,currentChat,members,files,true,reply);
 
@@ -378,19 +363,17 @@ export class ChatService extends TakeUntil{
     // 미리 로딩해 놓은 현재 채팅방 PUSH 수신 허용자들
     const targetUserList = this.pushTargetUserIdList;
 
-
     this.sendPush(targetUserList,pushTitle,this.convertMessage(text),pushData);
 
     return msg;
   }
 
-  async addMessage(text: string,chat: IChat,unreadMembers : any,
+  async addMessage(text: string,chat: IChat,unreadMembers : string[],
                    files?: any[],saveLastMessage = true,replyMessage?:IMessageData) {
     try{
       if(chat.ref == null) {
         throw new Error('parentRef has no data.');
       }
-      const membersUids = [];
       const now = new Date();
 
       const msg: IMessageData = {
@@ -401,7 +384,7 @@ export class ChatService extends TakeUntil{
         sender: this.bizFire.uid,
         created: now,
         isNotice : false,
-        read : null,
+        read : unreadMembers && unreadMembers.length > 0 ? MessageBuilder.makeReadFrom(unreadMembers,this.bizFire.uid) : null,
         type : 'chat',
         file: false,
         sid: chat.cid,
@@ -412,15 +395,6 @@ export class ChatService extends TakeUntil{
           delete replyMessage.reply;
         }
         msg.reply = replyMessage;
-      }
-
-      if(unreadMembers) {
-        msg.read = Commons.makeReadFrom(unreadMembers, this.bizFire.uid);
-        Object.keys(unreadMembers)
-            .filter(uid => uid !== this.bizFire.uid)
-            .forEach(uid => {
-              membersUids.push(uid);
-            })
       }
 
       const newChatRef = chat.ref.collection('chat').doc();
@@ -701,11 +675,6 @@ export class ChatService extends TakeUntil{
     }
 
     this.currentGroupId = null;
-
-
-    if(this.unreadCounter){
-      this.unreadCounter.clear();
-    }
   }
 
 }

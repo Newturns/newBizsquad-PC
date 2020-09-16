@@ -1,5 +1,4 @@
 import {ModuleWithProviders, NgModule} from '@angular/core';
-import { ChatRoomComponent } from './chat-room/chat-room';
 import {CommonModule} from "@angular/common";
 import {LastMessageComponent} from "./last-message/last-message.component";
 import { ChatHeaderComponent } from './chat-header/chat-header';
@@ -22,7 +21,6 @@ import {MembersPopoverComponent} from "./members-popover/members-popover";
 import {WarnPopoverComponent} from "./warn-popover/warn-popover";
 import {ChangeTitlePopoverComponent} from "./change-title-popover/change-title-popover";
 import {IonicModule} from '@ionic/angular';
-import {UnreadCounter} from './classes/unread-counter';
 import {PipesModule} from './pipes/pipes.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {TokenProvider} from '../biz-common/token';
@@ -37,7 +35,6 @@ import {MessageReplyComponent} from './message-reply/message-reply.component';
 
 @NgModule({
     declarations: [
-        ChatRoomComponent,
         LastMessageComponent,
         ChatHeaderComponent,
         MessageComponent,
@@ -74,7 +71,6 @@ import {MessageReplyComponent} from './message-reply/message-reply.component';
         ReactiveFormsModule,
     ],
     exports: [
-        ChatRoomComponent,
         LastMessageComponent,
         ChatHeaderComponent,
         MessageComponent,
@@ -114,7 +110,6 @@ import {MessageReplyComponent} from './message-reply/message-reply.component';
         CreateChatPopoverComponent
     ],
     providers: [
-        UnreadCounter,
         TokenProvider,
         LoadingProvider,
     ]

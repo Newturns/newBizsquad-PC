@@ -52,8 +52,7 @@ export class InviteChatPopoverComponent implements OnInit {
           this.groupSubColor = group.data.team_subColor;
 
           const inviteUids = this.currentGroup.getMemberIdsExceptGuests(false)
-              .filter(uid => Object.keys(this.roomData.data.members)
-                  .find(cUid => cUid === uid) == null);
+              .filter(uid => this.roomData.data.memberArray.find(cUid => cUid === uid) == null);
 
           this.userList = await this.cacheService.resolvedUserList(inviteUids, Commons.userInfoSorter).toPromise();
 
@@ -64,22 +63,21 @@ export class InviteChatPopoverComponent implements OnInit {
 
     if(this.checkedUser.length > 0) {
 
-      let members = {};
-      let makeNoticeUsers = [];
+      //기존 멤버.
+      let memberArray = this.roomData.data.memberArray;
 
-      this.checkedUser.forEach((u: IUser) => {
-        members[u.data.uid] = true;
-        makeNoticeUsers.push(u.data.uid);
-      });
+      //초대할 유저.
+      const inviteUsers = this.checkedUser.map(user => user.uid);
 
       this.bizFire.afStore.doc(Commons.chatDocPath(this.roomData.data.gid,this.roomData.cid)).set({
-        members : members
-      },{merge : true})
-          .then(() => {
-            this.chatService.makeRoomNoticeMessage('member-chat','invite',this.roomData.data.gid,this.roomData.cid,makeNoticeUsers);
-            this.popoverCtrl.dismiss();
-          })
-          .catch((e) => console.error(e));
+        memberArray : memberArray.concat(inviteUsers)
+      },{merge: true})
+        .then(() => {
+          this.chatService
+              .makeRoomNoticeMessage('member-chat','invite',this.roomData.data.gid,this.roomData.cid,inviteUsers);
+          this.popoverCtrl.dismiss();
+        })
+        .catch((e) => console.error(e));
     }
 
   }

@@ -9,14 +9,24 @@ export interface IChat extends ISquad{
 }
 export interface IChatData extends ISquadData{
   created: any,
-  members: any,
-  title?: string,
-  gid?: string,
+  destroyed?: any,
+  members?: any,
+  is_group?: number, // 멤버가 3명이상이면 1
   lastMessage?: IMessageData
   manager?: any,
-  memberArray?: any,
+  host? : any,
+  guest? : any,
+  title?: string,
   read?: any,
-  status: boolean
+  status?: boolean,
+  // @ts-ignore
+  chatType?: STRINGS.GROUP_CHAT | STRINGS.SQUAD_CHAT
+
+  //비디오채팅에서 사용
+  //?일 후 자동비활성을 위한 필드.
+  autoInactive?: any,
+  //비디오채팅방 참여 기록 저장 필드
+  joinedRecord?: any,
 }
 
 export interface IMessage extends IFirestoreDoc{

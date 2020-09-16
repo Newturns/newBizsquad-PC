@@ -18,24 +18,50 @@ export interface ISquad extends IBizGroupBase{
 
 export interface ISquadData {
 
-  members: any,
+  // 2020.09.05 호환을 위해 남겨둔다.
+  members?: any,
+  // 2020.09.05 새로운 멤버 저장 배열
+  memberArray?: string[],
+
   created: any,
   type: string,
+
+  // public 일경우 squad 멤버는 group 멤버 전체.
+  public?: boolean,
+
+  // general squad flag.
+  general?: boolean,
+  agile?: boolean,
+
   gid?: string,
   name?: string,
   title?: string,
+  default?: boolean,
   manager?: any,
+  guest? : any,
   subType?: string,
   status?: boolean,
   description?: string,
   color?:string,
   photoURL?: string,
-  photoPath?: string
-  default?: boolean,
-  // general squad flag.
-  general?: boolean,
-  agile?: boolean,
+  photoPath?: string,
 
+  createdBy?: string,
+
+  /*
+  * Well Done 시간 기록.
+  * */
+  closed?: any
+
+  //스쿼드 내의 유저 역할(업무)
+  userTask?: any,
+
+  // 2020.08.20. 차일드 스쿼드 added.
+  // 왼쪽 트리에 표시용으로 저장.
+  // 실제 firebase 위치는 squads/<sid>/squads/<child> 식으로 반복.
+  children?: string[],
+  // parent sid: 부모 sid 를 적어놓는다.
+  parentSid?: string,
 }
 
 export interface IUserDataDoc {

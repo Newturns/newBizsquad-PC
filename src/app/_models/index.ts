@@ -269,7 +269,7 @@ export class GroupBase implements IBizGroupBase{
   }
 
   getMemberIds: (includeMe: boolean) => string[] = (includeMe = true)=>{
-    return this.getMembersUidFrom(STRINGS.FIELD.MEMBER, includeMe);
+    return this.getMembersUidFrom(STRINGS.MEMBER_ARRAY, includeMe);
   };
 
   getManagerIds: (includeMe?: boolean) => string[] = (includeMe = true)=> {
@@ -287,11 +287,15 @@ export class GroupBase implements IBizGroupBase{
     if(this.data == null){
       throw new Error('this.data is null.');
     }
+    if(part === STRINGS.MEMBER_ARRAY){
+      return includeMe ? this.data[STRINGS.MEMBER_ARRAY] : this.data[STRINGS.MEMBER_ARRAY].filter(uid => uid !== this.uid);
+    }
+
     let ret;
     if(this.data && this.data[part]){
       ret = Object.keys(this.data[part]).filter(uid => {
         let r = this.data[part][uid] === true;
-        if(!includeMe && uid === this.uid){
+        if(r && !includeMe && uid === this.uid){
           r = false;
         }
         return r;
@@ -306,11 +310,7 @@ export class GroupBase implements IBizGroupBase{
     if(this.data == null){
       throw new Error('this.data is null.');
     }
-    let count = 0;
-    if(this.data.members){
-      count = Object.keys(this.data.members).filter(uid => this.data.members[uid] === true).length;
-    }
-    return count;
+    return this.data[STRINGS.MEMBER_ARRAY].length;
   }
 
   // remove deleted user from data.members and return clean data.

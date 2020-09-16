@@ -34,17 +34,16 @@ export class MessageBuilder {
     }
   }
 
-  static makeReadFrom(members: any, myUid: string): any {
+  static makeReadFrom(members: string[], myUid: string): any {
     //const members = currentChat.data.members;
     const read = {};
     if(members == null){
       throw new Error('empty members param');
     }
-    Object.keys(members)
-      .forEach(uid => {
-        // ser unread false except me.
-        read[uid] = {unread: uid !== myUid, read: uid === myUid ? new Date(): null};
-      });
+    members.forEach(uid => {
+      read[uid] = {unread: uid !== myUid, read: uid === myUid ? new Date(): null};
+    });
+
     return read;
   }
 

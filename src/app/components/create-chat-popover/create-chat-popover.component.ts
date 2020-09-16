@@ -54,38 +54,65 @@ export class CreateChatPopoverComponent implements OnInit {
 
     console.log("chatRooms",chatRooms);
 
-    let selectedRoom: IChat;
-    let members = {
-      [this.bizFire.currentUID] : true
-    };
-    if(this.isChecked){
-      this.isChecked.forEach(u => {
-        members[u.uid] = true;
-      })
-    }
-    for(let room of chatRooms) {
-      const member_list = room.data.members;
-      // 유저 키값이 false가 되면 리스트에서 제외하고 같은방이있는지 검사해야함.
+    let selectedRoom: IChat = null;
 
-      if(deepEqual(members,member_list)) {
-        selectedRoom = room;
-        break;
-      }
-    }
     if(this.isChecked.length > 0) {
-      if(selectedRoom == null){
-        this.chatService.createRoomByFabs(this.isChecked);
-        this.popoverCtrl.dismiss();
-      } else {
+      const createChatUids = this.isChecked.map(u => u.uid);
+      createChatUids.push(this.bizFire.uid);
+
+      if(this.isChecked.length === 1) {
+        for (let room of chatRooms) {
+          const member_list = room.data.memberArray;
+          if(member_list.length === 2 && createChatUids.filter(uid => member_list.includes(uid) !== true).length === 0) {
+            selectedRoom = room;
+            break;
+          }
+        }
+      }
+
+      if(selectedRoom) {
         this.chatService.onSelectChatRoom.next(selectedRoom);
         this.electronService.openChatRoom({cid: selectedRoom.cid, data: selectedRoom.data});
-
-        this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid))
-            .set({ lastChatId:{ pc: selectedRoom.cid } }, {merge: true});
-
+        this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid)).set({ lastChatId:{ pc: selectedRoom.cid } }, {merge: true});
+        this.popoverCtrl.dismiss();
+      } else {
+        this.chatService.createRoomByFabs(this.isChecked);
         this.popoverCtrl.dismiss();
       }
     }
+
+    // let members = {
+    //   [this.bizFire.currentUID] : true
+    // };
+    //
+    // if(this.isChecked){
+    //   this.isChecked.forEach(u => {
+    //     members[u.uid] = true;
+    //   })
+    // }
+    // for(let room of chatRooms) {
+    //   const member_list = room.data.members;
+    //   // 유저 키값이 false가 되면 리스트에서 제외하고 같은방이있는지 검사해야함.
+    //
+    //   if(deepEqual(members,member_list)) {
+    //     selectedRoom = room;
+    //     break;
+    //   }
+    // }
+    // if(this.isChecked.length > 0) {
+    //   if(selectedRoom == null){
+    //     this.chatService.createRoomByFabs(this.isChecked);
+    //     this.popoverCtrl.dismiss();
+    //   } else {
+    //     this.chatService.onSelectChatRoom.next(selectedRoom);
+    //     this.electronService.openChatRoom({cid: selectedRoom.cid, data: selectedRoom.data});
+    //
+    //     this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid))
+    //         .set({ lastChatId:{ pc: selectedRoom.cid } }, {merge: true});
+    //
+    //     this.popoverCtrl.dismiss();
+    //   }
+    // }
   }
 
   checkedUsers(user : IUser) {

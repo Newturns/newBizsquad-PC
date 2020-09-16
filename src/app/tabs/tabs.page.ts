@@ -67,11 +67,12 @@ export class TabsPage {
       this.teamColor = this.group.data.team_color;
     });
 
-    this.chatService.unreadCountMap$
-    .pipe(takeUntil(this._unsubscribeAll))
-    .subscribe((map: IUnreadMap)=> {
-      this.chatUnreadCount = map.totalUnreadCount();
-    });
+    // this.chatUnreadCount = 1;
+
+    // this.bizFire.afStore.collectionGroup('chat',ref=>
+    //     ref.where('status', '==', true)
+    //         .where(`memberArray`, 'array-contains', this.bizFire.uid)
+    // ).stateChanges(['added', 'removed']);
   }
 
   changeTabs(e) {

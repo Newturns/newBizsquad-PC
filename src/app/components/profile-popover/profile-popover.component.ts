@@ -178,16 +178,16 @@ export class ProfilePopoverComponent extends TakeUntil implements OnInit {
   gotoChat() {
     const chatRooms = this.chatService.getChatRooms();
     console.log("chatRooms :",chatRooms);
-    let selectedRoom: IChat;
+    let selectedRoom: IChat = null;
     for(let room of chatRooms) {
-      const member_list = room.data.members;
+      const member_list = room.data.memberArray;
 
-      if(Object.keys(member_list).length == 2) {
-        if(member_list.hasOwnProperty(this.targetValue.uid)) {
-          console.log("조건에 맞는 채팅방이 있습니다.",room);
-          selectedRoom = {cid: room.cid,data : room.data} as IChat;
-          break;
-        }
+      if(member_list.length == 2 &&
+          member_list.includes(this.targetValue.uid) &&
+          member_list.includes(this.bizFire.uid)) {
+        console.log("조건에 맞는 채팅방이 있습니다.",room);
+        selectedRoom = {cid: room.cid,data : room.data} as IChat;
+        break;
       }
     }
 

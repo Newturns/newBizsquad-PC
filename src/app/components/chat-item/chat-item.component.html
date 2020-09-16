@@ -65,10 +65,10 @@
           No Message
         </div>
       </ng-template>
-      <div class="msg-badge d-flex text-white mr-2 align-items-center justify-content-center flex-shrink-0" *ngIf="unreadCount">
+      <div class="msg-badge d-flex text-white mr-2 align-items-center justify-content-center flex-shrink-0"
+           *ngIf="unreadCount$ | async; let unreadCount">
         {{ unreadCount | badgeLimit: 999 }}
       </div>
-
 
     </div>
   </div>

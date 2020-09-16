@@ -1,14 +1,12 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {filter, take} from 'rxjs/operators';
+import {delay, map, switchMap, take} from 'rxjs/operators';
 import {TakeUntil} from "../../biz-common/take-until";
 import {IChat, IFiles, IMessageData} from '../../_models/message';
-import {ChatService} from "../../providers/chat.service";
 import {Commons} from "../../biz-common/commons";
 import {IUser} from '../../_models';
 import {CacheService} from '../../core/cache/cache';
 import {BizFireService} from '../../biz-fire/biz-fire';
-import {IUnreadMap} from '../classes/unread-counter';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 
 @Component({
   selector: 'biz-chat-item',
@@ -22,11 +20,6 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
   @Input()
   set chat(c: IChat){
     this.loadChat(c);
-  }
-
-  @Input()
-  set unread(count : number) {
-    this.unreadCount = count;
   }
 
   lastMessage: IMessageData;
@@ -54,35 +47,21 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
 
   langPack = {};
 
+  unreadCount$: Observable<any>;
+
   constructor(private cacheService: CacheService,
-              private bizFire : BizFireService,
-              private chatService: ChatService) {
+              private bizFire : BizFireService) {
     super();
   }
 
-  ngOnInit() {
-
-    this.chatService.unreadCountMap$
-        .pipe(
-            this.takeUntil,
-            filter(d=>d!=null)
-        )
-        .subscribe((list: IUnreadMap) => {
-          if(list.get(this.chatBox.cid) != null){
-            this.unreadCount = list.get(this.chatBox.cid).unreadList.length;
-          }
-        });
-
-  }
+  ngOnInit() {}
 
   onClickFunc(){
-    // this.chatSelected = true;
-    //  ↓테스트용↓
     this.clickedFunc.emit(this.chatBox);
   }
 
-  private loadChat(c: IChat){
-    if(c != null){
+  private loadChat(c: IChat) {
+    if(c != null) {
       this.chatBox = c;
       this.chatTitle = this.chatBox.data.title;
       this.lastMessage = this.chatBox.data.lastMessage;
@@ -97,11 +76,22 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
         this.makeNoticeMessage();
       }
 
-
-
       if(this.chatTitle == null){
         this.reloadTitle();
       }
+
+      // this.unreadCount$ = this.bizFire.afStore.collection(`${c.ref.path}/chat`, ref=>
+      //     ref.where(`read.${this.bizFire.uid}.unread`, '==', true)
+      // ).valueChanges()
+      //     .pipe(
+      //         switchMap(list =>{
+      //           if(this.chatSelected) return of(list).pipe(delay(250));
+      //           return of(list);
+      //         })
+      //         ,map(data => data.length)
+      //         ,this.takeUntil
+      //         ,this.bizFire.takeUntilUserSignOut
+      //     );
     }
   }
 
@@ -114,30 +104,18 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
     if(this.chatBox == null){
       return;
     }
-    // this._squadChat = this.chatBox.data.type !== 'member';
 
     this.chatTitle = this.chatBox.data.title || this.chatBox.data.name;
-    /*if(this.chatBox.data.type === 'member') {
-
-    } else {
-      this.userCount = this.chatBox.isPublic() ? this.bizFire.currentBizGroup.getMemberCount() : this.chatBox.getMemberCount();
-      // 스쿼드 채팅방은 제목 생성 불가.
-      // this.chatTitle = this.chatBox.data.name;
-    }*/
 
     if(this.chatTitle == null) {
       this.chatTitle = '';
-      // if not, create title with user names.
-      this.cacheService.resolvedUserList(this.chatBox.getMemberIds(false), Commons.userInfoSorter)
-        .subscribe((users :IUser[]) => {
-          users.forEach(u => {
-            if(this.chatTitle.length > 0){
-              this.chatTitle += ',';
-            }
-            this.chatTitle += u.data.displayName;
-          });
+      const chatUserUids = this.chatBox.data.memberArray.filter(uid => uid !== this.bizFire.uid);
 
-          if(users.length === 0){
+      // if not, create title with user names.
+      this.cacheService.resolvedUserList(chatUserUids, Commons.userInfoSorter)
+        .subscribe((users :IUser[]) => {
+          this.chatTitle = users.map(u => u.data.displayName).join(',');
+          if(users.length === 0) {
             // no user left only me.
             // add no user
             this.chatTitle = 'No users';
@@ -161,6 +139,7 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
         break;
       }
     }
+    
     //대화상대가 모두 탈퇴하고 자신만 남으면 자신의 아이콘이라도 표시하기 위함.
     if(uids == null || uids.length === 0) {
       const userData = await this.cacheService.userGetObserver(this.bizFire.uid).pipe(take(1)).toPromise();

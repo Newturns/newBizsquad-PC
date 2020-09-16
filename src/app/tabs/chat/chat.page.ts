@@ -70,19 +70,16 @@ export class ChatPage implements OnInit {
               return chats.map((chat : IChat) => {
                 if(chat.data.title == null) {
                   this.cacheService.resolvedUserList(chat.getMemberIds(false), Commons.userInfoSorter)
-                      .pipe(takeUntil(this._unsubscribeAll))
-                      .subscribe((users :IUser[]) => {
-                        chat.data.title = '';
-                        users.forEach(u => {
-                          if(chat.data.title.length > 0) {
-                            chat.data.title += ',';
-                          }
-                          chat.data.title += u.data.displayName;
-                        });
-                        if(users.length === 0) {
-                          chat.data.title = 'No users';
-                        }
-                      });
+                    .pipe(takeUntil(this._unsubscribeAll))
+                    .subscribe((users :IUser[]) => {
+                      chat.data.title = '';
+                      chat.data.title = users.map(u => u.data.displayName).join(',');
+                      if(users.length === 0) {
+                        // no user left only me.
+                        // add no user
+                        chat.data.title = 'No users';
+                      }
+                    });
                 }
                 return chat;
               });
@@ -108,22 +105,6 @@ export class ChatPage implements OnInit {
             this.squadChatRooms = onlyPrivateSquad;
           }
         });
-
-    // unread count map
-    this.chatService.unreadCountMap$
-        .pipe(takeUntil(this._unsubscribeAll))
-        .subscribe((list: IUnreadMap) => {
-          // temp array for counting.
-          this.memberUnreadTotalCount = 0;
-          this.squadUnreadTotalCount = 0;
-          list.getValues().forEach( (item: MapItem) => {
-            if(item.chat.data.type === 'member'){
-              this.memberUnreadTotalCount += item.unreadList.length;
-            } else {
-              this.squadUnreadTotalCount += item.unreadList.length;
-            }
-          });
-        });
   }
 
   ionViewDidLeave() {
@@ -144,7 +125,6 @@ export class ChatPage implements OnInit {
   onSearch(e) {
     const value = e.target.value;
     this.searchKeyword = value;
-    console.log(this.memberUnreadTotalCount,this.squadUnreadTotalCount);
   }
 
 

@@ -350,11 +350,9 @@ export class CacheService {
       }
 
       const datas = [];
-
       let totalTargetCount = userIdList.length; // not using now...
 
       userIdList.forEach(async (uid: string) => {
-
         this.userGetObserver(uid).subscribe(user => {
           totalTargetCount --;
           if(user){
@@ -362,12 +360,15 @@ export class CacheService {
           }
 
           if(totalTargetCount === 0){
+
+            if(sorter){
+              datas.sort(sorter);
+            }
             observer.next(datas);
             observer.complete();
           }
         });
       });
-
     });
   }
 
