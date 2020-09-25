@@ -5,9 +5,10 @@ import * as firebase from 'firebase/app';
 import {Commons, STRINGS} from '../biz-common/commons';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {DocumentChangeAction} from '@angular/fire/firestore';
-import {IBizGroup, IBizGroupData, IFirestoreDoc, IMetaData, IUser} from '../_models';
+import {DocumentSnapshot, IBizGroup, IBizGroupData, IFirestoreDoc, IMetaData, IUser} from '../_models';
 import {BizFireService} from '../biz-fire/biz-fire';
 import {CacheService} from './cache/cache';
+import {BizGroupBuilder} from '../biz-fire/biz-group';
 
 // export const NOTIFICATION_SERVICE = new InjectionToken<string>('notificationInfo');
 
@@ -397,36 +398,30 @@ export class NotificationService {
       }
 
       // get group data
-      this.cacheService.groupValueObserver(notificationData.gid)
-        .pipe(take(1))
-        .subscribe((g: IBizGroup)=>{
-
-          if(g.getMemberIds().indexOf(this.bizFire.currentUID) === -1){
+      this.bizFire.afStore.doc(Commons.groupPath(notificationData.gid)).get()
+          .pipe(
+              map((snap: DocumentSnapshot)=> BizGroupBuilder.buildFromDoc(snap, this.bizFire.uid) )
+          )
+          .subscribe(async (g: IBizGroup)=>{
 
             const data = g.data;
-
-            // set me
-            data.members[this.bizFire.currentUID] = true;
 
             // is ths user a manager?
             if(notificationData.info.auth === STRINGS.FIELD.MANAGER){
               // yes.
-              // add to guest
-              data[STRINGS.FIELD.MANAGER][this.bizFire.currentUID] = true;
-            }
+              // add to partner
+              //data[STRINGS.FIELD.MANAGER][this.bizFire.currentUID] = true;
+              await g.addLeader(this.bizFire.uid, true);
+            } else if(notificationData.info.auth === STRINGS.FIELD.GUEST){
 
-            // is ths user a guest?
-            if(notificationData.info.auth === STRINGS.FIELD.GUEST){
-              // yes.
-              // add to guest
-              data[STRINGS.FIELD.GUEST][this.bizFire.currentUID] = true;
+              await g.addGuest(this.bizFire.uid, true);
+            } else {
+              // set me as a member
+              await g.addMember(this.bizFire.uid, true);
             }
-
-            // update group member
-            this.bizFire.afStore.doc(path).update(data);
 
             // send someone joined alarm
-            const membersId = Object.keys(data.members).filter(uid=> uid !== this.bizFire.uid && data.members[uid] === true);
+            const membersId = g.getMemberIds(false);
 
             const notifyData = this.buildData('groupInvite');
 
@@ -437,11 +432,7 @@ export class NotificationService {
 
             resolve(true);
 
-          } else {
-            resolve(false);
-          }
-
-        });
+          });
     });
   }
 

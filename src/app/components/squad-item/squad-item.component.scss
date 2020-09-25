@@ -1,3 +1,24 @@
+.subSquad-toggle-frame {
+  width: 13px;
+  height: 100%;
+  margin-right: 3px;
+  cursor: pointer;
+  .subSquad-toggle {
+    padding: 2px;
+    font-size: 14px;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.60);
+    }
+  }
+
+  .rgba-60 {
+    color : rgba(255, 255, 255, 0.60);
+  }
+  .rgba-20 {
+    color: rgba(255, 255, 255, 0.20);
+  }
+}
 
 .squad-btn{
   .squad-item{

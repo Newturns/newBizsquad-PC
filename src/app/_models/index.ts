@@ -3,6 +3,14 @@ import {STRINGS} from "../biz-common/commons";
 import {IChat, IMessage, IMessageData} from "./message";
 import {ISquad} from '../providers/squad.service';
 
+export declare type QuerySnapshot = firebase.firestore.QuerySnapshot;
+export declare type DocumentSnapshot = firebase.firestore.DocumentSnapshot;
+export declare type DocumentReference = firebase.firestore.DocumentReference;
+export declare type FireQuerySnapshot = firebase.firestore.QuerySnapshot;
+export declare type FireDocumentSnapshot = firebase.firestore.DocumentSnapshot;
+export declare type FireDocumentReference = firebase.firestore.DocumentReference;
+export declare type DocumentData = firebase.firestore.DocumentData;
+
 
 export const defaultSquadName:string = 'Public Square';
 export const defaultSquadDesc:string = 'Anyone can talk to anyone';
@@ -120,6 +128,7 @@ export interface INotificationData extends IAlarmConfig {
   to?: string, // uid
   gid: string,
   sid?: string,
+  parentSid?: string,
   type: NotificationType, //IAlarmConfig 값으로 수정. (알람종류 확장시 대응)
   info?: NotificationInfo,
   created: any,
@@ -174,12 +183,19 @@ export interface INoticeItem {
 
 export interface IFirestoreDoc {
   ref?: firebase.firestore.DocumentReference;
+  doc?: firebase.firestore.DocumentSnapshot;
+}
+
+export interface IFirestoreDocData {
+  id?: string, // 각 데이터 안에 id 를 적을 경우를 위해.
+  gid?: string, // 모든 데이터들은 어떤 그룹의 소속이므로.
+  sid?: string, // 모든 데이터들은 어떤 스쿼드의 소속이므로.
+  doc?: FireDocumentSnapshot,
 }
 
 export interface IBizGroup extends IBizGroupBase {
   gid: string,
   data: IBizGroupData
-  ref: any;
 }
 
 export interface IBizGroupBase extends IFirestoreDoc{
@@ -194,13 +210,19 @@ export interface IBizGroupBase extends IFirestoreDoc{
   getMemberIdsExceptGuestsAndLeaders?:(includeMe?: boolean)=>string[];
   getMemberCount?: ()=> number;
 
+  // add, remove member
+  addMember?:(uid: string | string[], update?: boolean)=> Promise<any>,
+  addLeader?:(uid: string, update?: boolean)=> Promise<any>,
+  addGuest?:(uid: string, update?: boolean)=> Promise<any>,
+
+
   // for squad.
   isPublic?: () => boolean;
   // for FireStoreSave
   toFirestoreData?: ()=> any;
 }
 
-export interface IBizGroupData {
+export interface IBizGroupData extends IFirestoreDocData {
   manager: any,
   members: any,
   guest?: any,
@@ -233,6 +255,56 @@ export class GroupBase implements IBizGroupBase{
   uid: string;
   data: any;
   ref: any;
+
+  addMember(uid: string| string[], updateFirestore: boolean = true): Promise<any> {
+    return new Promise<any>(resolve => {
+      let added = false;
+      if(typeof uid === 'string'){
+        if((<string[]>this.data[STRINGS.MEMBER_ARRAY]).includes(uid) !== true) {
+          added = true;
+          (<string[]>this.data[STRINGS.MEMBER_ARRAY]).push(uid);
+          //todo: 2020.09.14 호환성 members 삽입. 나중에 지워도 됨. -----------------------------//
+          this.data.members = this.data.members || {};
+          this.data.memberArray.forEach(uid => this.data.members[uid] = true);
+          // 여기까지 호환성 -----------------------------------------------------------------//
+        }
+      }
+      else if(Array.isArray(uid)){
+        uid.forEach(id => {
+          if((<string[]>this.data[STRINGS.MEMBER_ARRAY]).includes(id) === false ) {
+            added = true;
+            (<string[]>this.data[STRINGS.MEMBER_ARRAY]).push(id);
+          }
+        });
+      }
+
+      if(added && updateFirestore && this.ref){
+        this.updateMembers().then(()=>resolve() );
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  addLeader(uid: string, update: boolean = true): Promise<any> {
+    return new Promise<any>(resolve => {
+      this.data[STRINGS.FIELD.MANAGER][uid] = true;
+
+      this.addMember(uid, update).then(()=>resolve());
+    });
+  }
+
+  addGuest(uid: string, update: boolean = true): Promise<any> {
+    return new Promise<any>(resolve => {
+
+      if(this.data[STRINGS.FIELD.GUEST] == null){
+        this.data[STRINGS.FIELD.GUEST] = {};
+      }
+      this.data[STRINGS.FIELD.GUEST][uid] = true;
+      this.addMember(uid, update).then(()=>resolve());
+    });
+  }
+
 
   isMember(uid?: string, auth = STRINGS.FIELD.MEMBER): boolean {
     if(uid == null) uid = this.uid;
@@ -336,6 +408,29 @@ export class GroupBase implements IBizGroupBase{
       }
     }
     return data;
+  }
+
+  private async updateMembers() {
+    if(this.ref){
+      const value: any = {
+        [STRINGS.MEMBER_ARRAY]: this.data[STRINGS.MEMBER_ARRAY]
+      };
+      if(this.data[STRINGS.FIELD.MANAGER]){
+        value[STRINGS.FIELD.MANAGER] = this.data[STRINGS.FIELD.MANAGER];
+      }
+      if(this.data[STRINGS.FIELD.GUEST]){
+        value[STRINGS.FIELD.GUEST] = this.data[STRINGS.FIELD.GUEST];
+      }
+      //todo: 2020.09.14 호환성 members 삽입. 나중에 지워도 됨. -----------------------------//
+      if(this.data['members']){
+        value['members'] = this.data['members'];
+      }
+      // 여기까지 호환성 -----------------------------------------------------------------//
+      return this.ref.update(value);
+    } else {
+      return;
+    }
+
   }
 
   constructor(data?: any) {

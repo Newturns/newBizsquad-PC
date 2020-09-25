@@ -2,15 +2,15 @@ import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {ConfigService} from '../../../config.service';
 import {BizFireService} from '../../../biz-fire/biz-fire';
 import {ActivatedRoute} from '@angular/router';
-import {IBizGroup, IUserData} from '../../../_models';
+import {FireDocumentSnapshot, FireQuerySnapshot, IBizGroup, IUserData} from '../../../_models';
 import {debounceTime, filter, take} from 'rxjs/operators';
 import {IChat, IMessage, IMessageData, MessageBuilder} from '../../../_models/message';
 import {Electron} from '../../../providers/electron';
-import {Commons} from '../../../biz-common/commons';
+import {Commons, STRINGS} from '../../../biz-common/commons';
 import {Chat} from '../../../biz-common/chat';
 import {ChatService} from '../../../providers/chat.service';
 import {LoadingProvider} from '../../../providers/loading';
-import {Subject, timer} from 'rxjs';
+import {Observable, Subject, timer} from 'rxjs';
 import {DocumentChangeAction} from '@angular/fire/firestore';
 import {ToastProvider} from '../../../providers/toast';
 import {IonContent} from '@ionic/angular';
@@ -83,6 +83,9 @@ export class ChatFramePage implements OnInit {
 
   replyMessage : IMessageData;
 
+  private currentChatDocPath : string;
+  private currentChatMsgColPath : string;
+
   constructor(private configService : ConfigService,
               private activatedRoute: ActivatedRoute,
               private electronService: Electron,
@@ -122,17 +125,6 @@ export class ChatFramePage implements OnInit {
     this.type = this.activatedRoute.snapshot.queryParamMap.get('type');
 
     this.getMessages(this.gid,this.cid,this.type);
-
-    this.bizFire.currentUser.subscribe((user: IUserData) => {
-      if(user) {
-        //한번만 실행.
-        if(this.user == null) {
-          this.user = user;
-          this.bizFire.onLang.subscribe((l: any) => this.langPack = l.pack());
-          this.onWindowChat(this.gid,this.cid,this.type);
-        }
-      }
-    });
 
     this.bizFire.onBizGroupSelected.subscribe((group : IBizGroup) => {
       if(group.data.members[this.bizFire.uid] === true && group.data.status === true) {
@@ -214,7 +206,7 @@ export class ChatFramePage implements OnInit {
     try{
       await this.bizFire.loadBizGroup(gid);
 
-      await this.chatDataLoad(gid,cid,type);
+      await this.chatDataLoad();
 
     } catch (e) {
       this.electronService.windowClose();
@@ -290,37 +282,85 @@ export class ChatFramePage implements OnInit {
     }
   }
 
-  async chatDataLoad(gid: string,cid:string,type:string) {
-    const RoomPath = type === 'member' ?
-        Commons.chatDocPath(gid,cid) : Commons.chatSquadPath(gid,cid);
+  async chatDataLoad() {
+    const RoomPath = this.currentChatDocPath;
     // 채팅방 정보 갱신. (초대,나가기)
     await this.bizFire.afStore.doc(RoomPath)
         .snapshotChanges().subscribe((snap : any) => {
           if(snap.payload.exists) {
             this.chatRoom = new Chat(snap.payload.id,snap.payload.data(),this.bizFire.uid,snap.payload.ref);
-
             this.chatService.onSelectChatRoom.next(this.chatRoom);
           }
         });
   }
 
   async getMessages(gid: string,cid:string,type:string) {
-    const msgPath = type === 'member' ?
-        Commons.chatMsgPath(gid,cid) :
-        Commons.chatSquadMsgPath(gid,cid);
 
-    await this.bizFire.afStore.collection(msgPath,ref => ref.orderBy('created','desc').limit(20))
-        .get().subscribe(async (snapshots) => {
-          if(snapshots && snapshots.docs) {
-            this.start = snapshots.docs[snapshots.docs.length - 1];
+    const loading = await this.loading.show();
 
-            console.log("startstartstart!!!",this.start);
+    try {
 
-            await this.getNewMessages(msgPath, this.start);
+      console.log("uid 있니?",this.bizFire.uid);
+      console.log(gid,cid,type);
 
-            this.showContent = true;
+      let groupCollection$: Observable<any>;
+      if (type === STRINGS.CHAT_MEMBER) {
+        // 멤버 챗은 chat 컬렉션에서 뽑는다. (2020.09.23 현재 멤버챗은 하위가 없으므로 필요없으나 확장성위해)
+        groupCollection$ = this.bizFire.afStore.collectionGroup('chat', ref =>
+            ref.where('gid', '==', gid)
+                .where('status', '==', true)
+                .where('type', '==', STRINGS.CHAT_MEMBER)
+                .where(STRINGS.MEMBER_ARRAY, 'array-contains', this.bizFire.uid)
+        ).get();
+      } else if (type === STRINGS.PRIVATE) {
+        // 하위 스쿼드 챗도 같이 찾기 위해 squads 컬랙션을 몽땅 검색한다.
+        groupCollection$ = this.bizFire.afStore.collectionGroup('squads', ref =>
+            ref.where('gid', '==', gid)
+                .where('status', '==', true)
+                .where('type', '==', STRINGS.PRIVATE)
+                .where(STRINGS.MEMBER_ARRAY, 'array-contains', this.bizFire.uid)
+        ).get();
+      }
+
+      const snapshots: FireQuerySnapshot = await groupCollection$.toPromise();
+      const currentChatDoc: FireDocumentSnapshot = snapshots.docs.find((d: FireDocumentSnapshot)=> d.id === cid);
+
+      if(currentChatDoc) {
+        this.currentChatDocPath = currentChatDoc.ref.path;
+        this.currentChatMsgColPath = `${currentChatDoc.ref.path}/chat`;
+        console.log('currentChatDoc path:', currentChatDoc.ref.path);
+        await this.bizFire.afStore.collection(this.currentChatMsgColPath, ref => ref.orderBy('created', 'desc').limit(20))
+            .get().subscribe(async (snapshots) => {
+              if (snapshots && snapshots.docs) {
+                this.start = snapshots.docs[snapshots.docs.length - 1];
+
+                await this.getNewMessages(this.currentChatMsgColPath, this.start);
+
+                this.showContent = true;
+              }
+            });
+
+        this.bizFire.currentUser.subscribe((user: IUserData) => {
+          if (user) {
+            //한번만 실행.
+            if (this.user == null) {
+              this.user = user;
+              this.bizFire.onLang.subscribe((l: any) => this.langPack = l.pack());
+              this.onWindowChat(this.gid, this.cid, this.type);
+            }
           }
         })
+
+      } else {
+        throw `${this.cid} not found from db`;
+      }
+
+    } catch (e) {
+      console.error(e);
+      // this.electronService.windowClose();
+    } finally {
+      await loading.dismiss();
+    }
   }
 
   async getNewMessages(msgPath,start) {

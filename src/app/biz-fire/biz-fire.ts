@@ -2,9 +2,9 @@ import {Injectable, Optional, SkipSelf} from '@angular/core';
 import * as firebase from 'firebase/app';
 import {AngularFireAuth} from '@angular/fire/auth';
 import {BehaviorSubject, Observable, Subscription, Subject, timer, concat, forkJoin, of} from 'rxjs';
-import {filter, takeUntil, take, concatMap, endWith, concatAll} from 'rxjs/operators';
+import {filter, takeUntil, take, concatMap, endWith, concatAll, map} from 'rxjs/operators';
 import {Commons, STRINGS} from '../biz-common/commons';
-import {AngularFirestore} from '@angular/fire/firestore';
+import {AngularFirestore, DocumentChangeAction} from '@angular/fire/firestore';
 import {InitProcess} from './init-process';
 import {BizGroupBuilder} from './biz-group';
 import {LangService} from '../core/lang.service';
@@ -17,6 +17,8 @@ import {Router} from '@angular/router';
 import {Electron} from '../providers/electron';
 import {UserStatusProvider} from '../core/user-status';
 import {AngularFireDatabase} from '@angular/fire/database';
+import {ISquad} from '../providers/squad.service';
+import {SquadBuilder} from './squad';
 
 @Injectable({
     providedIn: 'root'
@@ -97,7 +99,7 @@ export class BizFireService {
         return this._onBizGroupSelected.asObservable().pipe(filter(g => g!= null));
     }
 
-    onBizGroupChanged$ = new Subject<any>();
+    onBizGroupChanged$ = new BehaviorSubject<string>(null);
 
     currentBizGroup: IBizGroup;
     // util func
@@ -383,7 +385,7 @@ export class BizFireService {
 
                         const group: IBizGroup = BizGroupBuilder.buildWithData(gid, data, this.uid);
 
-                        this.onBizGroupChanged$.next({old: this.currentBizGroup, new: group});
+                        this.onBizGroupChanged$.next(group.gid);
                         this.currentBizGroup = group;
                         this._onBizGroupSelected.next(group);
 
@@ -527,6 +529,42 @@ export class BizFireService {
 
     deleteLink(link){
         return this.afStore.collection(`users/${this.currentUID}/customlinks`).doc(link.mid).delete();
+    }
+
+    // -- 2020.09.04 모든 프라이빗 스쿼드를 리턴한다. 부모/자식이 혼재되어 배열로 리턴된다 ---
+    // 부모-자식 정렬은 따로 해야한다
+    privateSquads$(gid: string, uid?: string): Observable<DocumentChangeAction<any>[]> {
+        return this.afStore.collectionGroup('squads', ref =>
+            ref.where('status', '==', true)
+                .where('type', '==', 'private')
+                .where(STRINGS.MEMBER_ARRAY, 'array-contains', uid || this.uid)
+                .where('gid', '==', gid)
+        ).stateChanges();
+    }
+
+    publicSquads$(gid: string): Observable<DocumentChangeAction<any>[]> {
+        return this.afStore.collectionGroup('squads', ref =>
+            ref.where('status', '==', true)
+                .where('type', '==', 'public')
+                .where('gid', '==', gid)
+        ).stateChanges();
+    }
+
+    wellDoneAgileSquad$(gid: string): Observable<ISquad[]>{
+        return this.afStore.collectionGroup(`squads`, ref=>
+            ref.where('status', '==', false)
+                .where('type', '==', 'private') // 웰던은 프라이빗만 가능하다 (제네럴은 웰던 기능이없으므로 결과는 애자일만)
+                .where(STRINGS.MEMBER_ARRAY, 'array-contains',this.uid)
+                .where('gid', '==', gid)
+        ).snapshotChanges()
+            .pipe(
+                map((changes: DocumentChangeAction<any>[])=>
+                        changes.map((c: DocumentChangeAction<any>)=>SquadBuilder.buildFromDoc(c.payload.doc, this.uid)
+                        ),
+                    // 웰던은 해당 스쿼드의 매니저에게만 보인다.
+                    map((list: ISquad[])=> list.filter(s => s.isManager()))
+                ),
+            );
     }
 
 }

@@ -4,12 +4,11 @@ import {IBizGroup} from '../_models';
 import {Router} from '@angular/router';
 import {Electron} from '../providers/electron';
 
-import {IUnreadMap} from '../components/classes/unread-counter';
-import {ChatService} from '../providers/chat.service';
-
 import {UserStatusProvider} from '../core/user-status';
-import {filter, takeUntil} from 'rxjs/operators';
+import {debounceTime, filter, takeUntil} from 'rxjs/operators';
 import {Subject} from 'rxjs';
+import {UnreadService} from '../providers/unread.service';
+import {IMessageData} from '../_models/message';
 
 @Component({
   selector: 'app-tabs',
@@ -37,8 +36,8 @@ export class TabsPage {
       private bizFire : BizFireService,
       private router : Router,
       private electronService : Electron,
-      private chatService : ChatService,
-      private userStatusService: UserStatusProvider) {
+      private userStatusService: UserStatusProvider,
+      private unreadService: UnreadService,) {
 
     // this.electronService.ipcRenderer.on('progress',(e,m) => {
     //   console.log(m);
@@ -67,12 +66,19 @@ export class TabsPage {
       this.teamColor = this.group.data.team_color;
     });
 
-    // this.chatUnreadCount = 1;
+    this.unreadService.unreadList$
+        .pipe(
+            debounceTime(100),
+            takeUntil(this._unsubscribeAll)
+        )
+        .subscribe((list: IMessageData[])=>{
 
-    // this.bizFire.afStore.collectionGroup('chat',ref=>
-    //     ref.where('status', '==', true)
-    //         .where(`memberArray`, 'array-contains', this.bizFire.uid)
-    // ).stateChanges(['added', 'removed']);
+          if(list && list.length > 0) {
+            this.chatUnreadCount = list.filter(list => list.gid === this.bizFire.gid).length;
+          } else {
+            this.chatUnreadCount = 0;
+          }
+        });
   }
 
   changeTabs(e) {

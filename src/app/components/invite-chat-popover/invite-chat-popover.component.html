@@ -3,7 +3,7 @@
     {{langPack['select_member_invite']}}
     <span *ngIf="checkedUser.length > 0" [ngStyle]="{'color': groupSubColor ? groupSubColor : '#2a8bf2'}">{{checkedUser.length}}</span>
   </div>
-  <div>
+  <div class="pointer">
     <img src="assets/imgs/renewal/Icon_Outline_close.svg" (click)="closePopup()">
   </div>
 </div>

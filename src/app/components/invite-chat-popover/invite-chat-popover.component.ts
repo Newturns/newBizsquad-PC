@@ -51,7 +51,7 @@ export class InviteChatPopoverComponent implements OnInit {
           this.currentGroup = group;
           this.groupSubColor = group.data.team_subColor;
 
-          const inviteUids = this.currentGroup.getMemberIdsExceptGuests(false)
+          const inviteUids = this.currentGroup.getMemberIds(false)
               .filter(uid => this.roomData.data.memberArray.find(cUid => cUid === uid) == null);
 
           this.userList = await this.cacheService.resolvedUserList(inviteUids, Commons.userInfoSorter).toPromise();

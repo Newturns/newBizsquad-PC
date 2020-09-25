@@ -126,7 +126,6 @@ export class NotifyPage implements OnInit {
         if(result) {
         //해당 디비와 관련된 웹으로 점프.
         this.tokenService.notifyWebJump(msg);
-
         if(msg.ref) {
           msg.ref.delete();
         }

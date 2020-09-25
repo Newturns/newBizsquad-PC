@@ -8,6 +8,8 @@ import { SquadPageRoutingModule } from './squad-routing.module';
 
 import { SquadPage } from './squad.page';
 import {ComponentsModule} from '../../components/components.module';
+import {FilterSquadPipe} from './filter-squad.pipe';
+import {SortSquadPipe} from './sort-squad.pipe';
 
 @NgModule({
   imports: [
@@ -17,6 +19,14 @@ import {ComponentsModule} from '../../components/components.module';
     SquadPageRoutingModule,
     ComponentsModule
   ],
-  declarations: [SquadPage]
+  declarations: [
+    SquadPage,
+    FilterSquadPipe,
+    SortSquadPipe,
+  ],
+  exports: [
+    FilterSquadPipe,
+    SortSquadPipe,
+  ]
 })
 export class SquadPageModule {}

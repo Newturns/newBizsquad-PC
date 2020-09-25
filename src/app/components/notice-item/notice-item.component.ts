@@ -1,9 +1,9 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {take} from 'rxjs/operators';
-import {defaultSquadName, IBizGroup, IBizGroupData, INotification, INotificationData} from '../../_models';
+import {defaultSquadName, FireDocumentSnapshot, IBizGroup, IBizGroupData, INotification, INotificationData} from '../../_models';
 import {NEWCOLORS} from "../../biz-common/colors";
-import {Commons} from "../../biz-common/commons";
+import {Commons, STRINGS} from '../../biz-common/commons';
 import {ISquadData} from "../../providers/squad.service";
 import {BizComponent} from '../classes/biz-component';
 import {BizFireService} from '../../biz-fire/biz-fire';
@@ -103,65 +103,107 @@ export class NoticeItemComponent extends BizComponent implements OnInit {
 
     this.pcLinkUrl = item.data.gid;
 
+    //is it invite?
+    if(item.data.type === 'groupInvite'){
+      return;
+    }
+
     // is it bbs ?
-    if(item.data.type === 'bbs'){
+    if(item.data.type === 'bbs') {
 
       link += `/${this.langPack['BBS']}`;
       this.pcLinkUrl += '/notice';
-
     }
 
-    //is it invite?
-    if(item.data.type === 'groupInvite'){
-      return ;
-    }
+    else if(item.data.type === 'video') {
 
-    // is it video ?
-    if(item.data.type === 'video'){
-      // ??
-      link = `video`;
-      this.pcLinkUrl += '/video';
+      // 비디오가 종료된 상태인지 확인.
+      let videoChatPath = item.data.info.path || `${STRINGS.VIDEO}/${item.data.info.vid}`;
+      const videoSnapShot: FireDocumentSnapshot = await this.bizFire.afStore.doc(videoChatPath).get().toPromise();
+      if(videoSnapShot.exists && videoSnapShot.get('status') === true){
+        // 채팅에서 비디오채팅을 생성했을시 타이틀은 없다.
+        // 여기서 새로 만든다.
+        // '제목<br>' + '화상채팅 초대가 왔습니다.'
+        let title = videoSnapShot.get('title') as string;
+        title = title && title.length > 0 ? `${title}<br>`: '';
+        title += this.langPack['video_alarm_desc'].substr(0, this.langPack['video_alarm_desc'].indexOf('<br>'));
+        // 타이틀 오버라이드
+        item.data.info.title = title;
 
-      if(item.data.info.vid){
-        link += `/${item.data.info.vid}`;
-        this.pcLinkUrl += `/${item.data.info.vid}`;
+        link = `video`;
+        this.pcLinkUrl += '/video';
+
+        if(item.data.info.vid){
+          link += `/${item.data.info.vid}`;
+          this.pcLinkUrl += `/${item.data.info.vid}`;
+        }
+      } else {
+        // 이미 종료된 비디오 채팅방.
+        item.data.info.title = this.langPack['video_chat_deleted']; // 'This video chat has been closed by host'
+        this.pcLinkUrl = null;
       }
+    } else if(item.data.type === 'comment') {
+      const squadData: ISquadData = await this.cacheService.getPromise(Commons.squadDocPath(item.data.gid, item.data.sid));
+      if (squadData) {
+        if (squadData.default) {
+          link += `/${this.langPack['public_square']}`;
+        } else {
+          link += `/${squadData.name || squadData.title}`;
+        }
+        this.pcLinkUrl += `/squad/${item.data.sid}`;
+      }
+    } else {
 
-    }
+      this.pcLinkUrl += '/squad';
 
-    else {
-      // sid 정보가 있을때만 링크 조립 가능.
-      const sid = item.data.sid || (item.data.info && item.data.info.sid);
-      if (sid) {
-        // add squad name
+      if (item.data.sid || item.data.parentSid) {
+        // get squad
+        let squadData: ISquadData;
+        // 부모 스쿼드 위치가 적혀있으면 바로 로딩
+        if(item.data.info.path) {
+          squadData = await this.cacheService.getPromise(item.data.info.path);
 
-        const squadData: ISquadData = await this.cacheService.getPromise(Commons.squadDocPath(item.data.gid, sid));
-        if (squadData) {
-
-          //디폴트 스쿼드일때 그룹명으로 표시.
-          if(squadData.default) {
-            if(squadData.gid){
-              const g: IBizGroupData = await this.cacheService.getPromise(Commons.groupPath(squadData.gid));
-              if(g){
-                link += `/${defaultSquadName}`;
-              }
+          if(squadData) {
+            if(squadData.default) {
+              link += `/${this.langPack['public_square']}`;
+            } else {
+              link += `/${squadData.name || squadData.title}`;
+            }
+            this.pcLinkUrl += `/${item.data.sid}`;
+            if(item.data.parentSid)  {
+              this.pcLinkUrl += `/${item.data.parentSid}`;
             }
 
           } else {
-            link += `/${squadData.name || squadData.title}`;
+            link += `/<span class="text-danger">${this.langPack['deleted_post']}</span>`;
           }
 
-          // add squad
-          this.pcLinkUrl += `/squad/${sid}`;
-
-          // add comment id?
-          if (item.data.type === 'comment' && item.data.info.cid) {
-            if (this.linkParam == null) {
-              this.linkParam = {};
+        } else {
+          if(item.data.sid && item.data.parentSid == null) {
+            squadData = await this.cacheService.getPromise(Commons.squadDocPath(item.data.gid, item.data.sid));
+            //디폴트 스쿼드일때 퍼블릭 스퀘어로 표시
+            if(squadData.default) {
+              link += `/${this.langPack['public_square']}`;
+            } else {
+              link += `/${squadData.name || squadData.title}`;
             }
-            this.linkParam['cid'] = item.data.info.cid;
+            this.pcLinkUrl += `/${item.data.sid}`;
+          } else if(item.data.sid && item.data.parentSid) {
+            // 부모
+            squadData = await this.cacheService.getPromise(Commons.squadDocPath(item.data.gid, item.data.parentSid));
+            //디폴트 스쿼드일때 퍼블릭 스퀘어로 표시
+            if(squadData.default) {
+              link += `/${this.langPack['public_square']}`;
+            } else {
+              link += `/${squadData.name || squadData.title}`;
+            }
+            this.pcLinkUrl += `/${item.data.parentSid}/${item.data.sid}`;
+            // 자식 스쿼드 이름 추가.
+            const child: ISquadData = await this.cacheService.getPromise(Commons.subSquadDocPath(item.data.gid, item.data.parentSid, item.data.sid));
+            link += `/${child.name || child.title}`;
           }
         }
+
       } // end sid
     }
 

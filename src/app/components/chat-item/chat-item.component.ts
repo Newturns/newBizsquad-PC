@@ -39,7 +39,6 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
   clickedFunc = new EventEmitter<any>();
 
   chatTitle: string;
-  unreadCount: number = 0;
 
   chatIcon : IUser;
 
@@ -80,18 +79,18 @@ export class ChatItemComponent extends TakeUntil implements OnInit {
         this.reloadTitle();
       }
 
-      // this.unreadCount$ = this.bizFire.afStore.collection(`${c.ref.path}/chat`, ref=>
-      //     ref.where(`read.${this.bizFire.uid}.unread`, '==', true)
-      // ).valueChanges()
-      //     .pipe(
-      //         switchMap(list =>{
-      //           if(this.chatSelected) return of(list).pipe(delay(250));
-      //           return of(list);
-      //         })
-      //         ,map(data => data.length)
-      //         ,this.takeUntil
-      //         ,this.bizFire.takeUntilUserSignOut
-      //     );
+      this.unreadCount$ = this.bizFire.afStore.collection(`${c.ref.path}/chat`, ref=>
+          ref.where(`read.${this.bizFire.uid}.unread`, '==', true)
+      ).valueChanges()
+          .pipe(
+              switchMap(list =>{
+                if(this.chatSelected) return of(list).pipe(delay(250));
+                return of(list);
+              })
+              ,map(data => data.length)
+              ,this.takeUntil
+              ,this.bizFire.takeUntilUserSignOut
+          );
     }
   }
 

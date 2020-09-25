@@ -1,6 +1,6 @@
 {
   "name": "bizsquad",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "author": {
     "name": "kimtaehwan",
     "email": "skyzard1@gmail.com",
@@ -24,6 +24,7 @@
   },
   "private": true,
   "dependencies": {
+    "@angular/animations": "^8.1.2",
     "@angular/common": "~8.1.2",
     "@angular/core": "~8.1.2",
     "@angular/fire": "^5.4.2",

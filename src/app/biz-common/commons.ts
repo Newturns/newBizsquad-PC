@@ -11,6 +11,7 @@ export const STRINGS = {
   WORKS: 'works',
   BILLING: 'billing',
   COMPANY: 'company',
+  VIDEO:'video',
   BBS:'bbs',
 
   FIELD:{
@@ -28,6 +29,8 @@ export const STRINGS = {
   USER_IMAGE_FILENAME: 'profile.jpeg',
   METADATA: 'metaData',
   MEMBER_ARRAY: 'memberArray',
+  CHAT_MEMBER: 'member',
+  PRIVATE : 'private',
 };
 
 export declare type ProcessChangeUpdater = (oldItem: any, newItem: any, change: any) => void;
@@ -99,7 +102,9 @@ export class Commons {
       static squadDocPath(gid: string, sid: string): string {
         return `${STRINGS.STRING_BIZGROUPS}/${gid}/squads/${sid}`;
       }
-
+      static subSquadDocPath(gid: string, sid: string, child: string): string {
+        return `${STRINGS.STRING_BIZGROUPS}/${gid}/squads/${sid}/squads/${child}`;
+      }
       static messagePath(gid: string, sid: string): string {
         return `${STRINGS.STRING_BIZGROUPS}/${gid}/squads/${sid}/messages`;
       }
@@ -332,11 +337,16 @@ export class Commons {
       }
 
 
-      static sortDataByCreated(key = 'created', sort = 'asc'){
+      static sortDataByCreated(sort: 'asc'|'desc' = 'asc'){
         return  (a: any, b: any) => {
           let ret = 0;
-          if(a.data && a.data[key] && b && b.data && b.data[key]){
-            ret = a.data[key].toMillis() > b.data[key].toMillis() ? -1 : 1;
+          if(a.data && a.data.created && b && b.data && b.data.created){
+            if(sort === 'asc'){
+              // 위로 보내는게 -1
+              ret = a.data.created.toMillis() < b.data.created.toMillis() ? -1 : 1;
+            } else {
+              ret = a.data.created.toMillis() > b.data.created.toMillis() ? -1 : 1;
+            }
           }
           return ret;
         }

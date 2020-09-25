@@ -1,5 +1,5 @@
 
-import { Injectable } from '@angular/core';
+import {Injectable, Optional, SkipSelf} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 import * as firebase from 'firebase/app';
 import {Commons, STRINGS} from '../biz-common/commons';
@@ -194,11 +194,23 @@ export class ChatService extends TakeUntil{
     // save squad chat list here
     this.chatDataMap.squadChatList = [];
 
+  //   privateSquads$(gid: string, uid?: string): Observable<DocumentChangeAction<any>[]> {
+  //     return this.afStore.collectionGroup('squads', ref =>
+  //         ref.where('status', '==', true)
+  //             .where('type', '==', 'private')
+  //             .where(STRINGS.MEMBER_ARRAY, 'array-contains', uid || this.uid)
+  //             .where('gid', '==', gid)
+  //     ).stateChanges();
+  // }
+
     // save unsubscribe
     this.chatDataMap.squadChatListSub =
-    this.bizFire.afStore.collection(path, (ref:any) => {
-      ref = ref.where('status', '==', true);
-      if(this.bizFire.currentBizGroup.isGuest() === true){
+    this.bizFire.afStore.collectionGroup('squads', (ref:any) => {
+      ref = ref.where('status', '==', true)
+          .where('type', '==', 'private')
+          .where(STRINGS.MEMBER_ARRAY, 'array-contains', this.bizFire.uid)
+          .where('gid', '==', gid);
+      if(this.bizFire.currentBizGroup.isGuest() === true) {
         //파트너 그룹일때는 agile 스쿼드만 표시
         ref = ref.where('agile', '==', true);
       }

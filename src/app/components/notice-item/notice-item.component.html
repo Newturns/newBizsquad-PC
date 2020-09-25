@@ -50,7 +50,7 @@
 
       <!--TITLE ? -->
       <div class="item-info d-flex flex-grow-1 flex-shrink-1 align-items-center">
-        <span>{{item.data.info?.title || langPack['join_group']}}</span>
+        <span [innerHTML]="item.data.info?.title || langPack['join_group']"></span>
       </div>
 
       <div class="d-flex align-items-center justify-content-between">
@@ -61,10 +61,16 @@
           </div>
         </ng-container>
 
-        <ng-container *ngIf="!item.data.groupInvite">
+        <ng-container *ngIf="item.data.video && pcLinkUrl">
+          <div class="notice-item-link" (click)="onLinkClicked(item)">
+            {{langPack['join']}}
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="!item.data.groupInvite && !item.data.video">
           <div class="notice-item-link mr-1" (click)="onLinkClicked(item)">
             <ng-container *ngIf="link$ | async as link">
-              {{link}}
+              <span [innerHTML]="link"></span>
             </ng-container>
           </div>
         </ng-container>

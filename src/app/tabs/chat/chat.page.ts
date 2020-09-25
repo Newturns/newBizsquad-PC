@@ -3,8 +3,7 @@ import {Electron} from '../../providers/electron';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {IBizGroup, IUser} from '../../_models';
 import {ChatService} from '../../providers/chat.service';
-import {Subject} from 'rxjs';
-import { filter, map, takeUntil} from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import {IChat} from '../../_models/message';
 import {Commons} from '../../biz-common/commons';
 import {CacheService} from '../../core/cache/cache';
@@ -14,14 +13,14 @@ import {GroupColorProvider} from '../../biz-common/group-color';
 import {PopoverController} from '@ionic/angular';
 
 import {CreateChatPopoverComponent} from '../../components/create-chat-popover/create-chat-popover.component';
-import {IUnreadMap, MapItem} from '../../components/classes/unread-counter';
+import {TakeUntil} from '../../biz-common/take-until';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.page.html',
   styleUrls: ['./chat.page.scss'],
 })
-export class ChatPage implements OnInit {
+export class ChatPage extends TakeUntil implements OnInit {
 
   langPack = {};
 
@@ -37,11 +36,6 @@ export class ChatPage implements OnInit {
   memberUnreadTotalCount = 0;
   squadUnreadTotalCount = 0;
 
-  // sort distinct and debounce subject
-  sortChatRooms$ = new Subject<string>();
-
-  private _unsubscribeAll;
-
   constructor(private electronService : Electron,
               private chatService : ChatService,
               private cacheService : CacheService,
@@ -50,36 +44,42 @@ export class ChatPage implements OnInit {
               private groupColorProvider: GroupColorProvider,
               private popoverCtrl : PopoverController,
               private bizFire : BizFireService) {
+    super();
   }
 
   ionViewWillEnter() {
-    this._unsubscribeAll = new Subject<any>();
 
+  }
+
+  ngOnInit() {
     console.log("-------- ngOnInit chat -----------");
-    this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
+    this.bizFire.onLang.pipe(this.takeUntil).subscribe((l: any) => this.langPack = l.pack());
 
     this.bizFire.onBizGroupSelected
-        .pipe(takeUntil(this._unsubscribeAll))
+        .pipe(this.takeUntil)
         .subscribe((group : IBizGroup) => {
           this.group = group;
         });
 
     // 멤버 채팅방
     this.chatService.chatList$
-        .pipe(filter(d=>d!=null),takeUntil(this._unsubscribeAll),map((chats : IChat[]) => {
+        .pipe(
+            filter(d=>d!=null),
+            this.takeUntil,
+            map((chats : IChat[]) => {
               return chats.map((chat : IChat) => {
                 if(chat.data.title == null) {
                   this.cacheService.resolvedUserList(chat.getMemberIds(false), Commons.userInfoSorter)
-                    .pipe(takeUntil(this._unsubscribeAll))
-                    .subscribe((users :IUser[]) => {
-                      chat.data.title = '';
-                      chat.data.title = users.map(u => u.data.displayName).join(',');
-                      if(users.length === 0) {
-                        // no user left only me.
-                        // add no user
-                        chat.data.title = 'No users';
-                      }
-                    });
+                      .pipe(this.takeUntil)
+                      .subscribe((users :IUser[]) => {
+                        chat.data.title = '';
+                        chat.data.title = users.map(u => u.data.displayName).join(',');
+                        if(users.length === 0) {
+                          // no user left only me.
+                          // add no user
+                          chat.data.title = 'No users';
+                        }
+                      });
                 }
                 return chat;
               });
@@ -87,40 +87,22 @@ export class ChatPage implements OnInit {
         ).subscribe((rooms : IChat[]) => {
       // this.chatRooms = rooms.sort(Commons.sortDataByCreated());
       this.chatRooms = rooms;
+      console.log("chatRooms",this.chatRooms);
     });
 
     // 스쿼드 채팅방
     this.chatService.squadChatList$
         .pipe(
             filter(d=>d != null),
-            takeUntil(this._unsubscribeAll)
+            this.takeUntil,
         )
-        .subscribe((squad : IChat[]) => {
-          if(squad && squad.length > 0) {
-            const onlyPrivateSquad = squad.filter(s => {
-              return s.data.type === 'private' && s.data.memberArray.find(uid => uid === this.bizFire.uid);
-            });
-
+        .subscribe((squadChat : IChat[]) => {
+          if(squadChat && squadChat.length > 0) {
             console.log("squadChatRooms",this.squadChatRooms);
-            this.squadChatRooms = onlyPrivateSquad;
+            this.squadChatRooms = squadChat;
           }
         });
   }
-
-  ionViewDidLeave() {
-
-    console.log("-------- ngOnDestroy chat -----------");
-    this.memberUnreadTotalCount = 0;
-    this.squadUnreadTotalCount = 0;
-    this._unsubscribeAll.next();
-    this._unsubscribeAll.complete();
-  }
-
-  ngOnInit() {
-  }
-  ngOnDestroy(): void {
-  }
-
 
   onSearch(e) {
     const value = e.target.value;

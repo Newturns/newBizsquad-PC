@@ -48,7 +48,7 @@ export class SelectorPage implements OnInit {
     }).snapshotChanges()
         .pipe(this.bizFire.takeUntilUserSignOut,takeUntil(this._unsubscribeAll))
         .subscribe((changes: any[]) => {
-          this.groups = changes.map(d=>(BizGroupBuilder.buildWithOnStateChangeAngularFire(d, this.bizFire.uid)));
+          this.groups = changes.map(c=>(BizGroupBuilder.buildWithOnStateChangeAngularFire(c, this.bizFire.uid)));
 
           //그룹이 없는 경우 그룹선택,작성 페이지로 이동
           if(this.groups.length === 0){

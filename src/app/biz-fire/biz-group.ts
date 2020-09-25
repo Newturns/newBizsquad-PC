@@ -1,15 +1,16 @@
-import {GroupBase, IBizGroup, IBizGroupData} from '../_models';
+import {DocumentSnapshot, GroupBase, IBizGroup, IBizGroupData} from '../_models';
 
 export class BizGroup extends GroupBase implements IBizGroup {
 
     gid: string;
     data: IBizGroupData;
     ref: any;
+    doc: DocumentSnapshot;
 
     constructor(gid: string, data: IBizGroupData, uid: string, ref?: any) {
         super();
         this.gid = gid;
-        this.data = this.filterFalseMembers(data);
+        this.data = data;
         this.uid = uid;
         this.ref = ref;
     
@@ -34,6 +35,13 @@ export class BizGroup extends GroupBase implements IBizGroup {
 
 
 export class BizGroupBuilder {
+
+    public static buildFromDoc(doc: any, uid: string): IBizGroup {
+        const b: IBizGroup = new BizGroup(doc.id, doc.data(), uid, doc.ref);
+        b.doc = doc;
+        return b;
+    }
+
     public static buildWithOnStateChangeAngularFire(change: any, uid: string): IBizGroup {
         return new BizGroup(change.payload.doc.id, change.payload.doc.data(), uid, change.payload.doc.ref);
     }

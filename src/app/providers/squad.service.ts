@@ -3,7 +3,7 @@ import {Observable } from 'rxjs';
 import {Commons, STRINGS} from '../biz-common/commons';
 import { takeUntil, map } from 'rxjs/operators';
 import * as firebase from 'firebase/app';
-import {IBizGroupBase} from "../_models";
+import {IBizGroupBase, IFirestoreDocData} from '../_models';
 import {IChat} from "../_models/message";
 import {TakeUntil} from "../biz-common/take-until";
 import {BizFireService} from '../biz-fire/biz-fire';
@@ -11,12 +11,17 @@ import {BizFireService} from '../biz-fire/biz-fire';
 export interface ISquad extends IBizGroupBase{
   sid?: string,
   data?: ISquadData,
+
   gid?: string,
-  members?: any,
-  guest?: boolean
+  uid?: string,
+
+  // ISquad 서브 스쿼드 용 배열
+  children?: ISquad[],
+  // 화면 꺽쇠용
+  showChildren?: boolean
 }
 
-export interface ISquadData {
+export interface ISquadData extends IFirestoreDocData {
 
   // 2020.09.05 호환을 위해 남겨둔다.
   members?: any,

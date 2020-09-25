@@ -1,37 +1,59 @@
+
 <div class="p-3" [ngStyle]="{'background-color': currentBizGroup.data.team_color ? currentBizGroup.data.team_color : '#324ca8'}">
   <biz-squad-filter [size]="'md'" [color]="currentBizGroup.data.team_subColor"
                     [isGuest]="currentBizGroup.isGuest()"
-                    (onFilter)="onSquadTypeFilter($event)"
-                    (onSort)="onSquadTypeFilter($event)">
+                    (onFilter)="onTypeFilter($event)"
+                    (onSort)="onSort($event)">
   </biz-squad-filter>
 </div>
 
 <ion-content>
   <div class="squad-frame w-100 h-100 px-3" bizGroupColor [useMainBackGround]="true">
     <!-- 북마크 스쿼드  -->
-    <div class="mb-3" *ngIf="bookmark.length > 0 && squadfilterValue === null || squadfilterValue === 'bookmark'">
-      <div class="squad-list-title mb-2">{{langPack['bookmark']}}</div>
-      <ng-container *ngFor="let squad of bookmark">
-        <div class="mb-1" (click)="tokenService.makeWebJump('squad',squad.cid)">
-          <biz-squad-item class="w-100" [squad]="squad" [star]="true"></biz-squad-item>
-        </div>
-      </ng-container>
-    </div>
+    <ng-container *ngIf="allSquadList | filterSquad: filterGeneral('bookmark'); let list;">
+      <div class="mb-3" *ngIf="list.length > 0">
+        <div class="squad-list-title mb-2">{{langPack['bookmark']}}</div>
+        <ng-container *ngFor="let s of allSquadList | filterSquad: filterGeneral('bookmark') | sortSquad: sortBy; trackBy: subSquadTrackBy">
+          <div class="mb-1" (click)="tokenService.makeWebJump('squad',s.sid)">
+            <biz-squad-item class="w-100" [squad]="s" [star]="isFavoriteSquad(s.sid)"></biz-squad-item>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+
     <!-- 제네럴 스쿼드  -->
-    <div class="mb-3" *ngIf="publicSquads.length > 0 && squadfilterValue === null || squadfilterValue === 'general'">
-      <div class="squad-list-title mb-2">{{langPack['squad_count_label']}}</div>
-      <ng-container *ngFor="let squad of publicSquads">
-        <div class="mb-1" (click)="tokenService.makeWebJump('squad',squad.cid)">
-          <biz-squad-item class="w-100" [squad]="squad" [star]="false"></biz-squad-item>
-        </div>
-      </ng-container>
-    </div>
+    <ng-container *ngIf="allSquadList| filterSquad: filterGeneral('general')">
+      <div class="mb-3">
+        <div class="squad-list-title mb-2">{{langPack['squad_count_label']}}</div>
+        <ng-container *ngFor="let s of allSquadList | filterSquad: filterGeneral('general') | sortSquad: sortBy; trackBy: subSquadTrackBy">
+          <div class="mb-1" (click)="tokenService.makeWebJump('squad',s.sid)">
+            <biz-squad-item class="w-100" [squad]="s" [star]="false"></biz-squad-item>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+
     <!-- 에자일 스쿼드  -->
-    <div *ngIf="privateSquads.length > 0 && squadfilterValue === null || squadfilterValue === 'agile'">
+    <div>
       <div class="squad-list-title mb-2">{{langPack['my_squad_count_label']}}</div>
-      <ng-container *ngFor="let squad of privateSquads">
-        <div class="mb-1" (click)="tokenService.makeWebJump('squad',squad.cid)">
-          <biz-squad-item class="w-100" [squad]="squad" [star]="false"></biz-squad-item>
+      <ng-container *ngFor="let s of allSquadList | filterSquad: filterGeneral('agile') | sortSquad: sortBy; trackBy: subSquadTrackBy">
+        <div class="mb-1">
+          <biz-squad-item [squad]="s"
+                          [star]="isFavoriteSquad(s.sid)"
+                          [hasChildren]="s.children && s.children.length > 0"
+                          (subSquadShow)="s.showChildren = $event" (clickedFunc)="tokenService.makeWebJump('squad',$event)">
+          </biz-squad-item>
+        </div>
+        <!--자식 -->
+        <div class="overflow-hidden" [@openClose]="s.children && s.children.length > 0 && s.showChildren ? 'open': 'closed'">
+          <ng-container *ngFor="let child of s.children | sortSquad: sortBy ; trackBy:subSquadTrackBy">
+            <div class="mb-1 pl-4">
+              <biz-squad-item [squad]="child"
+                              [star]="isFavoriteSquad(child.sid)"
+                              (clickedFunc)="tokenService.makeWebJump('childSquad',$event,s.sid)">
+              </biz-squad-item>
+            </div>
+          </ng-container>
         </div>
       </ng-container>
     </div>

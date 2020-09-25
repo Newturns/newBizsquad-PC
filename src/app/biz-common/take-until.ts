@@ -28,6 +28,10 @@ export class TakeUntil implements OnDestroy {
         this.unsubscribe();
     }
 
+    ionViewDidLeave(): void {
+        this.unsubscribe();
+    }
+
     protected unsubscribe(): void {
         if(this._unsubscribeAll != null) {
             this._unsubscribeAll.next();

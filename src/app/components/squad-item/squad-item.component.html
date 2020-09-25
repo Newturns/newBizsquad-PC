@@ -1,5 +1,17 @@
-<div class="squad-btn d-flex justify-content-center align-items-center" [ngClass]="{'squadSelected': squadSelected === true}">
-  <div class="squad-item w-100 d-flex align-items-center" (mouseover)="squadSelected = true" (mouseleave)="squadSelected = false">
+<div class="d-flex align-items-center justify-content-center">
+
+  <!--  자식 스쿼드 펼치기  -->
+  <div class="subSquad-toggle-frame d-flex align-items-center justify-content-center"
+       (click)="subSquadToggle($event)"
+       *ngIf="hasChildren">
+    <i class="fa subSquad-toggle font-18"
+       [ngClass]="_subSquadShow ? ['fa-chevron-down','rgba-60'] : ['fa-chevron-right','rgba-20']">
+    </i>
+  </div>
+
+  <div class="squad-btn d-flex justify-content-center align-items-center flex-grow-1" (click)="jumpWeb()"
+       [ngClass]="{'squadSelected': squadSelected === true,'ml-3' : isGeneral || !hasChildren}">
+    <div class="squad-item w-100 d-flex align-items-center" (mouseover)="squadSelected = true" (mouseleave)="squadSelected = false">
       <div class="squad-image d-flex justify-content-center align-items-center">
 
         <biz-team-icon [teamData]="squadBox?.data" [groupName]="getSquadTitle()" [size]="32"></biz-team-icon>
@@ -11,7 +23,7 @@
           <div class="d-flex flex-grow-1 flex-shrink-1 squad-name" [style.color]="!squadSelected ? 'white': null">
             <span>{{getSquadTitle()}}</span>
           </div>
-          <div class="d-flex align-items-center flex-shrink-0">
+          <div class="d-flex align-items-center flex-shrink-0" *ngIf="_squad?.data.status && !isChild">
             <div class="d-flex align-items-center" *ngIf="squadBox && !squadBox.isPublic()">
 
               <!--outline lock icon-->
@@ -40,5 +52,6 @@
           </div>
         </div>
       </div>
+    </div>
   </div>
 </div>
