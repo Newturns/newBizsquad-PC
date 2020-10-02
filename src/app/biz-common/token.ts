@@ -101,10 +101,6 @@ export class TokenProvider {
         } else {
           let jumbUrl = `${this.getWebUrl()}/auth?token=${token}&url=${link}`;
 
-          if(item.data.type === 'calendar') {
-            jumbUrl += `&tab=${item.data.type}`;
-          }
-
           console.log(jumbUrl);
           this.electron.goLink(jumbUrl);
         }
@@ -128,7 +124,8 @@ export class TokenProvider {
       const firebaseName = this.configService.firebaseName;
       if(firebaseName) {
         if(firebaseName === 'bizsquad') {
-          return `https://bizsquad.net/${firebaseName}`;
+          // return `https://bizsquad.net/${firebaseName}`;
+          return `http://localhost:4200/${firebaseName}`;
         } else {
           return `https://${firebaseName}.bizsquad.net/${firebaseName}`;
         }

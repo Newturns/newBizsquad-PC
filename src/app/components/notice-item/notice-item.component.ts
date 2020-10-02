@@ -4,7 +4,7 @@ import {take} from 'rxjs/operators';
 import {defaultSquadName, FireDocumentSnapshot, IBizGroup, IBizGroupData, INotification, INotificationData} from '../../_models';
 import {NEWCOLORS} from "../../biz-common/colors";
 import {Commons, STRINGS} from '../../biz-common/commons';
-import {ISquadData} from "../../providers/squad.service";
+import {ISquad, ISquadData} from '../../providers/squad.service';
 import {BizComponent} from '../classes/biz-component';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {CacheService} from '../../core/cache/cache';
@@ -40,7 +40,6 @@ export class NoticeItemComponent extends BizComponent implements OnInit {
   onAccept = new EventEmitter<INotification>();
 
   private linkUrl: string[] = [];
-  private linkParam;
 
   private pcLinkUrl : string;
 
@@ -142,71 +141,52 @@ export class NoticeItemComponent extends BizComponent implements OnInit {
         item.data.info.title = this.langPack['video_chat_deleted']; // 'This video chat has been closed by host'
         this.pcLinkUrl = null;
       }
-    } else if(item.data.type === 'comment') {
-      const squadData: ISquadData = await this.cacheService.getPromise(Commons.squadDocPath(item.data.gid, item.data.sid));
-      if (squadData) {
-        if (squadData.default) {
-          link += `/${this.langPack['public_square']}`;
-        } else {
-          link += `/${squadData.name || squadData.title}`;
-        }
-        this.pcLinkUrl += `/squad/${item.data.sid}`;
-      }
     } else {
 
       this.pcLinkUrl += '/squad';
 
       if (item.data.sid || item.data.parentSid) {
-        // get squad
-        let squadData: ISquadData;
-        // 부모 스쿼드 위치가 적혀있으면 바로 로딩
-        if(item.data.info.path) {
-          squadData = await this.cacheService.getPromise(item.data.info.path);
 
-          if(squadData) {
-            if(squadData.default) {
-              link += `/${this.langPack['public_square']}`;
-            } else {
-              link += `/${squadData.name || squadData.title}`;
-            }
-            this.pcLinkUrl += `/${item.data.sid}`;
-            if(item.data.parentSid)  {
-              this.pcLinkUrl += `/${item.data.parentSid}`;
-            }
+        const sid = item.data.sid || item.data.info.sid;
+        // collectionGroup()으로 모든 스쿼드를 조회한다.
+        const squad$ = await this.cacheService.findSquad$(sid, item.data.gid);
+
+        if(squad$) {
+          const squad: ISquad = await squad$.pipe(take(1)).toPromise();
+          const squadData: ISquadData = squad.data;
+          if(squadData.default) {
+            link += `/${this.langPack['public_square']}`;
+            this.pcLinkUrl += `/${sid}`;
 
           } else {
-            link += `/<span class="text-danger">${this.langPack['deleted_post']}</span>`;
+            link += `/${squadData.name || squadData.title}`;
+            if(squadData.parentSid){
+              const parentSquad$ = await this.cacheService.findSquad$(squadData.parentSid, item.data.gid);
+              if(parentSquad$){
+                const parentSquad: ISquad = await parentSquad$.pipe(take(1)).toPromise();
+                link += `/${parentSquad.data.name || parentSquad.data.title}`;
+              } else {
+                link += `/<span class="text-danger">${this.langPack['deleted_post']}</span>`;
+              }
+            }
+            this.pcLinkUrl += `/${squadData.sid}`;
           }
-
         } else {
-          if(item.data.sid && item.data.parentSid == null) {
-            squadData = await this.cacheService.getPromise(Commons.squadDocPath(item.data.gid, item.data.sid));
-            //디폴트 스쿼드일때 퍼블릭 스퀘어로 표시
-            if(squadData.default) {
-              link += `/${this.langPack['public_square']}`;
-            } else {
-              link += `/${squadData.name || squadData.title}`;
-            }
-            this.pcLinkUrl += `/${item.data.sid}`;
-          } else if(item.data.sid && item.data.parentSid) {
-            // 부모
-            squadData = await this.cacheService.getPromise(Commons.squadDocPath(item.data.gid, item.data.parentSid));
-            //디폴트 스쿼드일때 퍼블릭 스퀘어로 표시
-            if(squadData.default) {
-              link += `/${this.langPack['public_square']}`;
-            } else {
-              link += `/${squadData.name || squadData.title}`;
-            }
-            this.pcLinkUrl += `/${item.data.parentSid}/${item.data.sid}`;
-            // 자식 스쿼드 이름 추가.
-            const child: ISquadData = await this.cacheService.getPromise(Commons.subSquadDocPath(item.data.gid, item.data.parentSid, item.data.sid));
-            link += `/${child.name || child.title}`;
-          }
+          // not Squad Data.
+          link += `/<span class="text-danger">${this.langPack['deleted_post']}</span>`;
         }
 
-      } // end sid
-    }
+        // add comment id?
+        if (item.data.info.cid) {
+          this.pcLinkUrl += `&cid=${item.data.info.cid}`;
+        }
+        // task 일때 TASK 탭 선택
+        if(item.data.type === 'task' || item.data.type === 'calendar'){
+          this.pcLinkUrl += `&tab=${item.data.type}`;
+        }
 
+      }
+    }
     this.link$.next(link);
   }
 

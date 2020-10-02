@@ -7,9 +7,11 @@ import {Path} from './path';
 import { filter,map, take } from 'rxjs/operators';
 import { Commons } from '../../biz-common/commons';
 import * as firebase from 'firebase/app';
-import {IBizGroup, IUser} from "../../_models";
+import {FireQuerySnapshot, IBizGroup, IUser} from '../../_models';
 import {BizFireService} from '../../biz-fire/biz-fire';
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot;
+import {ISquad} from '../../providers/squad.service';
+import {SquadBuilder} from '../../biz-fire/squad';
 
 export declare type CacheOptionDataBuilder = (data: any)=> any;
 export declare type CacheOptionListBuilder = (id: string, data?: any)=> any;
@@ -400,5 +402,45 @@ export class CacheService {
           });
     }
     return this.valueChangeMap[path].subject.asObservable().pipe(filter(n => n!== 'init'));
+  }
+
+
+  async findSquad$(sid: string, gid?: string): Promise<Observable<ISquad>>{
+    const allDatas = Object.values(this.valueChangeMap);
+    const found = allDatas.findIndex(d => d.doc && d.doc.id === sid);
+    if(found !== -1){
+
+      const data: ICacheDataItem = allDatas[found];
+      return data.subject.asObservable().pipe(
+          filter(n => n!== 'init'),
+          map(value => SquadBuilder.buildFromDoc(data.doc, this.bizFire.uid))
+      );
+
+    } else {
+
+      const snap: FireQuerySnapshot = await this.bizFire.afStore.collectionGroup('squads', (ref: any) =>{
+        if(gid){
+          ref = ref.where('gid', '==', gid)
+              .where('status', '==', true)
+              .where('type', 'in', ['public', 'private'])
+        }
+        return ref;
+      }).get().toPromise();
+
+      // console.log(snap.docs.map(d=>d.id));
+      const list = snap.docs.filter(doc => doc.id === sid);
+      if(list.length === 1){
+        return this.getValueChanges(list[0].ref.path).pipe(map(value => {
+          const s: ISquad = SquadBuilder.buildFromData(list[0].id, value, this.bizFire.uid);
+          s.doc = list[0];
+          s.ref = s.doc.ref;
+          return s;
+        }));
+      } else {
+        console.error(`[${sid}] not found from collectionGroup`);
+        return null;
+      }
+    }
+
   }
 }

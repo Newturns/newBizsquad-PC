@@ -12,7 +12,7 @@
   <div class="squad-btn d-flex justify-content-center align-items-center flex-grow-1" (click)="jumpWeb()"
        [ngClass]="{'squadSelected': squadSelected === true,'ml-3' : isGeneral || !hasChildren}">
     <div class="squad-item w-100 d-flex align-items-center" (mouseover)="squadSelected = true" (mouseleave)="squadSelected = false">
-      <div class="squad-image d-flex justify-content-center align-items-center">
+      <div class="squad-image d-flex justify-content-center align-items-center" *ngIf="!isChild">
 
         <biz-team-icon [teamData]="squadBox?.data" [groupName]="getSquadTitle()" [size]="32"></biz-team-icon>
 
@@ -43,7 +43,7 @@
           </div>
         </div>
 
-        <div class="d-flex align-items-center squad-member">
+        <div class="d-flex align-items-center squad-member" *ngIf="!isChild">
           <div class="mr-1">
             member
           </div>
