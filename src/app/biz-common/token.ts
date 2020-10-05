@@ -124,8 +124,8 @@ export class TokenProvider {
       const firebaseName = this.configService.firebaseName;
       if(firebaseName) {
         if(firebaseName === 'bizsquad') {
-          // return `https://bizsquad.net/${firebaseName}`;
-          return `http://localhost:4200/${firebaseName}`;
+          return `https://bizsquad.net/${firebaseName}`;
+          // return `http://localhost:4200/${firebaseName}`;
         } else {
           return `https://${firebaseName}.bizsquad.net/${firebaseName}`;
         }
