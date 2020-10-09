@@ -72,7 +72,7 @@ export class CreateChatPopoverComponent implements OnInit {
 
       if(selectedRoom) {
         this.chatService.onSelectChatRoom.next(selectedRoom);
-        this.electronService.openChatRoom({cid: selectedRoom.cid, data: selectedRoom.data});
+        this.electronService.openChatRoom({cid: selectedRoom.cid, data: selectedRoom.data},this.bizFire.uid);
         this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid)).set({ lastChatId:{ pc: selectedRoom.cid } }, {merge: true});
         this.popoverCtrl.dismiss();
       } else {

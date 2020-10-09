@@ -63,6 +63,11 @@ export interface IUserData {
     web? : string,
     mobile? : string
   },
+  lastChatId?: {
+    pc? : string[],
+    web? : string,
+    mobile? : string,
+  }
   user_onlineColor?: string,
   lastWebGid?: string,
   lastPcGid?:string

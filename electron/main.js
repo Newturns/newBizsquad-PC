@@ -1,9 +1,10 @@
 //보안에러 나오지않도록.. 추가
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
 
-const {app,BrowserWindow,Tray,Menu,ipcMain,dialog,shell} = require('electron');
+const {app,BrowserWindow,Tray,Menu,ipcMain,dialog,shell,net} = require('electron');
 const path = require('path');
 const url = require('url');
+const request = require('request');
 
 //윈도우 유저로컬별 크기 저장.
 const windowStateKeeper = require('electron-window-state');
@@ -192,13 +193,8 @@ ipcMain.on('createChatRoom', (event, data) => {
 
     let chatRoomId;
 
-    if(chatRoom.cid == null){
-        // 스쿼드 채팅 일때 스쿼드의 doc id
-        chatRoomId = chatRoom.sid;
-    } else {
-        // 개인 채팅 일떄 채팅방의 doc id
-        chatRoomId = chatRoom.cid;
-    }
+    // 스쿼드 채팅 일때 cid가 null이므로 Sid사용,
+    chatRoomId = chatRoom.cid || chatRoom.sid;
 
     if(chatWindows[chatRoomId]) {
 
@@ -257,7 +253,8 @@ ipcMain.on('createChatRoom', (event, data) => {
                     { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
                     { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
                     { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
-                ]}
+                ]
+            }
         ]);
 
         chatWindows[chatRoomId].on('focus', () => {
@@ -272,9 +269,9 @@ ipcMain.on('createChatRoom', (event, data) => {
         chatWindows[chatRoomId].webContents.openDevTools();
     }
 
-    // 창이 닫히면 호출됩니다.
     chatWindows[chatRoomId].on('closed', () => {
         chatWindows[chatRoomId] = null;
+        closeChatUserDataUpdate(chatRoom.uid,chatRoomId,chatRoom.fireFunc);
     });
 });
 
@@ -377,5 +374,28 @@ setInterval(function() {
 
 function sendStatusToWindow(message) {
     logger.info(message);
+}
+
+function closeChatUserDataUpdate(uid,cid,fireFunc) {
+    storage.get('userData', function(error, data) {
+        if (error) throw error;
+
+        const path = `${fireFunc}/chatRoomClosedOnPc`;
+        console.log(uid,cid,fireFunc);
+        console.log(path);
+
+        request({
+            body: JSON.stringify({uid : uid, cid : cid}),
+            followAllRedirects: true,
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            method: 'POST',
+            url: path
+        }, (error, response, body) => {
+            // console.log(body);
+        });
+    });
 }
 

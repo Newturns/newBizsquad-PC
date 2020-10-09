@@ -3,6 +3,7 @@ import { ipcRenderer, webFrame, remote } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
 import {BizFireService} from '../biz-fire/biz-fire';
+import {ConfigService} from '../config.service';
 
 @Injectable()
 export class Electron {
@@ -22,7 +23,7 @@ export class Electron {
         return window && (window as any).process && (window as any).process.type;
     }
 
-    constructor() {
+    constructor(private configService: ConfigService,) {
 
         // Conditional imports
         // angula 6 부터 fs 에러가 발생. 아래와같이 코드 수정.
@@ -71,8 +72,17 @@ export class Electron {
         this.ipcRenderer.send('notification');
     }
 
-    openChatRoom(ChatRoom) {
-        this.ipcRenderer.send('createChatRoom',ChatRoom);
+    openChatRoom(chatRoom,uid) {
+        if(chatRoom) {
+            if(!chatRoom.fireFunc)
+                chatRoom.fireFunc = this.configService.metaData.fireFunc;
+
+            if(!chatRoom.uid)
+                chatRoom.uid = uid;
+        }
+        console.log("openChatRoom()",chatRoom);
+
+        this.ipcRenderer.send('createChatRoom',chatRoom);
     }
 
     resetValue(){
@@ -84,8 +94,8 @@ export class Electron {
         this.ipcRenderer.send('loadGH',url);
     }
 
-    saveLocalUser(id:string,pwd:any,auto:boolean,company:string) {
-        const data = {id:id,pwd:pwd,auto:auto,company:company};
+    saveLocalUser(id:string,pwd:any,auto:boolean,company:string,uid:string) {
+        const data = {id:id,pwd:pwd,auto:auto,company:company,uid:uid};
         this.ipcRenderer.send('saveLocalUser',data);
     }
 

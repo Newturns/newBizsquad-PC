@@ -159,7 +159,6 @@ export class NoticeItemComponent extends BizComponent implements OnInit {
             this.pcLinkUrl += `/${sid}`;
 
           } else {
-            link += `/${squadData.name || squadData.title}`;
             if(squadData.parentSid){
               const parentSquad$ = await this.cacheService.findSquad$(squadData.parentSid, item.data.gid);
               if(parentSquad$){
@@ -169,7 +168,8 @@ export class NoticeItemComponent extends BizComponent implements OnInit {
                 link += `/<span class="text-danger">${this.langPack['deleted_post']}</span>`;
               }
             }
-            this.pcLinkUrl += `/${squadData.sid}`;
+            link += `/${squadData.name || squadData.title}`;
+            this.pcLinkUrl += `/${sid}`;
           }
         } else {
           // not Squad Data.

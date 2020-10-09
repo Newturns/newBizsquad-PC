@@ -1,24 +1,23 @@
 
 import {Injectable, Optional, SkipSelf} from '@angular/core';
 import {BehaviorSubject, Observable, of} from 'rxjs';
-import * as firebase from 'firebase/app';
 import {Commons, STRINGS} from '../biz-common/commons';
 
 import {debounceTime, filter, takeUntil} from 'rxjs/operators';
 import {IChat, IChatData, IMessage, IMessageData} from "../_models/message";
-import {IBizGroup, IUser} from '../_models';
+import {IBizGroup, IUser, IUserData} from '../_models';
 import {HttpClient} from "@angular/common/http";
 import {BizFireService} from '../biz-fire/biz-fire';
 import {Electron} from './electron';
 import {LangService} from '../core/lang.service';
 import {CacheService} from '../core/cache/cache';
-import {ConfigService} from '../config.service';
 import {PopoverController} from '@ionic/angular';
 import {TakeUntil} from '../biz-common/take-until';
 import {Chat} from '../biz-common/chat';
 import {DocumentChangeAction} from '@angular/fire/firestore';
 import {IUploadItem, UploadProgressComponent} from '../components/upload-progress/upload-progress.component';
 import {MessageBuilder} from '../biz-common/message';
+import * as firebase from 'firebase/app';
 
 @Injectable({
     providedIn: 'root'
@@ -74,7 +73,6 @@ export class ChatService extends TakeUntil{
       private langService : LangService,
       private http: HttpClient,
       private cacheService : CacheService,
-      private configService: ConfigService,
       private popoverCtrl : PopoverController) {
     super();
 
@@ -333,9 +331,8 @@ export class ChatService extends TakeUntil{
           this.makeRoomNoticeMessage('member-chat','init',newRoom.gid,snap.id)
               .then(() => {
                 this.onSelectChatRoom.next(this.var_chatRooms);
-                this.electron.openChatRoom(this.var_chatRooms);
-                this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid))
-                    .set({ lastChatId:{ pc: this.var_chatRooms.cid } }, {merge: true});
+                this.electron.openChatRoom(this.var_chatRooms,this.bizFire.uid);
+                this.saveLastChatId(this.var_chatRooms.cid);
               });
         })
       });
@@ -667,6 +664,11 @@ export class ChatService extends TakeUntil{
     userWithPushAllowed = userWithPushAllowed.filter(uid => uid != null);
     console.log('userWithPushAllowed:', userWithPushAllowed);
     return userWithPushAllowed;
+  }
+
+  async saveLastChatId(cid : string) {
+    await this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid))
+        .set({ lastChatId:{ pc: firebase.firestore.FieldValue.arrayUnion(cid) } }, {merge: true});
   }
 
 

@@ -195,7 +195,8 @@ export class ProfilePopoverComponent extends TakeUntil implements OnInit {
       this.chatService.createRoomByProfile(this.targetValue);
     } else {
       this.chatService.onSelectChatRoom.next(selectedRoom);
-      this.electronService.openChatRoom(selectedRoom);
+      this.electronService.openChatRoom(selectedRoom,this.bizFire.uid);
+      this.chatService.saveLastChatId(selectedRoom.cid);
     }
     this.closePopover();
   }

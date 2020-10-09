@@ -117,12 +117,11 @@ export class ChatPage extends TakeUntil implements OnInit {
 
   gotoRoom(c : IChat) {
     this.chatService.onSelectChatRoom.next(c);
+    this.chatService.saveLastChatId(c.cid);
     console.log(c);
-    this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid))
-        .set({ lastChatId:{ pc: c.cid } }, {merge: true});
 
     const cutRefValue = {cid: c.cid, data: c.data};
-    this.electronService.openChatRoom(cutRefValue);
+    this.electronService.openChatRoom(cutRefValue,this.bizFire.uid);
 
   }
 
