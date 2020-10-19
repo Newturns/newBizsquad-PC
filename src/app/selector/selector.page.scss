@@ -5,11 +5,8 @@ ion-navbar{
   -webkit-app-region: drag;
 }
 .titleButton{
-  font-family: Roboto;
   font-size: 18px;
   font-weight: 500;
-  font-stretch: normal;
-  font-style: normal;
   line-height: 2.67;
   letter-spacing: normal;
   color: #0d1c2e;
@@ -37,11 +34,8 @@ ion-navbar{
   .group-detail {
     width: 0;
     .group-name {
-      font-family: Roboto;
       font-size: 16px;
       font-weight: 500;
-      font-stretch: normal;
-      font-style: normal;
       line-height: 1;
       letter-spacing: 0.4px;
       color: #000000;
@@ -52,12 +46,7 @@ ion-navbar{
       }
     }
     .group-description {
-      font-family: Roboto;
       font-size: 12px;
-      font-weight: normal;
-      font-stretch: normal;
-      font-style: normal;
-      line-height: normal;
       letter-spacing: -0.05px;
       color: #707c97;
       div {

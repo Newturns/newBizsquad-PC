@@ -32,11 +32,11 @@
 //$font-family-ios-base: “Roboto”;
 
 body{
-  font-family: "Roboto","Noto Sans KR","Noto Sans JP","Nanum Gothic", Dotum, Helvetica, sans-serif;
+  font-family: "Ubuntu","Noto Sans KR","Noto Sans JP","Nanum Gothic", Dotum, Helvetica, sans-serif;
 }
 
 .md,.ios{
-  font-family: "Roboto","Noto Sans KR","Noto Sans JP","Nanum Gothic", Dotum, Helvetica, sans-serif;
+  font-family: "Ubuntu","Noto Sans KR","Noto Sans JP","Nanum Gothic", Dotum, Helvetica, sans-serif;
 }
 
 
@@ -157,6 +157,16 @@ ion-item:hover a {
     // border-top-right-radius: 5px;
     // border-bottom-left-radius: 5px;
     // border-bottom-right-radius: 5px;
+  }
+}
+
+.page-clipboard-attach {
+  .popover-content{
+    top: 75px !important;
+    width: 340px;
+    height: 300px;
+    border-radius: 10px;
+    background-color: white !important;
   }
 }
 

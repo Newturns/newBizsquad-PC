@@ -134,7 +134,9 @@ export class ImgComponent extends TakeUntil implements OnInit {
   }
 
   goLink(url) {
-    this.electronService.goLink(url);
+    if(url) {
+      this.electronService.goLink(url);
+    }
   }
 
   onLoad(e){

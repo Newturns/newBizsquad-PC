@@ -13,10 +13,12 @@ import {LoadingProvider} from '../../../providers/loading';
 import {Observable, Subject, timer} from 'rxjs';
 import {DocumentChangeAction} from '@angular/fire/firestore';
 import {ToastProvider} from '../../../providers/toast';
-import {IonContent} from '@ionic/angular';
+import {IonContent, PopoverController} from '@ionic/angular';
 import {formatDate} from '@angular/common';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {CacheService} from '../../../core/cache/cache';
+import {InviteChatPopoverComponent} from '../../../components/invite-chat-popover/invite-chat-popover.component';
+import {ClipboardAttachPopoverComponent} from '../../../components/clipboard-attach-popover/clipboard-attach-popover.component';
 
 @Component({
   selector: 'app-chat-frame',
@@ -94,7 +96,8 @@ export class ChatFramePage implements OnInit {
               private toastProvider : ToastProvider,
               private fb: FormBuilder,
               public cacheService : CacheService,
-              private bizFire : BizFireService) {
+              private bizFire : BizFireService,
+              private popoverCtrl : PopoverController) {
 
     this.chatForm = fb.group(
         {
@@ -215,6 +218,8 @@ export class ChatFramePage implements OnInit {
 
   file(file, dndMode = false){
 
+    console.log(file);
+
     let fileList: FileList;
 
     if(dndMode === false) {
@@ -258,10 +263,12 @@ export class ChatFramePage implements OnInit {
   }
 
   protected adjustTextarea(event: any): void {
-    let textarea: any = event.target;
-    textarea.style.overflow = 'hidden';
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
+    if(event && event.target) {
+      let textarea: any = event.target;
+      textarea.style.overflow = 'hidden';
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
     return;
   }
 
@@ -612,5 +619,31 @@ export class ChatFramePage implements OnInit {
       }
     }
     return ret;
+  }
+
+  async pasteClipboard() {
+    //이미지 파일이 아닐경우(텍스트) null을 반환.
+    const hasImg = this.electronService.clipboardHasImg();
+    //붙여넣은 데이터가 이미지일 경우 실행.
+    if(hasImg) {
+      //추가. 업로드 할지 선택 팝업 추가.
+      const popover = await this.popoverCtrl.create({
+        component: ClipboardAttachPopoverComponent,
+        animated: false,
+        cssClass: ['page-clipboard-attach'],
+        componentProps: {
+          base64Image : this.electronService.getClipboardImg64(),
+          cancel: this.langPack['cancel'],
+          send: this.langPack['ok'],
+        }
+      });
+      await popover.present();
+
+      const result = await popover.onDidDismiss();
+      if(result.data) {
+        const imageFile = await this.electronService.getClipboardImg();
+        await this.chatService.addChatMessage(imageFile.name,this.chatRoom,[imageFile]);
+      }
+    }
   }
 }

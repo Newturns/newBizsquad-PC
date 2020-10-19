@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ipcRenderer, webFrame, remote } from 'electron';
+import { ipcRenderer, webFrame, remote,clipboard } from 'electron';
 import * as childProcess from 'child_process';
 import * as fs from 'fs';
-import {BizFireService} from '../biz-fire/biz-fire';
 import {ConfigService} from '../config.service';
 
 @Injectable()
@@ -11,6 +10,7 @@ export class Electron {
     ipcRenderer: typeof ipcRenderer;
     webFrame: typeof webFrame;
     remote: typeof remote;
+    clipboard: typeof clipboard;
     childProcess: typeof childProcess;
     fs: typeof fs;
 
@@ -31,6 +31,7 @@ export class Electron {
             this.ipcRenderer = (window as any).require('electron').ipcRenderer;
             this.webFrame = (window as any).require('electron').webFrame;
             this.remote = (window as any).require('electron').remote;
+            this.clipboard = (window as any).require('electron').clipboard;
 
             this.childProcess = (window as any).require('child_process');
             this.fs = (window as any).require('fs');
@@ -102,6 +103,25 @@ export class Electron {
     clearChatWindows() {
         this.ipcRenderer.send('userLogOut');
     }
+
+    clipboardHasImg() : boolean {
+        const availableFormats = this.clipboard.availableFormats("clipboard");
+        return availableFormats.includes("image/png") || availableFormats.includes("image/jpeg");
+    }
+
+    getClipboardImg() : File {
+        const clipboardImg = this.clipboard.readImage("clipboard");
+        const filetoPNG = clipboardImg.toPNG();
+        const fileName = `clipboard_${new Date().getTime()}.png`;
+        return new File([filetoPNG],fileName,{type: "image/png"});
+    }
+
+    getClipboardImg64() {
+        //이미지를 최대한 가볍게 만들어 ctrl+v시 딜레이시간을 최소화.
+        const clipboardImg = this.clipboard.readImage("clipboard").resize({width : 300,quality : 'good'});
+        return clipboardImg.toDataURL();
+    }
+
 
 
     mouseRightClick() {

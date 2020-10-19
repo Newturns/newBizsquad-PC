@@ -1,7 +1,7 @@
 //보안에러 나오지않도록.. 추가
 process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = '1';
 
-const {app,BrowserWindow,Tray,Menu,ipcMain,dialog,shell,net} = require('electron');
+const {app,BrowserWindow,Tray,Menu,ipcMain,dialog,shell,clipboard} = require('electron');
 const path = require('path');
 const url = require('url');
 const request = require('request');

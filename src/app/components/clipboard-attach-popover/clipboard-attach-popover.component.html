@@ -1,0 +1,14 @@
+<div class="clipboard-frame d-flex flex-column align-items-center justify-content-between flex-grow-1 p-4">
+
+  <!-- 미리보기 이미지 -->
+  <div class="thumb-img w-100">
+    <img *ngIf="base64Image" [src]="base64Image">
+  </div>
+
+  <!-- 액션버튼. -->
+  <div class="d-flex">
+    <biz-button class="m-0" [title]="cancel" [warn]="true" (click)="cancelAttach()"></biz-button>
+    <biz-button [title]="send" [teamColor]="true" (click)="sendImage()"></biz-button>
+  </div>
+
+</div>

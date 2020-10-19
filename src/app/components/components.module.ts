@@ -32,6 +32,7 @@ import {InviteChatPopoverComponent} from './invite-chat-popover/invite-chat-popo
 import {CreateChatPopoverComponent} from './create-chat-popover/create-chat-popover.component';
 import {GoogleTransTextComponent} from './google-trans-text/google-trans-text.component';
 import {MessageReplyComponent} from './message-reply/message-reply.component';
+import {ClipboardAttachPopoverComponent} from './clipboard-attach-popover/clipboard-attach-popover.component';
 
 @NgModule({
     declarations: [
@@ -61,6 +62,7 @@ import {MessageReplyComponent} from './message-reply/message-reply.component';
         InviteChatPopoverComponent,
         CreateChatPopoverComponent,
         GoogleTransTextComponent,
+        ClipboardAttachPopoverComponent,
         MessageReplyComponent
     ],
     imports: [
@@ -96,6 +98,7 @@ import {MessageReplyComponent} from './message-reply/message-reply.component';
         InviteChatPopoverComponent,
         CustomLinkComponent,
         CreateChatPopoverComponent,
+        ClipboardAttachPopoverComponent,
         GoogleTransTextComponent,
         MessageReplyComponent,
     ],
@@ -106,6 +109,7 @@ import {MessageReplyComponent} from './message-reply/message-reply.component';
         ProfilePopoverComponent,
         ChatMenuPopoverComponent,
         InviteChatPopoverComponent,
+        ClipboardAttachPopoverComponent,
         CustomLinkComponent,
         CreateChatPopoverComponent
     ],
