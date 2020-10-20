@@ -32,6 +32,14 @@
   }
 
 }
+.reply-message {
+  span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+  }
+}
 
 
 // scroll bar

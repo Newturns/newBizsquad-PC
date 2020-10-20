@@ -50,7 +50,7 @@
             <div class="mb-1 pl-4">
               <biz-squad-item [squad]="child"
                               [star]="isFavoriteSquad(child.sid)"
-                              (clickedFunc)="tokenService.makeWebJump('childSquad',$event,s.sid)">
+                              (clickedFunc)="tokenService.makeWebJump('squad',$event)">
               </biz-squad-item>
             </div>
           </ng-container>

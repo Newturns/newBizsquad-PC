@@ -27,18 +27,18 @@
 
 <ion-footer no-border>
   <div class="d-flex flex-row align-items-center justify-content-between p-2" *ngIf="replyMessage != null">
-    <div class="d-flex align-items-center overflow-hidden">
-      <ion-icon name="return-right"></ion-icon>
-      <div class="ml-3 mr-3 d-flex flex-column overflow-hidden">
-        <div class="font-13 text-primary" *ngIf="cacheService.userGetObserver(replyMessage.sender) | async as user">
+    <div class="d-flex align-items-center flex-grow-1">
+      <ion-icon class="flex-shrink-0" name="return-right"></ion-icon>
+      <div class="ml-3 mr-3 d-flex flex-column flex-grow-1">
+        <div class="font-13 text-primary flex-shrink-0" *ngIf="cacheService.userGetObserver(replyMessage.sender) | async as user">
           {{user.data.displayName}}
         </div>
-        <div class="font-12 reply-message">
-          {{removeHtml(replyMessage.message.text)}}
+        <div class="d-flex font-12 reply-message flex-grow-1">
+          <span class="flex-grow-1">{{removeHtml(replyMessage.message.text)}}</span>
         </div>
       </div>
     </div>
-    <ion-icon class="pointer" name="close" (click)="removeReplyInfo()"></ion-icon>
+    <ion-icon class="pointer flex-shrink-0" name="close" (click)="removeReplyInfo()"></ion-icon>
   </div>
 
   <form [formGroup]="chatForm">

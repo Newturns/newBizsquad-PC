@@ -59,7 +59,7 @@ export class TokenProvider {
       });
     }
 
-    async makeWebJump(type: string,id?:string,parentId?: string) {
+    async makeWebJump(type: string,id?:string) {
       const loading = await this.loading.show();
       this.getToken(this.bizFire.uid).then(async (token : string) => {
         if(type === 'setting') {
@@ -70,9 +70,6 @@ export class TokenProvider {
         }
         if(type === 'squad') {
           this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/squad/${id}`);
-        }
-        if(type === 'childSquad') {
-          this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/squad/${parentId}/${id}`);
         }
         if(type == 'mypage') {
           this.electron.goLink(`${this.getWebUrl()}/auth?token=${token}&url=${this.bizFire.gid}/myPage`);
@@ -125,7 +122,6 @@ export class TokenProvider {
       if(firebaseName) {
         if(firebaseName === 'bizsquad') {
           return `https://bizsquad.net/${firebaseName}`;
-          // return `http://localhost:4200/${firebaseName}`;
         } else {
           return `https://${firebaseName}.bizsquad.net/${firebaseName}`;
         }
