@@ -34,6 +34,7 @@ export class SelectorPage implements OnInit {
     this._unsubscribeAll = new Subject<any>();
     this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
     this.loadGroups();
+    this.electronService.setAppBadge(0);
   }
 
   private async loadGroups() {

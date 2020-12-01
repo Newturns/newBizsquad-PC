@@ -62,15 +62,7 @@ export class HomePage implements OnInit {
         .pipe(filter(n => n != null),takeUntil(this._unsubscribeAll))
         .subscribe((msgs : INotification[]) => {
           if(msgs) {
-            this.badgeCount = msgs.filter(m => {
-              let ret : boolean;
-              if(m.data.statusInfo.done !== true) {
-                ret = true;
-              } else {
-                ret = false;
-              }
-              return ret;
-            }).length;
+            this.badgeCount = msgs.filter(m => m.data.statusInfo.done !== true).length;
             if(this.badgeCount > 99) this.badgeCount = 99;
           }
         });

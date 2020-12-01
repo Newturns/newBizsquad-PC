@@ -6,9 +6,11 @@ import {Electron} from '../providers/electron';
 
 import {UserStatusProvider} from '../core/user-status';
 import {debounceTime, filter, takeUntil} from 'rxjs/operators';
+import {combineLatest} from 'rxjs';
 import {Subject} from 'rxjs';
 import {UnreadService} from '../providers/unread.service';
 import {IMessageData} from '../_models/message';
+import {NotificationService} from '../core/notification.service';
 
 @Component({
   selector: 'app-tabs',
@@ -37,6 +39,7 @@ export class TabsPage {
       private router : Router,
       private electronService : Electron,
       private userStatusService: UserStatusProvider,
+      private notificationService : NotificationService,
       private unreadService: UnreadService,) {
 
     // this.electronService.ipcRenderer.on('progress',(e,m) => {
@@ -69,16 +72,35 @@ export class TabsPage {
     this.unreadService.unreadList$
         .pipe(
             debounceTime(100),
-            takeUntil(this._unsubscribeAll)
+            takeUntil(this._unsubscribeAll),
         )
         .subscribe((list: IMessageData[])=>{
 
           if(list && list.length > 0) {
             this.chatUnreadCount = list.filter(list => list.gid === this.bizFire.gid).length;
+            this.electronService.setAppBadge(this.chatUnreadCount);
+          } else {
+            this.chatUnreadCount = 0;
+            this.electronService.setAppBadge(0);
+          }
+        });
+    combineLatest(this.unreadService.unreadList$,this.notificationService.onNotifications)
+        .pipe(
+            debounceTime(100),
+            takeUntil(this._unsubscribeAll),
+        ).subscribe(([chatList, notifyList])=>{
+          if(chatList && chatList.length > 0) {
+            this.chatUnreadCount = chatList.filter(list => list.gid === this.bizFire.gid).length;
           } else {
             this.chatUnreadCount = 0;
           }
-        });
+          if(notifyList && notifyList.length > 0) {
+            this.newNotifyCount = notifyList.filter(m => m.data.statusInfo.done !== true).length;
+          } else {
+            this.newNotifyCount = 0;
+          }
+          this.electronService.setAppBadge(this.chatUnreadCount + this.newNotifyCount);
+    });
   }
 
   changeTabs(e) {

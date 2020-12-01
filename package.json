@@ -1,6 +1,6 @@
 {
   "name": "bizsquad",
-  "version": "1.5.2",
+  "version": "1.5.4",
   "author": {
     "name": "kimtaehwan",
     "email": "skyzard1@gmail.com",
@@ -19,6 +19,7 @@
     "dist": "electron-builder",
     "dist-all": "electron-builder -mw",
     "dist-win": "electron-builder --win",
+    "dist-mac": "electron-builder --mac",
     "sign-dev-electron-app": "codesign --deep --force --verbose --sign node_modules/electron-prebuilt-compile/node_modules/electron/dist/Electron.app",
     "postinstall": "npm run sign-dev-electron-app"
   },

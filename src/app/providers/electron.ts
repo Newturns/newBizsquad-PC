@@ -61,12 +61,15 @@ export class Electron {
         }
     }
 
-    setAppBadge(count){
-        // macOS에서만 적용
-        this.remote.app.setBadgeCount(count);
-
-        // windows를 위한 프레임 깜빡임 이펙트
-        this.ipcRenderer.send('windowsFlashFrame',count);
+    setAppBadge(count : number){
+        if(this.remote.process.platform === 'darwin') {
+            // macOS에서만 적용
+            this.remote.app.badgeCount = count;
+            // this.remote.app.setBadgeCount(count);
+        } else {
+            // windows를 위한 프레임 깜빡임 이펙트
+            this.ipcRenderer.send('windowsFlashFrame',count);
+        }
     }
 
     notification() {

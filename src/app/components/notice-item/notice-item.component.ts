@@ -181,7 +181,7 @@ export class NoticeItemComponent extends BizComponent implements OnInit {
           this.pcLinkUrl += `&cid=${item.data.info.cid}`;
         }
         // task 일때 TASK 탭 선택
-        if(item.data.type === 'task' || item.data.type === 'calendar'){
+        if(item.data.type === 'calendar'){
           this.pcLinkUrl += `&tab=${item.data.type}`;
         }
 

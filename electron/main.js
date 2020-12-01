@@ -292,9 +292,9 @@ ipcMain.handle('test-channel',async (e,value) => {
 
 ipcMain.on('windowsFlashFrame',(event, count) => {
     if(count > 0) {
-        win.flashFrame(true);
+        mainWindow.flashFrame(true);
     } else {
-        win.flashFrame(false);
+        mainWindow.flashFrame(false);
     }
 });
 
