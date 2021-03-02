@@ -37,6 +37,14 @@ export declare type ProcessChangeUpdater = (oldItem: any, newItem: any, change: 
 
 export class Commons {
 
+  static getSquadSortString(userData : IUserData) : 'name' | 'created' {
+    let sort : 'name' | 'created' = 'name';
+    if(userData && userData.squadChatSort) {
+      sort = userData.squadChatSort.sort || sort;
+    }
+    return sort;
+  }
+
   static processChange(change: any, chatList: any[], key: string, builder: (change: any)=>any, updater?:ProcessChangeUpdater,
                        push = true){
 

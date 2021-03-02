@@ -67,6 +67,7 @@ export class ChatService extends TakeUntil{
   /***********************************************************/
   pushTargetUserIdList: string[];
 
+
   constructor(
       public bizFire : BizFireService,
       public electron: Electron,
@@ -223,7 +224,9 @@ export class ChatService extends TakeUntil{
           });
 
           // sort by latest.
-          this.chatDataMap.squadChatList.sort(Commons.sortDataByLastMessage());
+          // this.chatDataMap.squadChatList.sort(Commons.sortDataByLastMessage());
+
+
 
           this.chatDataMap.squadChatSubject.next(this.chatDataMap.squadChatList);
 

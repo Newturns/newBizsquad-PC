@@ -14,11 +14,25 @@ import {PopoverController} from '@ionic/angular';
 
 import {CreateChatPopoverComponent} from '../../components/create-chat-popover/create-chat-popover.component';
 import {TakeUntil} from '../../biz-common/take-until';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.page.html',
   styleUrls: ['./chat.page.scss'],
+  animations:[
+    trigger('openClose', [
+      state('open', style({
+        height: '*'
+      })),
+      state('closed', style({
+        height: '0'
+      })),
+      transition('open <=> closed', [
+        animate('.15s'),
+      ]),
+    ])
+  ]
 })
 export class ChatPage extends TakeUntil implements OnInit {
 
@@ -35,6 +49,9 @@ export class ChatPage extends TakeUntil implements OnInit {
 
   memberUnreadTotalCount = 0;
   squadUnreadTotalCount = 0;
+
+  // sort pipe
+  sortBy: 'name' | 'created' = 'name';
 
   constructor(private electronService : Electron,
               private chatService : ChatService,
@@ -98,8 +115,23 @@ export class ChatPage extends TakeUntil implements OnInit {
         )
         .subscribe((squadChat : IChat[]) => {
           if(squadChat && squadChat.length > 0) {
+
+            this.sortBy = Commons.getSquadSortString(this.bizFire.currentUserValue);
+
+            squadChat.filter(s => s.data.parentSid)
+            .forEach(s => {
+              const parent: IChat = squadChat.find(parent => parent.cid === s.data.parentSid);
+              if(parent){
+                parent.showChildren = false;
+                parent.children = parent.children || [];
+                if(parent.children.find((savedChat : IChat) => savedChat.cid == s.cid) == null){
+                  parent.children.push(s);
+                }
+              }
+            });
+
+            this.squadChatRooms = squadChat.filter(s => !s.data.parentSid);
             console.log("squadChatRooms",this.squadChatRooms);
-            this.squadChatRooms = squadChat;
           }
         });
   }
@@ -137,6 +169,11 @@ export class ChatPage extends TakeUntil implements OnInit {
       showBackdrop: false,
     });
     await popover.present();
+  }
+
+
+  subChatTrackBy(index: number, c: IChat){
+    return c.cid;
   }
 
 }

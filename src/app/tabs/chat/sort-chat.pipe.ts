@@ -1,21 +1,21 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import {Commons} from '../../biz-common/commons';
-import {ISquad} from '../../providers/squad.service';
+import {IChat} from '../../_models/message';
 
 @Pipe({
-  name: 'sortSquad'
+  name: 'sortChat'
 })
-export class SortSquadPipe implements PipeTransform {
+export class SortChatPipe implements PipeTransform {
 
-  transform(squadList: any[], sortBy: string): ISquad[] {
+  transform(squadList: any[], sortBy: string): IChat[] {
     if(squadList == null) return [];
 
     // default sorting
     sortBy = sortBy || 'created';
-    const sorter = sortBy === 'name' ? Commons.squadSortByName : Commons.sortDataByCreated('desc');
+    const sorter = sortBy === 'name' ? Commons.squadSortByName : Commons.sortDataByCreated();
     squadList.sort(sorter);
     // public square up
-    squadList.sort((a:ISquad, b: ISquad )=>{
+    squadList.sort((a:IChat, b: IChat)=>{
       let ret = 0;
       if(a.data.default === true){
         ret = -1;
@@ -26,7 +26,7 @@ export class SortSquadPipe implements PipeTransform {
       return ret;
     });
 
-    return squadList as ISquad[];
+    return squadList as IChat[];
   }
 
 }

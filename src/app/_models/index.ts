@@ -70,7 +70,13 @@ export interface IUserData {
   }
   user_onlineColor?: string,
   lastWebGid?: string,
-  lastPcGid?:string
+  lastPcGid?:string,
+
+  //20.12.01 추가 - 스쿼드 정렬 및 스쿼드 채팅정렬에 사용.
+  squadChatSort? : {
+    updated : any
+    sort : 'name' | 'created'
+  }
 }
 
 export interface ICustomMenu {

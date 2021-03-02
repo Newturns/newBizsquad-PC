@@ -10,6 +10,7 @@ import { ChatPage } from './chat.page';
 import {ComponentsModule} from '../../components/components.module';
 import {PipesModule} from '../../components/pipes/pipes.module';
 import {GroupColorProvider} from '../../biz-common/group-color';
+import {SortChatPipe} from './sort-chat.pipe';
 
 @NgModule({
   imports: [
@@ -20,7 +21,13 @@ import {GroupColorProvider} from '../../biz-common/group-color';
     ComponentsModule,
     PipesModule,
   ],
-  declarations: [ChatPage],
+  declarations: [
+    ChatPage,
+    SortChatPipe
+  ],
+  exports: [
+    SortChatPipe,
+  ],
   providers: [GroupColorProvider]
 })
 export class ChatPageModule {}

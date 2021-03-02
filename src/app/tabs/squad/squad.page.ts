@@ -9,6 +9,7 @@ import {ChatService} from '../../providers/chat.service';
 import {DocumentChangeAction} from '@angular/fire/firestore';
 import {SquadBuilder} from '../../biz-fire/squad';
 import {animate, state, style, transition, trigger} from '@angular/animations';
+import {Commons} from '../../biz-common/commons';
 
 @Component({
   selector: 'app-squad',
@@ -48,6 +49,8 @@ export class SquadPage implements OnInit {
   }
 
   ngOnInit() {
+
+    this.sortBy = Commons.getSquadSortString(this.bizFire.currentUserValue);
 
     this.bizFire.onLang.pipe(takeUntil(this._unsubscribeAll)).subscribe((l: any) => this.langPack = l.pack());
 
@@ -147,8 +150,14 @@ export class SquadPage implements OnInit {
 
 
   onSort(type: any){
+    if(this.sortBy !== type) {
+      this.bizFire.afStore.doc(Commons.userPath(this.bizFire.uid)).update({
+        squadChatSort : {updated : new Date(), sort : type}
+      })
+    }
     this.sortBy = type;
   }
+
   onTypeFilter(type: any){
     this.type = type;
   }
@@ -162,10 +171,13 @@ export class SquadPage implements OnInit {
 
       if(s.data.status === false) return false;
 
+      /*****
+       * 2020.10.12 자식스쿼드 즐겨찾기 아이콘 및 즐겨찾기 표시하도록 사양변경
+       *****/
       // 2020.09.04
       // 풀 스쿼드 리스트에는 부모/자식 스쿼드가 혼재되어있다.
       // 이 함수는 톱레벨 부모 스쿼드 만 표시한다.
-      if(s.data.parentSid){
+      if(forceType !== 'bookmark' && s.data.parentSid){
         // 이 스쿼드는 자식 스쿼드이므로 화면에 표시안한다.
         return false;
       }

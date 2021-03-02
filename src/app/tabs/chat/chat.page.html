@@ -39,6 +39,21 @@
       <biz-chat-item  (clickedFunc)="gotoRoom($event)" [chat]="room" bizGroupColor [hover]="true" [selected]="false"></biz-chat-item>
      </div>
     </ng-container>
+
+
+    <!--자식-->
+    <div class="pl-2 overflow-hidden"
+         [@openClose]="room.children && room.children.length > 0 && room.showChildren ? 'open': 'closed'">
+     <ng-container *ngFor="let child of room.children | sortChat: sortBy; trackBy:subChatTrackBy">
+      <div class="w-100" *ngIf="!searchKeyword || child.data.name && child.data.name.indexOf(searchKeyword.trim())>-1;">
+       <biz-chat-item [chat]="child" bizGroupColor
+                      [hover]="true"
+                      [selected]="false"
+                      (clickedFunc)="gotoRoom($event)">
+       </biz-chat-item>
+      </div>
+     </ng-container>
+    </div>
    </ng-container>
   </div>
 

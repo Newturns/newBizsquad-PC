@@ -63,7 +63,7 @@ export class Electron {
 
     setAppBadge(count : number){
         if(this.remote.process.platform === 'darwin') {
-            // macOS에서만 적용
+            // macOS에서만 적용 (뱃지카운터 표시);
             this.remote.app.badgeCount = count;
             // this.remote.app.setBadgeCount(count);
         } else {
