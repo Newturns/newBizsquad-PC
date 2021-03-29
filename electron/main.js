@@ -18,6 +18,7 @@ const _menu = require('./menu');
 // auto update //
 const { autoUpdater } = require("electron-updater");
 const logger = require('electron-log');
+const contextMenu = require('electron-context-menu');
 
 app.setAppUserModelId("com.bizsquad.ionic");
 app.setAsDefaultProtocolClient('bizsquad');
@@ -38,11 +39,8 @@ let selectChatRoom;
 //접속한 firebase dbName 저장.
 
 //dev tool on/off
-const devMode = true;
+const devMode = false;
 
-function createTray() {
-
-}
 let tray = null;
 // 트레이(최소화)상태일때의 메뉴.
 const trayContextMenu = Menu.buildFromTemplate([
@@ -205,6 +203,9 @@ ipcMain.on('createChatRoom', (event, data) => {
         chatWindows[chatRoomId].focus();
 
     } else {
+        //210311 마우스 우클릭 시 메뉴 생성.
+        contextMenu({showCopyImage: true, showCopyImageAddress: false, showServices: true});
+
         selectChatRoom = chatRoom;
 
         // console.log(selectChatRoom);
@@ -276,6 +277,11 @@ ipcMain.on('createChatRoom', (event, data) => {
     chatWindows[chatRoomId].on('closed', () => {
         chatWindows[chatRoomId] = null;
         closeChatUserDataUpdate(chatRoom.uid,chatRoomId,chatRoom.fireFunc);
+    });
+
+    chatWindows[chatRoomId].webContents.on('new-window',(e,url) => {
+        e.preventDefault();
+        shell.openExternal(url);
     });
 });
 

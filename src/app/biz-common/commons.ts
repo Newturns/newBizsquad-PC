@@ -252,7 +252,7 @@ export class Commons {
           comment = comment.replace(/\n/gi, '<br>');
         }
 
-        return checkSuccess ? `<p>${comment}</p>` : null;
+        return checkSuccess ? `${comment}` : null;
       }
 
       static makeReadFrom(members: any, myUid: string): any {

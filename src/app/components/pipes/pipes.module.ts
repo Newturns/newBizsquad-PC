@@ -2,13 +2,28 @@ import { NgModule } from '@angular/core';
 import { TimestampToDatePipe } from './timestamp-to-date/timestamp-to-date';
 import { SanitizingHtmlPipe } from './sanitizing-html/sanitizing-html';
 import { BadgeLimitPipe } from './badge-limit/badge-limit';
+import { NgxLinkifyjsModule } from 'ngx-linkifyjs';
+import {ConvertLineBreakPipe} from './convert-line-break.pipe';
+import {RemoveHtmlPipe} from './remove-html.pipe';
+
 @NgModule({
-	declarations: [TimestampToDatePipe,
+	declarations: [
+    TimestampToDatePipe,
     SanitizingHtmlPipe,
-    BadgeLimitPipe],
-	imports: [],
-	exports: [TimestampToDatePipe,
+    BadgeLimitPipe,
+    ConvertLineBreakPipe,
+    RemoveHtmlPipe,
+  ],
+	imports: [
+    NgxLinkifyjsModule.forRoot(),
+  ],
+	exports: [
+    TimestampToDatePipe,
     SanitizingHtmlPipe,
-    BadgeLimitPipe]
+    BadgeLimitPipe,
+    NgxLinkifyjsModule,
+    ConvertLineBreakPipe,
+    RemoveHtmlPipe,
+  ]
 })
 export class PipesModule {}

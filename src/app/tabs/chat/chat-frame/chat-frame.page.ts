@@ -276,7 +276,9 @@ export class ChatFramePage implements OnInit {
     let valid = this.chatForm.valid;
 
     if(valid) {
-      const text = Commons.chatInputConverter(value);
+      //0304 -이제 <p>태그 및 <br>태그를 디비에 저장하지 않음.
+      // const text = Commons.chatInputConverter(value);
+      const text = value;
 
       if(text.length > 0) {
 

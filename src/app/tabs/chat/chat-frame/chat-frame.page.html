@@ -25,7 +25,7 @@
   </div>
 </ion-content>
 
-<ion-footer no-border>
+<ion-footer no-border dropzone (dropped)="onFileDropped($event)">
   <div class="d-flex flex-row align-items-center justify-content-between p-2" *ngIf="replyMessage != null">
     <div class="d-flex align-items-center flex-grow-1">
       <ion-icon class="flex-shrink-0" name="return-right"></ion-icon>
