@@ -1,5 +1,5 @@
 import { FormControl } from '@angular/forms';
-import {IUser, IUserData} from "../_models";
+import {IBizGroup, IUser, IUserData} from '../_models';
 import {ISquad} from "../providers/squad.service";
 import {NEWCOLORS} from "./colors";
 import {IChat} from '../_models/message';
@@ -43,6 +43,27 @@ export class Commons {
       sort = userData.squadChatSort.sort || sort;
     }
     return sort;
+  }
+
+  static groupSortByIndex(groups : IBizGroup[],indexSort : string[]) : IBizGroup[] {
+    //문서 id가 담긴 배열.
+    const indexArray : string[] = indexSort;
+
+    return groups.sort((a, b) => {
+      let ret = 0;
+      if(indexArray.includes(b.gid) && indexArray.includes(a.gid)) {
+        ret = indexArray.indexOf(b.gid) < indexArray.indexOf(a.gid) ? 1 : -1;
+      }
+      return ret
+    });
+  }
+
+  static groupSortByName(a:IBizGroup, b: IBizGroup ): number{
+    let ret = 0;
+    if(a.data && a.data.team_name && b.data && b.data.team_name ){
+      ret = a.data.team_name.toLowerCase() < b.data.team_name.toLowerCase() ? -1 : 1;
+    }
+    return ret;
   }
 
   static processChange(change: any, chatList: any[], key: string, builder: (change: any)=>any, updater?:ProcessChangeUpdater,

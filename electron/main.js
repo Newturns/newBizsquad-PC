@@ -86,7 +86,11 @@ function createWindow () {
         maxWidth:600,
         maxHeight:1024,
         titleBarStyle: 'hidden-inset',
-        webPreferences: { nodeIntegration : true }
+        webPreferences: {
+            nodeIntegration : true,
+            contextIsolation: false,
+            enableRemoteModule: true
+        }
     });
 
     const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -229,7 +233,11 @@ ipcMain.on('createChatRoom', (event, data) => {
             maxHeight:1024,
             titleBarStyle: 'hidden-inset',
             opacity: 1,
-            webPreferences: { nodeIntegration : true }
+            webPreferences: {
+                nodeIntegration : true,
+                contextIsolation: false,
+                enableRemoteModule: true
+            }
         });
 
         chatWindows[chatRoomId].loadURL(url.format({

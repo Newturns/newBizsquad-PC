@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import {IBizGroup} from '../_models';
+import {DocumentSnapshot, IBizGroup, IUser, IUserData} from '../_models';
 import {BizFireService} from '../biz-fire/biz-fire';
 import {Router} from '@angular/router';
 import {Electron} from '../providers/electron';
 import {BizGroupBuilder} from '../biz-fire/biz-group';
-import {STRINGS} from '../biz-common/commons';
+import {Commons, STRINGS} from '../biz-common/commons';
 import * as firebase from 'firebase/app';
-import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {combineLatest, Subject} from 'rxjs';
+import {filter, map, takeUntil} from 'rxjs/operators';
+import {DocumentChangeAction} from '@angular/fire/firestore';
+import {Action} from '@angular/fire/database';
 @Component({
   selector: 'app-selector',
   templateUrl: './selector.page.html',
@@ -37,28 +39,39 @@ export class SelectorPage implements OnInit {
     this.electronService.setAppBadge(0);
   }
 
-  private async loadGroups() {
+  private loadGroups() {
 
-    const userData = await this.bizFire.promiseCurrentUser();
     // find all biz group
-    this.bizFire.afStore.collection(STRINGS.STRING_BIZGROUPS, ref => {
+    const bizGroupObs = this.bizFire.afStore.collection(STRINGS.STRING_BIZGROUPS, ref => {
       let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
       query = query.where(STRINGS.MEMBER_ARRAY, 'array-contains', this.bizFire.uid);
       query = query.where('status', '==', true);
       return query;
     }).snapshotChanges()
-        .pipe(this.bizFire.takeUntilUserSignOut,takeUntil(this._unsubscribeAll))
-        .subscribe((changes: any[]) => {
-          this.groups = changes.map(c=>(BizGroupBuilder.buildWithOnStateChangeAngularFire(c, this.bizFire.uid)));
+        .pipe(
+            map((changes :DocumentChangeAction<any>[]) =>
+                changes.map(c=>(BizGroupBuilder.buildWithOnStateChangeAngularFire(c, this.bizFire.uid)))
+            )
+        )
 
-          //그룹이 없는 경우 그룹선택,작성 페이지로 이동
-          if(this.groups.length === 0){
-
-            //  그룹이 없을 경우 액션.
-            console.error('그룹이 현재 없슴.  그룹생성 ??');
-
+    combineLatest(bizGroupObs,this.bizFire.currentUser)
+      .pipe(
+        this.bizFire.takeUntilUserSignOut,
+        takeUntil(this._unsubscribeAll)
+      ).subscribe(([groups,userData]) => {
+        if(groups && groups.length > 0) {
+          if(userData && userData.groupIndex && userData.groupIndex.length > 0) {
+            this.groups = Commons.groupSortByIndex(groups,userData.groupIndex);
+            console.log("this.groups",this.groups);
+          } else {
+            this.groups = groups.sort(Commons.groupSortByName);
+            console.log("not groupIndex",this.groups);
           }
-        });
+        } else {
+          //  그룹이 없을 경우 액션.
+          console.error('그룹이 현재 없슴.  그룹생성 ??');
+        }
+    });
   }
 
 

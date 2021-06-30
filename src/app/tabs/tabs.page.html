@@ -1,15 +1,13 @@
 <ion-tabs (ionTabsWillChange)="changeTabs($event)">
 
   <ion-header no-border class="drag">
-    <ion-toolbar class="drag">
-      <ion-buttons slot="start" class="no-drag">
-        <ion-button fill="clear" size="small" (click)="groupSelectPage()">
-          <span class="groupName" *ngIf="group">{{ group.data.team_name }}</span>
-          <ion-icon class="font-14" name="md-arrow-dropdown"></ion-icon>
-        </ion-button>
-      </ion-buttons>
+    <ion-toolbar class="drag d-flex">
+      <ion-label slot="start" class="d-flex flex-grow-1 align-items-center px-2 no-drag pointer text-truncate" (click)="groupSelectPage()">
+        <span class="groupName" *ngIf="group">{{ group.data.team_name }}</span>
+        <ion-icon class="font-14 flex-shrink-0" name="md-arrow-dropdown"></ion-icon>
+      </ion-label>
 <!--      <div class="new-badge drag d-flex text-white align-items-center justify-content-center" *ngIf="newNotifyCount > 0">N</div>-->
-      <ion-buttons slot="end" class="no-drag">
+      <ion-buttons slot="end" class="no-drag flex-shrink-0">
         <ion-button class="ion-no-padding" fill="clear" size="small" slot="icon-only" color="light" (click)="windowMimimize()">
           <img src="assets/imgs/renewal/Icon_Outline_minimize.svg">
         </ion-button>

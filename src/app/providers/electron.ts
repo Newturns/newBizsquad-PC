@@ -20,11 +20,10 @@ export class Electron {
     opacity = 0;
 
     get isElectron(): boolean {
-        return window && (window as any).process && (window as any).process.type;
+        return !!(window && (window as any).process && (window as any).process.type);
     }
 
     constructor(private configService: ConfigService,) {
-
         // Conditional imports
         // angula 6 부터 fs 에러가 발생. 아래와같이 코드 수정.
         if (this.isElectron) {
@@ -32,10 +31,11 @@ export class Electron {
             this.webFrame = (window as any).require('electron').webFrame;
             this.remote = (window as any).require('electron').remote;
             this.clipboard = (window as any).require('electron').clipboard;
-
             this.childProcess = (window as any).require('child_process');
             this.fs = (window as any).require('fs');
         }
+
+        console.log("remote",this.remote);
     }
 
     windowHide(){
