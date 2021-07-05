@@ -5,9 +5,10 @@ import {Commons} from "../../biz-common/commons";
 import {BizFireService} from '../../biz-fire/biz-fire';
 import {CacheService} from '../../core/cache/cache';
 import {Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {filter, takeUntil} from 'rxjs/operators';
 import {TranslateService} from '../../providers/translate.service';
 import {ChatService} from '../../providers/chat.service';
+import {NgxLinkifyOptions} from 'ngx-linkifyjs';
 
 
 @Component({
@@ -31,6 +32,9 @@ export class MessageBalloonComponent implements OnInit {
 
   @Input()
   sameUser : boolean = false;
+
+  @Input()
+  showMoreBtn : boolean = false;
 
   @Output()
   initScrollBottomForTranslation = new EventEmitter<boolean>();
@@ -62,6 +66,27 @@ export class MessageBalloonComponent implements OnInit {
 
   private _unsubscribeAll;
 
+  options: NgxLinkifyOptions = {
+    attributes: null,
+    className: 'text-yellow',
+    events: null,
+    format: function (value, type) {
+      return value;
+    },
+    formatHref: function (href, type) {
+      return href;
+    },
+    ignoreTags: [],
+    nl2br: true,
+    tagName: 'a',
+    target: {
+      url: '_blank'
+    },
+    validate: true
+  };
+
+  showMoreMessage : IMessage;
+
   constructor(
     private translateService: TranslateService,
     private bizFire : BizFireService,
@@ -73,6 +98,14 @@ export class MessageBalloonComponent implements OnInit {
   ngOnInit() {
     this.bizFire.currentUser.pipe(takeUntil(this._unsubscribeAll)).subscribe((user) => {
       this.userTranslationsFlg = user.autoTranslation;
+    });
+
+    this.chatService.showMoreChat
+    .pipe(
+      takeUntil(this._unsubscribeAll),
+    )
+    .subscribe((msg : IMessage) => {
+      this.showMoreMessage = msg;
     });
   }
 
@@ -165,11 +198,18 @@ export class MessageBalloonComponent implements OnInit {
   }
 
   getReplay(msg: IMessageData){
+    this.chatService.showMoreChat.next(null);
     this.messageReply.emit(msg);
   }
 
   imgLoad() {
     this.imgDidLoad.emit(true);
+  }
+
+  showMoreMenu(e:any,message : IMessage) {
+    e.stopPropagation();
+    this.showMoreBtn = !this.showMoreBtn
+    this.chatService.showMoreChat.next(message);
   }
 
 }

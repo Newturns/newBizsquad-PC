@@ -1,16 +1,24 @@
 <ng-container *ngIf="!message.data.isNotice; else notice">
 
   <ng-container *ngIf="isMyMessage">
-    <div class="d-flex justify-content-end">
-      <div class="d-flex flex-column justify-content-center">
+    <div class="d-flex justify-content-end balloon-frame" (click)="showMoreBtn = false">
+      <div class="d-flex flex-column justify-content-end">
+        <div class="d-flex align-items-center justify-content-end">
+          <div class="position-relative">
+            <ion-icon class="pointer more-btn" name="more" (click)="showMoreMenu($event,message)"></ion-icon>
+            <div class="popup" *ngIf="showMoreBtn && showMoreMessage && showMoreMessage.mid === message.mid">
+              <ul><li (click)="getReplay(message.data)">Reply</li></ul>
+            </div>
+          </div>
+          <div class="read-count text-right">{{readCount}}</div>
+        </div>
         <div class="font-12 text-muted"> {{message.data.created | timestampToDate | date: 'h:mma'}}</div>
-        <div class="read-count text-right">{{readCount}}</div>
 <!--        <div class="d-flex justify-content-center">-->
 <!--          <i class="material-icons">more_horiz</i>-->
 <!--        </div>-->
       </div>
 
-      <div class="myMessage m-2 p-1" (click)="getReplay(message.data)">
+      <div class="myMessage m-2 p-1">
         <biz-message-reply *ngIf="message.data.reply" [message]="message.data.reply"></biz-message-reply>
         <div class="p-2" *ngIf="message.data.message.files &&  message.data.message.files.length > 0; else myText">
           <biz-chat-attach [files]="message.data.message.files" [isMyMessage]="isMyMessage" (imgDidLoad)="imgLoad()"></biz-chat-attach>
@@ -24,7 +32,7 @@
   </ng-container>
 
   <ng-container *ngIf="!isMyMessage">
-    <div class="d-flex align-items-start ml-3">
+    <div class="d-flex align-items-start ml-3 balloon-frame" (click)="showMoreBtn = false">
       <!--childContentPadding 추가 됨.-->
       <ng-container *ngIf="!sameUser && currentUserData;">
         <app-avatar-button [user]="currentUserData" [displayNameOn]="false">
@@ -49,7 +57,7 @@
 
         <div class="d-flex justify-content-start">
 
-          <div class="otherMessage p-1" [ngClass]="groupColorBalloon()" (click)="getReplay(message.data)">
+          <div class="otherMessage p-1" [ngClass]="groupColorBalloon()">
             <biz-message-reply *ngIf="message.data.reply" [message]="message.data.reply"></biz-message-reply>
             <div class="p-2" *ngIf="message.data.message.files &&  message.data.message.files.length > 0; else otherText">
               <biz-chat-attach [files]="message.data.message.files" [isMyMessage]="isMyMessage" (imgDidLoad)="imgLoad()">
@@ -57,7 +65,7 @@
             </div>
             <ng-template #otherText>
               <div class="d-flex flex-column">
-                <div class="font-14 px-2 pt-2" [innerHTML]="text | convertLineBreak | removeHtmlTag | linkify: {nl2br : true}"></div>
+                <div class="font-14 px-2 pt-2" [innerHTML]="text | convertLineBreak | removeHtmlTag | linkify: options"></div>
                 <div class="px-2 pb-2">
                   <biz-google-trans-text *ngIf="userTranslationsFlg"
                                          [message]="message"
@@ -69,20 +77,26 @@
             </ng-template>
           </div>
 
-          <div class="d-flex flex-column justify-content-center ml-2">
+          <div class="d-flex flex-column justify-content-end ml-2">
+            <div class="position-relative">
+              <ion-icon class="pointer more-btn" name="more" (click)="showMoreMenu($event,message)"></ion-icon>
+              <div class="popup" *ngIf="showMoreBtn && showMoreMessage && showMoreMessage.mid === message.mid">
+                <ul><li (click)="getReplay(message.data)">Reply</li></ul>
+              </div>
+            </div>
+<!--            <div class="read-count">-->
+<!--              <ng-container *ngIf="singleChatRoom">-->
+<!--                &lt;!&ndash;1:1채팅에서는 읽은이가 나밖에 없으므로 아무표시 안함&ndash;&gt;-->
+<!--              </ng-container>-->
+<!--              <ng-container *ngIf="!singleChatRoom">-->
+<!--                <ng-container *ngIf="readCount">-->
+<!--                  {{readCount}}-->
+<!--                </ng-container>-->
+<!--              </ng-container>-->
+<!--            </div>-->
+
             <div class="font-12 text-muted">
               {{message.data.created | timestampToDate | date: "h:mma"}}
-            </div>
-            <div class="read-count">
-
-              <ng-container *ngIf="singleChatRoom">
-                <!--1:1채팅에서는 읽은이가 나밖에 없으므로 아무표시 안함-->
-              </ng-container>
-              <ng-container *ngIf="!singleChatRoom">
-                <ng-container *ngIf="readCount">
-                  {{readCount}}
-                </ng-container>
-              </ng-container>
             </div>
 
           </div>

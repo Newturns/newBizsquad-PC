@@ -27,6 +27,8 @@ export class ChatService extends TakeUntil{
 
   var_chatRooms: any;
 
+  showMoreChat = new BehaviorSubject<IMessage>(null);
+
   // onChatRoomListChanged = new BehaviorSubject<IChat[]>(null);
 
   onSelectChatRoom = new BehaviorSubject<IChat>(null);

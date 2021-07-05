@@ -648,4 +648,8 @@ export class ChatFramePage implements OnInit {
       }
     }
   }
+
+  chatMoreClose() {
+    this.chatService.showMoreChat.next(null);
+  }
 }
