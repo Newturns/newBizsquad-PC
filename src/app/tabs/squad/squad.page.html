@@ -35,7 +35,7 @@
 
     <!-- 에자일 스쿼드  -->
     <div>
-      <div class="squad-list-title mb-2">{{langPack['my_squad_count_label']}}</div>
+      <div class="squad-list-title mb-2">{{langPack['project']}}</div>
       <ng-container *ngFor="let s of allSquadList | filterSquad: filterGeneral('agile') | sortSquad: sortBy; trackBy: subSquadTrackBy">
         <div class="mb-1">
           <biz-squad-item [squad]="s"

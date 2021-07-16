@@ -39,7 +39,7 @@ let selectChatRoom;
 //접속한 firebase dbName 저장.
 
 //dev tool on/off
-const devMode = false;
+const devMode = true;
 
 let tray = null;
 // 트레이(최소화)상태일때의 메뉴.
